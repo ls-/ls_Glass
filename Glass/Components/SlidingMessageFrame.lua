@@ -185,16 +185,17 @@ function SlidingMessageFrameMixin:Init(chatFrame)
   end, true)
 
   -- Hide the default chat frame and show the sliding message frame instead
-  self:RawHook(chatFrame, "Show", function ()
-    self:Show()
-  end, true)
+    self:RawHook(chatFrame, "Show", function ()
+      self:Show()
+    end, true)
+
+  self:SetShown(chatFrame:IsShown())
+  chatFrame:Hide()
 
   self:RawHook(chatFrame, "Hide", function (f)
     self.hooks[chatFrame].Hide(f)
     self:Hide()
   end, true)
-
-  chatFrame:Hide()
 
   -- Load any messages already in the chat frame to Glass
   if chatFrame == DEFAULT_CHAT_FRAME then
