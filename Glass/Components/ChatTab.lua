@@ -54,7 +54,8 @@ function ChatTabMixin:Init(slidingMessageFrame)
   self:SetNormalFontObject("GlassChatDockFont")
   self.Text:ClearAllPoints()
   self.Text:SetPoint("LEFT", Constants.TEXT_XPADDING, 0)
-  self:SetWidth(self.Text:GetStringWidth() + Constants.TEXT_XPADDING * 2)
+  self.Text:SetWidth(self.Text:GetUnboundedStringWidth())
+  self:SetWidth(self.Text:GetUnboundedStringWidth() + Constants.TEXT_XPADDING * 2)
 
   if not self:IsHooked(self, "SetAlpha") then
     self:RawHook(self, "SetAlpha", function (alpha)
