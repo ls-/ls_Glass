@@ -56,7 +56,7 @@ function MoverDialogMixin:Init()
   self.desc:SetPoint("BOTTOMRIGHT", -18, 48)
   self.desc:SetText("Chat frame unlocked. You can now drag the chat frame to reposition it.")
 
-  self.lockButton = CreateFrame("Button", nil, self, "OptionsButtonTemplate")
+  self.lockButton = CreateFrame("Button", nil, self, "UIPanelButtonTemplate")
   self.lockButton:SetText("Lock")
   self.lockButton:SetScript("OnClick", function()
     Core:Dispatch(LockMover())

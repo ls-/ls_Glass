@@ -164,14 +164,14 @@ function News:OnEnable()
 
   for _, release in ipairs(CHANGELOG) do
     local releaseLabel = AceGUI:Create("Label")
-    releaseLabel:SetFont('Fonts\\FRIZQT__.TTF', baseSize);
+    releaseLabel:SetFont('Fonts\\FRIZQT__.TTF', baseSize, '');
     releaseLabel:SetRelativeWidth(1)
     releaseLabel:SetText("|c00DFBA69"..release.name.."|r")
     scrollFrame:AddChild(releaseLabel)
 
     for i, item in ipairs(release.items) do
       local itemLabel = AceGUI:Create("Label")
-      itemLabel:SetFont('Fonts\\FRIZQT__.TTF', baseSize);
+      itemLabel:SetFont('Fonts\\FRIZQT__.TTF', baseSize, '');
       itemLabel:SetRelativeWidth(1)
       itemLabel.label:SetSpacing(3.2)
       itemLabel.label:SetAlpha(0.95)
