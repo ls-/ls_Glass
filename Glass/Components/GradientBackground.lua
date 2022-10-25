@@ -13,10 +13,10 @@ function GradientBackgroundMixin:SetGradientBackground(leftWidth, rightWidth, co
     self.leftBg:SetColorTexture(1, 1, 1, 1)
   end
   self.leftBg:SetWidth(leftWidth)
-  self.leftBg:SetGradientAlpha(
+  self.leftBg:SetGradient(
     "HORIZONTAL",
-    color.r, color.g, color.b, 0,
-    color.r, color.g, color.b, opacity
+    CreateColor(color.r, color.g, color.b, 0),
+    CreateColor(color.r, color.g, color.b, opacity)
   )
 
   if self.rightBg == nil then
@@ -26,10 +26,10 @@ function GradientBackgroundMixin:SetGradientBackground(leftWidth, rightWidth, co
     self.rightBg:SetColorTexture(1, 1, 1, 1)
   end
   self.rightBg:SetWidth(rightWidth)
-  self.rightBg:SetGradientAlpha(
+  self.rightBg:SetGradient(
     "HORIZONTAL",
-    color.r, color.g, color.b, opacity,
-    color.r, color.g, color.b, 0
+    CreateColor(color.r, color.g, color.b, opacity),
+    CreateColor(color.r, color.g, color.b, 0)
   )
 
   if self.centerBg == nil then

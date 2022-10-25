@@ -33,7 +33,7 @@ local UNLOCK_WINDOW = UNLOCK_WINDOW
 
 local tabTexs = {
   '',
-  'Selected',
+  'Active',
   'Highlight'
 }
 
@@ -45,16 +45,17 @@ function ChatTabMixin:Init(slidingMessageFrame)
   local dropDown = _G[self.chatFrame:GetName().."TabDropDown"]
 
   for _, texName in ipairs(tabTexs) do
-    _G[self:GetName()..texName..'Left']:SetTexture()
-    _G[self:GetName()..texName..'Middle']:SetTexture()
-    _G[self:GetName()..texName..'Right']:SetTexture()
+      self[texName .. "Left"]:SetTexture(0)
+      self[texName .. "Middle"]:SetTexture(0)
+      self[texName .. "Right"]:SetTexture(0)
   end
 
   self:SetHeight(Constants.DOCK_HEIGHT)
   self:SetNormalFontObject("GlassChatDockFont")
   self.Text:ClearAllPoints()
   self.Text:SetPoint("LEFT", Constants.TEXT_XPADDING, 0)
-  self:SetWidth(self.Text:GetStringWidth() + Constants.TEXT_XPADDING * 2)
+  self.Text:SetWidth(self.Text:GetUnboundedStringWidth())
+  self:SetWidth(self.Text:GetUnboundedStringWidth() + Constants.TEXT_XPADDING * 2)
 
   if not self:IsHooked(self, "SetAlpha") then
     self:RawHook(self, "SetAlpha", function (alpha)
