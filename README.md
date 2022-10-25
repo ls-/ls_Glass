@@ -1,8 +1,9 @@
-# Unmaintained
+# Disclaimer
 
-### Unfortunately, I do not play World of Warcraft anymore, so I can no longer maintain this addon.
-
-Please feel free to fork and rebrand if you want to take this on. 🙂
+This fork is largely for my own personal use and experiments. I'm still not sure
+about taking the addon over because it'll require a pretty substantial rewrite
+to make it not break anything in the default UI. If someone else takes it over
+in the meantime, no biggie 😁
 
 ---
 
