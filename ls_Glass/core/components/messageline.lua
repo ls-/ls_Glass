@@ -38,22 +38,22 @@ function MessageLineMixin:Init()
   self:SetHyperlinksEnabled(true)
 
   self:SetScript("OnHyperlinkClick", function (_, link, text, button)
-    Core:Dispatch(HyperlinkClick({link, text, button}))
+    E:Dispatch(HyperlinkClick({link, text, button}))
   end)
 
   self:SetScript("OnHyperlinkEnter", function (_, link, text)
     if Core.db.profile.mouseOverTooltips then
-      Core:Dispatch(HyperlinkEnter({link, text}))
+      E:Dispatch(HyperlinkEnter({link, text}))
     end
   end)
 
   self:SetScript("OnHyperlinkLeave", function (_, link)
-    Core:Dispatch(HyperlinkLeave(link))
+    E:Dispatch(HyperlinkLeave(link))
   end)
 
   if self.subscriptions == nil then
     self.subscriptions = {
-      Core:Subscribe(UPDATE_CONFIG, function (key)
+      E:Subscribe(UPDATE_CONFIG, function (key)
         if key == "chatFadeInDuration" then
           self:SetFadeInDuration(Core.db.profile.chatFadeInDuration)
         end

@@ -115,7 +115,7 @@ function ChatTabMixin:Init(slidingMessageFrame)
       info.text = UNLOCK_WINDOW
       info.notCheckable = 1
       info.func = function()
-        Core:Dispatch(UnlockMover())
+        E:Dispatch(UnlockMover())
       end
       UIDropDownMenu_AddButton(info)
 
@@ -164,7 +164,7 @@ function ChatTabMixin:Init(slidingMessageFrame)
   -- Listeners
   if self.subscriptions == nil then
     self.subscriptions = {
-      Core:Subscribe(UPDATE_CONFIG, function (key)
+      E:Subscribe(UPDATE_CONFIG, function (key)
         if key == "frameWidth" or key == "frameHeight" or key == "font" or key == "messageFontSize" then
           self:SetWidth()
         end

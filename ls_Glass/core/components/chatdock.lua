@@ -61,12 +61,12 @@ function ChatDockMixin:Init(parent)
 
   if self.subscriptions == nil then
     self.subscriptions = {
-      Core:Subscribe(MOUSE_ENTER, function ()
+      E:Subscribe(MOUSE_ENTER, function ()
         -- Don't hide tabs when mouse is over
         self.state.mouseOver = true
         self:Show()
       end),
-      Core:Subscribe(MOUSE_LEAVE, function ()
+      E:Subscribe(MOUSE_LEAVE, function ()
         -- Hide chat tab when mouse leaves
         self.state.mouseOver = false
 
@@ -79,7 +79,7 @@ function ChatDockMixin:Init(parent)
           self:Hide()
         end
       end),
-      Core:Subscribe(UPDATE_CONFIG, function (key)
+      E:Subscribe(UPDATE_CONFIG, function (key)
         if key == "frameWidth" then
           self:SetWidth(Core.db.profile.frameWidth)
 

@@ -39,7 +39,7 @@ function MoverFrameMixin:Init()
 
   if self.subscriptions == nil then
     self.subscriptions = {
-      Core:Subscribe(LOCK_MOVER, function ()
+      E:Subscribe(LOCK_MOVER, function ()
         self:Hide()
         self:EnableMouse(false)
         self:SetMovable(false)
@@ -51,14 +51,14 @@ function MoverFrameMixin:Init()
           yOfs = yOfs
         }
 
-        Core:Dispatch(SaveFramePosition(position))
+        E:Dispatch(SaveFramePosition(position))
       end),
-      Core:Subscribe(UNLOCK_MOVER, function ()
+      E:Subscribe(UNLOCK_MOVER, function ()
         self:Show()
         self:EnableMouse(true)
         self:SetMovable(true)
       end),
-      Core:Subscribe(UPDATE_CONFIG, function (key)
+      E:Subscribe(UPDATE_CONFIG, function (key)
         if (key == "frameWidth") then
           self:SetWidth(Core.db.profile.frameWidth)
         end

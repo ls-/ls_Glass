@@ -56,7 +56,7 @@ function Fonts:OnEnable()
   self.fonts.GlassEditBoxFont:SetJustifyV("MIDDLE")
   self.fonts.GlassEditBoxFont:SetSpacing(3)
 
-  Core:Subscribe(UPDATE_CONFIG, function (key)
+  E:Subscribe(UPDATE_CONFIG, function (key)
     if key == "font" or key == "messageFontSize" then
       self.fonts.GlassMessageFont:SetFont(
         LSM:Fetch(LSM.MediaType.FONT, Core.db.profile.font),

@@ -194,7 +194,7 @@ function News:OnEnable()
     end
   end
 
-  Core:Subscribe(OPEN_NEWS, function ()
+  E:Subscribe(OPEN_NEWS, function ()
     frame:Show()
   end)
 end

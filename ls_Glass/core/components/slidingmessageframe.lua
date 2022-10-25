@@ -210,7 +210,7 @@ function SlidingMessageFrameMixin:Init(chatFrame)
   -- Listeners
   if self.subscriptions == nil then
     self.subscriptions = {
-      Core:Subscribe(MOUSE_ENTER, function ()
+      E:Subscribe(MOUSE_ENTER, function ()
         -- Don't hide chats when mouse is over
         self.state.mouseOver = true
 
@@ -224,7 +224,7 @@ function SlidingMessageFrameMixin:Init(chatFrame)
           end
         end
       end),
-      Core:Subscribe(MOUSE_LEAVE, function ()
+      E:Subscribe(MOUSE_LEAVE, function ()
         -- Hide chats when mouse leaves
         self.state.mouseOver = false
 
@@ -234,7 +234,7 @@ function SlidingMessageFrameMixin:Init(chatFrame)
           message:HideDelay(Core.db.profile.chatHoldTime)
         end
       end),
-      Core:Subscribe(UPDATE_CONFIG, function (key)
+      E:Subscribe(UPDATE_CONFIG, function (key)
         if self.state.isCombatLog == false then
           if (
             key == "font" or

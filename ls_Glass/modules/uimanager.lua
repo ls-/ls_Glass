@@ -33,7 +33,7 @@ function UIManager:OnEnable()
 	self.container:SetPoint("TOPLEFT", self.moverFrame)
 
 	-- Chat dock
-	-- self.dock = CreateChatDock(self.container)
+	self.dock = E:CreateTabHeader(self.container)
 
 	-- SlidingMessageFrames
 	-- self.slidingMessageFramePool = CreateSlidingMessageFramePool(self.container)

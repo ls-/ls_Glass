@@ -18,9 +18,9 @@ local container_proto = {
 function container_proto:OnFrame()
 	if self.state.mouseOver ~= MouseIsOver(self) then
 		if not self.state.mouseOver then
-			Core:Dispatch(MouseEnter())
+			E:Dispatch(MouseEnter())
 		else
-			Core:Dispatch(MouseLeave())
+			E:Dispatch(MouseLeave())
 		end
 
 		self.state.mouseOver = not self.state.mouseOver
@@ -37,7 +37,7 @@ function E:CreateMainContainer(name, parent)
 	frame.bg:SetColorTexture(0, 0.6, 0.3, 0.3)
 	frame.bg:SetAllPoints()
 
-	Core:Subscribe(UPDATE_CONFIG, function (key)
+	E:Subscribe(UPDATE_CONFIG, function (key)
 		if key == "frameWidth" then -- TODO
 			frame:SetWidth(C.db.profile.width)
 		end

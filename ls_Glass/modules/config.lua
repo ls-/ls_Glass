@@ -52,7 +52,7 @@ function C:OnEnable()
                   name = "What’s new",
                   type = "execute",
                   func = function()
-                    Core:Dispatch(OpenNews())
+                    E:Dispatch(OpenNews())
                   end,
                   order = 2.2,
                 },
@@ -67,7 +67,7 @@ function C:OnEnable()
                   name = "Unlock frame",
                   type = "execute",
                   func = function()
-                    Core:Dispatch(UnlockMover())
+                    E:Dispatch(UnlockMover())
                   end,
                   order = 2.4,
                 },
@@ -91,7 +91,7 @@ function C:OnEnable()
                   end,
                   set = function(info, input)
                     Core.db.profile.font = input
-                    Core:Dispatch(UpdateConfig("font"))
+                    E:Dispatch(UpdateConfig("font"))
                   end,
                 },
                 fontFlags = {
@@ -104,7 +104,7 @@ function C:OnEnable()
                   end,
                   set = function (_, input)
                     Core.db.profile.fontFlags = input
-                    Core:Dispatch(UpdateConfig("font"))
+                    E:Dispatch(UpdateConfig("font"))
                   end
                 }
               },
@@ -131,7 +131,7 @@ function C:OnEnable()
                   end,
                   set = function (info, input)
                     Core.db.profile.frameWidth = input
-                    Core:Dispatch(UpdateConfig("frameWidth"))
+                    E:Dispatch(UpdateConfig("frameWidth"))
                   end
                 },
                 frameHeight = {
@@ -149,7 +149,7 @@ function C:OnEnable()
                   end,
                   set = function (info, input)
                     Core.db.profile.frameHeight = input
-                    Core:Dispatch(UpdateConfig("frameHeight"))
+                    E:Dispatch(UpdateConfig("frameHeight"))
                   end
                 },
                 frameXOfs = {
@@ -167,7 +167,7 @@ function C:OnEnable()
                   end,
                   set = function (_, input)
                     Core.db.profile.positionAnchor.xOfs = input
-                    Core:Dispatch(UpdateConfig("framePosition"))
+                    E:Dispatch(UpdateConfig("framePosition"))
                   end
                 },
                 frameYOfs = {
@@ -185,7 +185,7 @@ function C:OnEnable()
                   end,
                   set = function (_, input)
                     Core.db.profile.positionAnchor.yOfs = input
-                    Core:Dispatch(UpdateConfig("framePosition"))
+                    E:Dispatch(UpdateConfig("framePosition"))
                   end
                 },
                 frameAnchor = {
@@ -199,7 +199,7 @@ function C:OnEnable()
                   end,
                   set = function (_, input)
                     Core.db.profile.positionAnchor.point = input
-                    Core:Dispatch(UpdateConfig("framePosition"))
+                    E:Dispatch(UpdateConfig("framePosition"))
                   end
                 },
               }
@@ -231,7 +231,7 @@ function C:OnEnable()
                   end,
                   set = function (info, input)
                     Core.db.profile.editBoxFontSize = input
-                    Core:Dispatch(UpdateConfig("editBoxFontSize"))
+                    E:Dispatch(UpdateConfig("editBoxFontSize"))
                   end,
                   order = 1.1,
                 },
@@ -250,7 +250,7 @@ function C:OnEnable()
                   end,
                   set = function (info, input)
                     Core.db.profile.editBoxBackgroundOpacity = input
-                    Core:Dispatch(UpdateConfig("editBoxBackgroundOpacity"))
+                    E:Dispatch(UpdateConfig("editBoxBackgroundOpacity"))
                   end,
                 },
               }
@@ -280,7 +280,7 @@ function C:OnEnable()
                     else
                       Core.db.profile.editBoxAnchor.yOfs = -5
                     end
-                    Core:Dispatch(UpdateConfig("editBoxAnchor"))
+                    E:Dispatch(UpdateConfig("editBoxAnchor"))
                   end
                 },
                 editBoxAnchorYOfs = {
@@ -298,7 +298,7 @@ function C:OnEnable()
                   end,
                   set = function (info, input)
                     Core.db.profile.editBoxAnchor.yOfs = input
-                    Core:Dispatch(UpdateConfig("editBoxAnchor"))
+                    E:Dispatch(UpdateConfig("editBoxAnchor"))
                   end
                 }
               },
@@ -330,7 +330,7 @@ function C:OnEnable()
                   end,
                   set = function (info, input)
                     Core.db.profile.messageFontSize = input
-                    Core:Dispatch(UpdateConfig("messageFontSize"))
+                    E:Dispatch(UpdateConfig("messageFontSize"))
                   end,
                   order = 1.2,
                 },
@@ -349,7 +349,7 @@ function C:OnEnable()
                   end,
                   set = function (info, input)
                     Core.db.profile.chatBackgroundOpacity = input
-                    Core:Dispatch(UpdateConfig("chatBackgroundOpacity"))
+                    E:Dispatch(UpdateConfig("chatBackgroundOpacity"))
                   end,
                 },
                 messageLeading = {
@@ -366,7 +366,7 @@ function C:OnEnable()
                   end,
                   set = function (info, input)
                     Core.db.profile.messageLeading = input
-                    Core:Dispatch(UpdateConfig("messageLeading"))
+                    E:Dispatch(UpdateConfig("messageLeading"))
                   end,
                   order = 1.4,
                 },
@@ -384,7 +384,7 @@ function C:OnEnable()
                   end,
                   set = function (info, input)
                     Core.db.profile.messageLinePadding = input
-                    Core:Dispatch(UpdateConfig("messageLinePadding"))
+                    E:Dispatch(UpdateConfig("messageLinePadding"))
                   end,
                   order = 1.5,
                 },
@@ -442,7 +442,7 @@ function C:OnEnable()
                   end,
                   set = function (_, input)
                     Core.db.profile.chatFadeInDuration = input
-                    Core:Dispatch(UpdateConfig("chatFadeInDuration"))
+                    E:Dispatch(UpdateConfig("chatFadeInDuration"))
                   end
                 },
                 fadeOutDuration = {
@@ -461,7 +461,7 @@ function C:OnEnable()
                   end,
                   set = function (_, input)
                     Core.db.profile.chatFadeOutDuration = input
-                    Core:Dispatch(UpdateConfig("chatFadeOutDuration"))
+                    E:Dispatch(UpdateConfig("chatFadeOutDuration"))
                   end
                 },
                 slideInDuration = {
@@ -499,7 +499,7 @@ function C:OnEnable()
                   end,
                   set = function (info, input)
                     Core.db.profile.indentWordWrap = input
-                    Core:Dispatch(UpdateConfig("indentWordWrap"))
+                    E:Dispatch(UpdateConfig("indentWordWrap"))
                   end,
                 },
                 mouseOverTooltips = {
@@ -550,14 +550,14 @@ function C:OnEnable()
   Core.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
   Core.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 
-  Core:Subscribe(SAVE_FRAME_POSITION, function (position)
+  E:Subscribe(SAVE_FRAME_POSITION, function (position)
     Core.db.profile.positionAnchor = position
   end)
 end
 
 function C:OnSlashCommand(input)
   if input == "lock" then
-    Core:Dispatch(UnlockMover())
+    E:Dispatch(UnlockMover())
   else
     AceConfigDialog:Open("Glass")
   end
@@ -565,22 +565,22 @@ end
 
 function C:RefreshConfig()
   -- General
-  Core:Dispatch(UpdateConfig("font"))
-  Core:Dispatch(UpdateConfig("frameHeight"))
-  Core:Dispatch(UpdateConfig("frameWidth"))
-  Core:Dispatch(UpdateConfig("framePosition"))
+  E:Dispatch(UpdateConfig("font"))
+  E:Dispatch(UpdateConfig("frameHeight"))
+  E:Dispatch(UpdateConfig("frameWidth"))
+  E:Dispatch(UpdateConfig("framePosition"))
 
   -- Edit box
-  Core:Dispatch(UpdateConfig("editBoxFontSize"))
-  Core:Dispatch(UpdateConfig("editBoxBackgroundOpacity"))
-  Core:Dispatch(UpdateConfig("editBoxAnchor"))
+  E:Dispatch(UpdateConfig("editBoxFontSize"))
+  E:Dispatch(UpdateConfig("editBoxBackgroundOpacity"))
+  E:Dispatch(UpdateConfig("editBoxAnchor"))
 
   -- Messages
-  Core:Dispatch(UpdateConfig("messageFontSize"))
-  Core:Dispatch(UpdateConfig("chatBackgroundOpacity"))
-  Core:Dispatch(UpdateConfig("chatFadeInDuration"))
-  Core:Dispatch(UpdateConfig("chatFadeOutDuration"))
+  E:Dispatch(UpdateConfig("messageFontSize"))
+  E:Dispatch(UpdateConfig("chatBackgroundOpacity"))
+  E:Dispatch(UpdateConfig("chatFadeInDuration"))
+  E:Dispatch(UpdateConfig("chatFadeOutDuration"))
 
   -- For things that don't update using the config frame e.g. frame position
-  Core:Dispatch(RefreshConfig())
+  E:Dispatch(RefreshConfig())
 end

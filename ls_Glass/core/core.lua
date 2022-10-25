@@ -3,6 +3,7 @@ local C, L = ns.C, ns.L
 
 -- Lua
 local _G = getfenv(0)
+local t_insert = _G.table.insert
 
 -- Mine
 local E = {}
@@ -146,5 +147,29 @@ do
 		end
 
 		return result
+	end
+end
+
+------------
+-- EVENTS --
+------------
+
+do
+	local listeners = {}
+
+	function E:Subscribe(messageType, listener)
+		if not listeners[messageType] then
+			listeners[messageType] = {}
+		end
+
+		t_insert(listeners[messageType], listener)
+	end
+
+	function E:Dispatch(messageType, payload)
+		if not listeners[messageType] then return end
+
+		for _, listener in ipairs(listeners[messageType]) do
+			listener(payload)
+		end
 	end
 end

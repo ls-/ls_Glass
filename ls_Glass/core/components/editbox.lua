@@ -106,7 +106,7 @@ function EditBoxMixin:Init(parent)
     outroAg:Play()
   end, true)
 
-  Core:Subscribe(UPDATE_CONFIG, function (key)
+  E:Subscribe(UPDATE_CONFIG, function (key)
     if key == "font" or key == "editBoxFontSize" then
       Ypadding = self.header:GetLineHeight() * 0.66
       self:SetHeight(self.header:GetLineHeight() + Ypadding * 2)

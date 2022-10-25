@@ -62,15 +62,15 @@ function MoverDialogMixin:Init()
   self.lockButton = CreateFrame("Button", nil, self, "UIPanelButtonTemplate")
   self.lockButton:SetText("Lock")
   self.lockButton:SetScript("OnClick", function()
-    Core:Dispatch(LockMover())
+    E:Dispatch(LockMover())
   end)
   self.lockButton:SetPoint("BOTTOMRIGHT", -14, 14)
 
-  Core:Subscribe(LOCK_MOVER, function ()
+  E:Subscribe(LOCK_MOVER, function ()
     self:Hide()
   end)
 
-  Core:Subscribe(UNLOCK_MOVER, function ()
+  E:Subscribe(UNLOCK_MOVER, function ()
     self:Show()
   end)
 end

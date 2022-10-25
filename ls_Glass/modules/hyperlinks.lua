@@ -41,19 +41,19 @@ function Hyperlinks:OnEnable()
     local linkType, addon, param1 = strsplit(":", link)
     if linkType == "garrmission" and addon == "Glass" then
       if param1 == "opennews" then
-        Core:Dispatch(OpenNews())
+        E:Dispatch(OpenNews())
       end
     end
   end)
 
-  Core:Subscribe(HYPERLINK_CLICK, function (payload)
+  E:Subscribe(HYPERLINK_CLICK, function (payload)
     local link, text, button = unpack(payload)
     -- Use global reference in case some addon has hooked into it for custom
     -- hyperlinks (e.g. Mythic Dungeon Tools, Prat)
     _G.SetItemRef(link, text, button)
   end)
 
-  Core:Subscribe(HYPERLINK_ENTER, function (payload)
+  E:Subscribe(HYPERLINK_ENTER, function (payload)
     local link, text = unpack(payload)
     local t = string.match(link, "^(.-):")
 
@@ -72,7 +72,7 @@ function Hyperlinks:OnEnable()
     end
   end)
 
-  Core:Subscribe(HYPERLINK_LEAVE, function (link)
+  E:Subscribe(HYPERLINK_LEAVE, function (link)
     if self.state.showingTooltip then
       self.state.showingTooltip:Hide()
       self.state.showingTooltip = false
