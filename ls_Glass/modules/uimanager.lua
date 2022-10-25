@@ -36,16 +36,16 @@ function UIManager:OnEnable()
 	-- self.dock = CreateChatDock(self.container)
 
 	-- SlidingMessageFrames
-	self.slidingMessageFramePool = CreateSlidingMessageFramePool(self.container)
+	-- self.slidingMessageFramePool = CreateSlidingMessageFramePool(self.container)
 
-	for i=1, NUM_CHAT_WINDOWS do
-		local chatFrame = _G["ChatFrame"..i]
-		local smf = self.slidingMessageFramePool:Acquire()
-		smf:Init(chatFrame)
+	-- for i=1, NUM_CHAT_WINDOWS do
+	-- 	local chatFrame = _G["ChatFrame"..i]
+	-- 	local smf = self.slidingMessageFramePool:Acquire()
+	-- 	smf:Init(chatFrame)
 
-		self.state.frames[i] = smf
-		self.state.tabs[i] = CreateChatTab(smf)
-	end
+	-- 	self.state.frames[i] = smf
+	-- 	self.state.tabs[i] = CreateChatTab(smf)
+	-- end
 
 	-- -- Edit box
 	-- self.editBox = CreateEditBox(self.container)
