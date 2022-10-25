@@ -7,7 +7,6 @@ local UIManager = Core:GetModule("UIManager")
 local CreateChatDock = Core.Components.CreateChatDock
 local CreateChatTab = Core.Components.CreateChatTab
 local CreateEditBox = Core.Components.CreateEditBox
-local CreateMainContainerFrame = Core.Components.CreateMainContainerFrame
 local CreateMoverDialog = Core.Components.CreateMoverDialog
 local CreateMoverFrame = Core.Components.CreateMoverFrame
 local CreateSlidingMessageFramePool = Core.Components.CreateSlidingMessageFramePool
@@ -30,7 +29,7 @@ function UIManager:OnEnable()
 	-- self.moverDialog = CreateMoverDialog("GlassMoverDialog", UIParent)
 
 	-- Main Container
-	self.container = CreateMainContainerFrame("GlassFrame", UIParent)
+	self.container = E:CreateMainContainer("GlassFrame", UIParent)
 	self.container:SetPoint("TOPLEFT", self.moverFrame)
 
 	-- Chat dock

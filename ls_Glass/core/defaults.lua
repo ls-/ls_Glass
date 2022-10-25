@@ -8,6 +8,11 @@ ns.C, ns.D = C, D
 local _G = getfenv(0)
 
 D.profile = {
+	width = 448,
+	height = 256,
+
+
+	-- OLD
 	-- General
 	font = "Friz Quadrata TT",
 	fontFlags = "",

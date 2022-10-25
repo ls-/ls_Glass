@@ -4,7 +4,7 @@
 	<Script file="editbox.lua"/>
 	<Script file="fadingframe.lua"/>
 	<Script file="gradientbackground.lua"/>
-	<Script file="maincontainerframe.lua"/>
+	<Script file="maincontainer.lua"/>
 	<Script file="messageline.lua"/>
 	<Script file="moverdialog.lua"/>
 	<Script file="moverframe.lua"/>
