@@ -86,4 +86,5 @@ on [CurseForge](https://www.curseforge.com/wow/addons/glass).
 
 MIT License
 
+Copyright (c) 2022 Val Voronov
 Copyright (c) 2020 Mitchel Cabuloy
