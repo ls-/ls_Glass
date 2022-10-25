@@ -10,6 +10,10 @@ local _G = getfenv(0)
 D.profile = {
 	width = 448,
 	height = 256,
+	chat = {
+		mouseover = true,
+		hold_time = 10,
+	},
 
 
 	-- OLD

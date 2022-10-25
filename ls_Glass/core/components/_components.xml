@@ -1,5 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="chatdock.lua"/>
+	<Script file="tabheader.lua"/>
 	<Script file="chattab.lua"/>
 	<Script file="editbox.lua"/>
 	<Script file="fadingframe.lua"/>
