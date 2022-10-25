@@ -1,4 +1,7 @@
-local Core, Constants, Utils = unpack(select(2, ...))
+local addonName, ns = ...
+local E, C, D, L = ns.E, ns.C, ns.D, ns.L
+
+local Core, Constants = unpack(select(2, ...))
 local UIManager = Core:GetModule("UIManager")
 
 local CreateChatDock = Core.Components.CreateChatDock
@@ -8,19 +11,6 @@ local CreateMainContainerFrame = Core.Components.CreateMainContainerFrame
 local CreateMoverDialog = Core.Components.CreateMoverDialog
 local CreateMoverFrame = Core.Components.CreateMoverFrame
 local CreateSlidingMessageFramePool = Core.Components.CreateSlidingMessageFramePool
-
--- luacheck: push ignore 113
-local BNToastFrame = BNToastFrame
-local ChatAlertFrame = ChatAlertFrame
-local ChatFrameChannelButton = ChatFrameChannelButton
-local ChatFrameMenuButton = ChatFrameMenuButton
-local CreateFrame = CreateFrame
-local GetCVar = C_CVar and C_CVar.GetCVar or GetCVar
-local NUM_CHAT_WINDOWS = NUM_CHAT_WINDOWS
-local QuickJoinToastButton = QuickJoinToastButton
-local SetCVar = C_CVar and C_CVar.SetCVar or SetCVar
-local UIParent = UIParent
--- luacheck: pop
 
 ----
 -- UIManager Module
@@ -77,18 +67,10 @@ function UIManager:OnEnable()
   ChatFrameChannelButton:Hide()
   ChatFrameMenuButton:Hide()
 
-  -- New version alert
-  --[===[@non-debug@
-  if Core.db.global.version == nil or Utils.versionGreaterThan(Core.Version, Core.db.global.version) then
-    Utils.notify('Glass has just been updated. |cFFFFFF00|Hgarrmission:Glass:opennews|h[See what’s new]|h|r')
-    Core.db.global.version = Core.Version
-  end
-  --@end-non-debug@]===]--
-
   -- Force classic chat style
   if GetCVar("chatStyle") ~= "classic" then
     SetCVar("chatStyle", "classic")
-    Utils.notify('Chat Style set to "Classic Style"')
+    E.notify('Chat Style set to "Classic Style"')
 
     -- Resets the background that IM style causes
     self.editBox:SetFocus()

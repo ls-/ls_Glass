@@ -1,0 +1,14 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="chatdock.lua"/>
+	<Script file="chattab.lua"/>
+	<Script file="editbox.lua"/>
+	<Script file="fadingframe.lua"/>
+	<Script file="gradientbackground.lua"/>
+	<Script file="maincontainerframe.lua"/>
+	<Script file="messageline.lua"/>
+	<Script file="moverdialog.lua"/>
+	<Script file="moverframe.lua"/>
+	<Script file="newmessagealertframe.lua"/>
+	<Script file="scrolloverlayframe.lua"/>
+	<Script file="slidingmessageframe.lua"/>
+</Ui>

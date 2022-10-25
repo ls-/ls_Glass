@@ -23,29 +23,9 @@ embeds\AceHook-3.0\AceHook-3.0.xml
 embeds\lodash.wow\lodash.wow.xml
 embeds\LibEasing\LibEasing.lua
 
-# Glass
+locales\_locales.xml
+
+core\_core.xml
 init.lua
-core\constants.lua
-core\utils.lua
 
-# Components
-components\ChatDock.lua
-components\ChatTab.lua
-components\EditBox.lua
-components\FadingFrame.lua
-components\GradientBackground.lua
-components\MainContainerFrame.lua
-components\MessageLine.lua
-components\MoverDialog.lua
-components\MoverFrame.lua
-components\NewMessageAlertFrame.lua
-components\ScrollOverlayFrame.lua
-components\SlidingMessageFrame.lua
-
-# Modules
-modules\Config.lua
-modules\Fonts.lua
-modules\Hyperlinks.lua
-modules\News.lua
-modules\TextProcessing.lua
-modules\UIManager.lua
+modules\_modules.xml

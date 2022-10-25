@@ -1,10 +1,13 @@
-local Core, Constants, Utils = unpack(select(2, ...))
+local addonName, ns = ...
+local E, C, D, L = ns.E, ns.C, ns.D, ns.L
+
+local Core, Constants = unpack(select(2, ...))
 
 local Colors = Constants.COLORS
 
 local CreateNewMessageAlertFrame = Core.Components.CreateNewMessageAlertFrame
 
-local super = Utils.super
+local super = E.super
 
 -- luacheck: push ignore 113
 local CreateFrame = CreateFrame

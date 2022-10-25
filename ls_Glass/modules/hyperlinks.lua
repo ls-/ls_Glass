@@ -1,3 +1,6 @@
+local addonName, ns = ...
+local E, C, D, L = ns.E, ns.C, ns.D, ns.L
+
 local Core, Constants = unpack(select(2, ...))
 local Hyperlinks = Core:GetModule("Hyperlinks")
 

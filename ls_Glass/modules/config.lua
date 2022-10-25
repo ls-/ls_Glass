@@ -1,3 +1,6 @@
+local addonName, ns = ...
+local E, C, D, L = ns.E, ns.C, ns.D, ns.L
+
 local Core, Constants = unpack(select(2, ...))
 local C = Core:GetModule("Config")
 
@@ -114,7 +117,7 @@ function C:OnEnable()
               args = {
                 frameWidth = {
                   name = "Width",
-                  desc = "Default: "..Core.defaults.profile.frameWidth..
+                  desc = "Default: "..D.profile.frameWidth..
                     "\nMin: 100",
                   type = "range",
                   order = 4.1,
@@ -133,7 +136,7 @@ function C:OnEnable()
                 },
                 frameHeight = {
                   name = "Height",
-                  desc = "Default: "..Core.defaults.profile.frameHeight,
+                  desc = "Default: "..D.profile.frameHeight,
                   type = "range",
                   order = 4.2,
                   min = 1,
@@ -151,7 +154,7 @@ function C:OnEnable()
                 },
                 frameXOfs = {
                   name = "X offset",
-                  desc = "Default: "..Core.defaults.profile.positionAnchor.xOfs,
+                  desc = "Default: "..D.profile.positionAnchor.xOfs,
                   type = "range",
                   order = 4.3,
                   min = -9999,
@@ -169,7 +172,7 @@ function C:OnEnable()
                 },
                 frameYOfs = {
                   name = "Y offset",
-                  desc = "Default: "..Core.defaults.profile.positionAnchor.yOfs,
+                  desc = "Default: "..D.profile.positionAnchor.yOfs,
                   type = "range",
                   order = 4.4,
                   min = -9999,
@@ -187,7 +190,7 @@ function C:OnEnable()
                 },
                 frameAnchor = {
                   name = "Anchor",
-                  desc = "Default: "..Core.db.profile.positionAnchor.point,
+                  desc = "Default: "..D.profile.positionAnchor.point,
                   type = "select",
                   order = 4.5,
                   values = ANCHORS,
@@ -216,7 +219,7 @@ function C:OnEnable()
               args = {
                 editBoxFontSize = {
                   name = "Font size",
-                  desc = "Default: "..Core.defaults.profile.editBoxFontSize.."\nMin: 1\nMax: 100",
+                  desc = "Default: "..D.profile.editBoxFontSize.."\nMin: 1\nMax: 100",
                   type = "range",
                   min = 1,
                   max = 100,
@@ -234,7 +237,7 @@ function C:OnEnable()
                 },
                 editBoxBackgroundOpacity = {
                   name = "Background opacity",
-                  desc = "Default: "..Core.defaults.profile.editBoxBackgroundOpacity,
+                  desc = "Default: "..D.profile.editBoxBackgroundOpacity,
                   type = "range",
                   order = 1.3,
                   min = 0,
@@ -260,7 +263,7 @@ function C:OnEnable()
               args = {
                 editBoxAnchorPosition = {
                   name = "Position",
-                  desc = "Default: "..Core.defaults.profile.editBoxAnchor.position,
+                  desc = "Default: "..D.profile.editBoxAnchor.position,
                   type = "select",
                   order = 2.1,
                   values = {
@@ -315,7 +318,7 @@ function C:OnEnable()
               args = {
                 messageFontSize = {
                   name = "Font size",
-                  desc = "Default: "..Core.defaults.profile.messageFontSize.."\nMin: 1\nMax: 100",
+                  desc = "Default: "..D.profile.messageFontSize.."\nMin: 1\nMax: 100",
                   type = "range",
                   min = 1,
                   max = 100,
@@ -333,7 +336,7 @@ function C:OnEnable()
                 },
                 chatBackgroundOpacity = {
                   name = "Background opacity",
-                  desc = "Default: "..Core.defaults.profile.chatBackgroundOpacity,
+                  desc = "Default: "..D.profile.chatBackgroundOpacity,
                   type = "range",
                   order = 1.3,
                   min = 0,
@@ -351,7 +354,7 @@ function C:OnEnable()
                 },
                 messageLeading = {
                   name = "Leading",
-                  desc = "Default: "..Core.defaults.profile.messageLeading.."\nMin: 0\nMax: 10",
+                  desc = "Default: "..D.profile.messageLeading.."\nMin: 0\nMax: 10",
                   type = "range",
                   min = 0,
                   max = 10,
@@ -369,7 +372,7 @@ function C:OnEnable()
                 },
                 messageLinePadding = {
                   name = "Line padding",
-                  desc = "Default: "..Core.defaults.profile.messageLinePadding.."\nMin: 0\nMax: 5",
+                  desc = "Default: "..D.profile.messageLinePadding.."\nMin: 0\nMax: 5",
                   type = "range",
                   min = 0,
                   max = 5,
@@ -395,7 +398,7 @@ function C:OnEnable()
               args = {
                 chatHoldTime = {
                   name = "Fade out delay",
-                  desc = "Default: "..Core.defaults.profile.chatHoldTime..
+                  desc = "Default: "..D.profile.chatHoldTime..
                     "\nMin: 1\nMax: 180",
                   type = "range",
                   order = 2.1,
@@ -413,7 +416,7 @@ function C:OnEnable()
                 },
                 chatShowOnMouseOver = {
                   name = "Show on mouse over",
-                  desc = "Default: "..tostring(Core.defaults.profile.chatShowOnMouseOver),
+                  desc = "Default: "..tostring(D.profile.chatShowOnMouseOver),
                   type = "toggle",
                   order = 2.2,
                   get = function ()
@@ -425,7 +428,7 @@ function C:OnEnable()
                 },
                 fadeInDuration = {
                   name = "Fade in duration",
-                  desc = "Default: "..Core.defaults.profile.chatFadeInDuration..
+                  desc = "Default: "..D.profile.chatFadeInDuration..
                     "\nMin: 0\nMax:30",
                   type = "range",
                   order = 2.3,
@@ -444,7 +447,7 @@ function C:OnEnable()
                 },
                 fadeOutDuration = {
                   name = "Fade out duration",
-                  desc = "Default: "..Core.defaults.profile.chatFadeOutDuration..
+                  desc = "Default: "..D.profile.chatFadeOutDuration..
                     "\nMin: 0\nMax:30",
                   type = "range",
                   order = 2.3,
@@ -463,7 +466,7 @@ function C:OnEnable()
                 },
                 slideInDuration = {
                   name = "Slide in duration",
-                  desc = "Default: "..Core.defaults.profile.chatSlideInDuration,
+                  desc = "Default: "..D.profile.chatSlideInDuration,
                   type = "range",
                   order = 2.4,
                   min = 0,
@@ -514,7 +517,7 @@ function C:OnEnable()
                 iconTextureYOffset = {
                   type = "range",
                   name = "Text icons Y offset",
-                  desc = "Default: "..Core.defaults.profile.iconTextureYOffset..
+                  desc = "Default: "..D.profile.iconTextureYOffset..
                     "\nAdjust this if text icons aren't centered.",
                   order = 3.3,
                   min = 0,

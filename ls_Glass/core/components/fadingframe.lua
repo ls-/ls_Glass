@@ -1,6 +1,9 @@
-local Core, _, Utils = unpack(select(2, ...))
+local addonName, ns = ...
+local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
-local super = Utils.super
+local Core = unpack(select(2, ...))
+
+local super = E.super
 
 -- luacheck: push ignore 113
 local C_Timer = C_Timer
