@@ -2,7 +2,6 @@ local addonName, ns = ...
 local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
 local Core, Constants = unpack(select(2, ...))
-local TP = Core:GetModule("TextProcessing")
 
 local AceHook = Core.Libs.AceHook
 
@@ -292,7 +291,7 @@ function SlidingMessageFrameMixin:CreateMessageFrame(frame, text, red, green, bl
   local message = self.messageFramePool:Acquire()
 
   message.text:SetTextColor(red, green, blue, 1)
-  message.text:SetText(TP:ProcessText(text))
+  message.text:SetText(E:ProcessText(text))
 
   -- Adjust height to contain text
   message:UpdateFrame()

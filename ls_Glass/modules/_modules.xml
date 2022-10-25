@@ -3,6 +3,5 @@
 	<Script file="fonts.lua"/>
 	<Script file="hyperlinks.lua"/>
 	<Script file="news.lua"/>
-	<Script file="textprocessing.lua"/>
 	<Script file="uimanager.lua"/>
 </Ui>
