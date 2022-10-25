@@ -1,5 +1,5 @@
 local addonName, ns = ...
-local E, C, D, L = ns.E, ns.C, ns.D, ns.L
+local E, Cfg, D, L = ns.E, ns.C, ns.D, ns.L -- TODO: Cfg -> C
 
 local Core, Constants = unpack(select(2, ...))
 local C = Core:GetModule("Config")
