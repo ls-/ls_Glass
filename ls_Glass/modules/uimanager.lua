@@ -23,17 +23,12 @@ function UIManager:OnInitialize()
 end
 
 function UIManager:OnEnable()
-	-- Mover
-	-- TODO: Replace with a stripped down version of LST or LSUI movers
-	self.moverFrame = CreateMoverFrame("GlassMoverFrame", UIParent)
-	-- self.moverDialog = CreateMoverDialog("GlassMoverDialog", UIParent)
-
 	-- Main Container
-	self.container = E:CreateMainContainer("GlassFrame", UIParent)
-	self.container:SetPoint("TOPLEFT", self.moverFrame)
+	-- self.container = E:CreateMainContainer("GlassFrame", UIParent)
+	-- self.container:SetPoint("TOPLEFT", self.moverFrame)
 
 	-- Chat dock
-	self.dock = E:CreateTabHeader(self.container)
+	-- self.dock = E:CreateTabHeader(self.container)
 
 	-- SlidingMessageFrames
 	-- self.slidingMessageFramePool = CreateSlidingMessageFramePool(self.container)
@@ -97,24 +92,24 @@ function UIManager:OnEnable()
 
 	-- Start rendering
 	-- TODO: Consider moving it elsewhere
-	self.tickerFrame = CreateFrame("Frame", "GlassUpdaterFrame", UIParent)
+	-- self.tickerFrame = CreateFrame("Frame", "GlassUpdaterFrame", UIParent)
 
-	self.timeElapsed = 0
-	self.tickerFrame:SetScript("OnUpdate", function (_, elapsed)
-		self.timeElapsed = self.timeElapsed + elapsed
+	-- self.timeElapsed = 0
+	-- self.tickerFrame:SetScript("OnUpdate", function (_, elapsed)
+	-- 	self.timeElapsed = self.timeElapsed + elapsed
 
-		while (self.timeElapsed > 0.01) do
-			self.timeElapsed = self.timeElapsed - 0.01
+	-- 	while (self.timeElapsed > 0.01) do
+	-- 		self.timeElapsed = self.timeElapsed - 0.01
 
-			self.container:OnFrame()
+	-- 		self.container:OnFrame()
 
-			for _, smf in ipairs(self.state.frames) do
-				smf:OnFrame()
-			end
+	-- 		for _, smf in ipairs(self.state.frames) do
+	-- 			smf:OnFrame()
+	-- 		end
 
-			for _, smf in pairs(self.state.temporaryFrames) do
-				smf:OnFrame()
-			end
-		end
-	end)
+	-- 		for _, smf in pairs(self.state.temporaryFrames) do
+	-- 			smf:OnFrame()
+	-- 		end
+	-- 	end
+	-- end)
 end
