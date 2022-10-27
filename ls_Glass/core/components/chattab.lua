@@ -5,8 +5,6 @@ local Core, Constants = unpack(select(2, ...))
 
 local AceHook = Core.Libs.AceHook
 
-local UnlockMover = Constants.ACTIONS.UnlockMover
-
 local Colors = Constants.COLORS
 
 local UPDATE_CONFIG = Constants.EVENTS.UPDATE_CONFIG
@@ -115,7 +113,6 @@ function ChatTabMixin:Init(slidingMessageFrame)
       info.text = UNLOCK_WINDOW
       info.notCheckable = 1
       info.func = function()
-        E:Dispatch(UnlockMover())
       end
       UIDropDownMenu_AddButton(info)
 

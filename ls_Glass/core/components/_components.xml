@@ -6,8 +6,6 @@
 	<Script file="gradientbackground.lua"/>
 	<Script file="maincontainer.lua"/>
 	<Script file="messageline.lua"/>
-	<Script file="moverdialog.lua"/>
-	<Script file="moverframe.lua"/>
 	<Script file="newmessagealertframe.lua"/>
 	<Script file="scrolloverlayframe.lua"/>
 	<Script file="slidingmessageframe.lua"/>

@@ -11,7 +11,6 @@ local LSM = Core.Libs.LSM
 
 local OpenNews = Constants.ACTIONS.OpenNews
 local RefreshConfig = Constants.ACTIONS.RefreshConfig
-local UnlockMover = Constants.ACTIONS.UnlockMover
 local UpdateConfig = Constants.ACTIONS.UpdateConfig
 
 local SAVE_FRAME_POSITION = Constants.EVENTS.SAVE_FRAME_POSITION
@@ -62,14 +61,6 @@ function C:OnEnable()
                   type = "description",
                   width = "double",
                   order = 2.3,
-                },
-                unlockFrame = {
-                  name = "Unlock frame",
-                  type = "execute",
-                  func = function()
-                    E:Dispatch(UnlockMover())
-                  end,
-                  order = 2.4,
                 },
               }
             },
@@ -556,11 +547,7 @@ function C:OnEnable()
 end
 
 function C:OnSlashCommand(input)
-  if input == "lock" then
-    E:Dispatch(UnlockMover())
-  else
     AceConfigDialog:Open("Glass")
-  end
 end
 
 function C:RefreshConfig()
