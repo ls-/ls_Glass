@@ -29,28 +29,32 @@ do
 		self:SetGradientBackgroundColor(0, 0, 0, C.db.profile.chat.opacity) -- TODO: Add me to config!
 	end
 
-	function message_line_proto:OnHyperlinkClick(link, text, button)
-		E:Dispatch(HyperlinkClick({link, text, button}))
-	end
+	-- function message_line_proto:OnHyperlinkClick(link, text, button)
+	-- -- function message_line_proto:OnHyperlinkClick(link, text, button)
+	-- 	print(link)
+	-- 	ChatFrame_OnHyperlinkShow(link, text, button)
+	-- 	-- SetItemRef(link, text, button)
+	-- 	-- E:Dispatch(HyperlinkClick({link, text, button}))
+	-- end
 
-	function message_line_proto:OnHyperlinkEnter(link, text)
-		if C.db.profile.mouseover_tooltips then
-			E:Dispatch(HyperlinkEnter({link, text}))
-		end
-	end
+	-- function message_line_proto:OnHyperlinkEnter(link, text)
+	-- 	if C.db.profile.mouseover_tooltips then
+	-- 		E:Dispatch(HyperlinkEnter({link, text}))
+	-- 	end
+	-- end
 
-	function message_line_proto:OnHyperlinkLeave(link)
-		E:Dispatch(HyperlinkLeave(link))
-	end
+	-- function message_line_proto:OnHyperlinkLeave(link)
+	-- 	E:Dispatch(HyperlinkLeave(link))
+	-- end
 end
 
 local function createMessageLine(parent)
 	local frame = Mixin(CreateFrame("Frame", nil, parent), message_line_proto)
 	frame:SetSize(C.db.profile.width, C.db.profile.chat.size + C.db.profile.chat.padding * 2)
 	frame:SetHyperlinksEnabled(true)
-	frame:SetScript("OnHyperlinkClick", frame.OnHyperlinkClick)
-	frame:SetScript("OnHyperlinkEnter", frame.OnHyperlinkEnter)
-	frame:SetScript("OnHyperlinkLeave", frame.OnHyperlinkLeave)
+	-- frame:SetScript("OnHyperlinkClick", frame.OnHyperlinkClick)
+	-- frame:SetScript("OnHyperlinkEnter", frame.OnHyperlinkEnter)
+	-- frame:SetScript("OnHyperlinkLeave", frame.OnHyperlinkLeave)
 	frame:Hide()
 
 	-- frame:SetFadeInDuration(Core.db.profile.chatFadeInDuration) -- ! FadingFrameMixin
