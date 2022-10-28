@@ -23,9 +23,6 @@ function UIManager:OnInitialize()
 end
 
 function UIManager:OnEnable()
-	-- Main Container
-	-- self.container = E:CreateMainContainer("GlassFrame", UIParent)
-	-- self.container:SetPoint("TOPLEFT", self.moverFrame)
 
 	-- Chat dock
 	-- self.dock = E:CreateTabHeader(self.container)
