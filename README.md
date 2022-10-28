@@ -1,9 +1,13 @@
 # Disclaimer
 
-This fork is largely for my own personal use and experiments. I'm still not sure
-about taking the addon over because it'll require a pretty substantial rewrite
-to make it not break anything in the default UI. If someone else takes it over
-in the meantime, no biggie 😁
+This fork is largely for my own personal use and experiments. I'm still not sure about taking the addon over because it'll require a pretty substantial rewrite to make it not break anything in the default UI. If someone else takes it over in the meantime, no biggie 😁
+
+## An update from 28/10/2022
+
+Right now it's basically impossible to handle clicking any chat links (player names, item links, etc) via `SetItemRef` in an addon that replaces the default chat output (like this one) and doesn't just customise/reskin it (like Prat). If you call it, you won't be able to close chat tabs while in combat, the default layout editor will go haywire, etc. It's not something I can ignore because it's the most basic and fundamental chat feature. This project is def put on the backburner. 
+
+
+![Imgur](https://i.imgur.com/D6vpWG6.png)
 
 ---
 
@@ -19,5 +23,5 @@ in the meantime, no biggie 😁
 
 MIT License
 
-Copyright (c) 2022 Val Voronov
+Copyright (c) 2022 Val Voronov  
 Copyright (c) 2020 Mitchel Cabuloy
