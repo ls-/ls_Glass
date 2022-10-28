@@ -173,3 +173,41 @@ do
 		end
 	end
 end
+
+
+-----------
+-- UTILS --
+-----------
+
+do
+	local hidden = _G.CreateFrame("Frame", nil, UIParent)
+	hidden:Hide()
+
+	function E:ForceHide(object, skipEvents)
+		if not object then return end
+
+		object:Hide(true)
+		object:SetParent(hidden)
+
+		if object.EnableMouse then
+			object:EnableMouse(false)
+		end
+
+		if object.UnregisterAllEvents then
+			if not skipEvents then
+				object:UnregisterAllEvents()
+			end
+
+			if object:GetName() then
+				object.ignoreFramePositionManager = true
+				object:SetAttribute("ignoreFramePositionManager", true)
+			end
+
+			object:SetAttribute("statehidden", true)
+		end
+
+		if object.SetUserPlaced then
+			pcall(object.SetUserPlaced, object, true)
+		end
+	end
+end

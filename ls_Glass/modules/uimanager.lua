@@ -4,14 +4,14 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 local Core, Constants = unpack(select(2, ...))
 local UIManager = Core:GetModule("UIManager")
 
-local CreateChatDock = Core.Components.CreateChatDock
-local CreateChatTab = Core.Components.CreateChatTab
-local CreateEditBox = Core.Components.CreateEditBox
-local CreateMoverDialog = Core.Components.CreateMoverDialog
-local CreateMoverFrame = Core.Components.CreateMoverFrame
-local CreateSlidingMessageFramePool = Core.Components.CreateSlidingMessageFramePool
+-- local CreateChatDock = Core.Components.CreateChatDock
+-- local CreateChatTab = Core.Components.CreateChatTab
+-- local CreateEditBox = Core.Components.CreateEditBox
+-- local CreateMoverDialog = Core.Components.CreateMoverDialog
+-- local CreateMoverFrame = Core.Components.CreateMoverFrame
+-- local CreateSlidingMessageFramePool = Core.Components.CreateSlidingMessageFramePool
 
-----
+
 -- UIManager Module
 function UIManager:OnInitialize()
 	self.state = {
@@ -22,22 +22,50 @@ function UIManager:OnInitialize()
 	}
 end
 
+local chatFrames = {}
+local tempChatFrames = {}
+local expectedChatFrames = {}
+
 function UIManager:OnEnable()
-
 	-- Chat dock
-	-- self.dock = E:CreateTabHeader(self.container)
+	-- self.dock = E:CreateTabHeader(ChatFrame1)
 
-	-- SlidingMessageFrames
-	-- self.slidingMessageFramePool = CreateSlidingMessageFramePool(self.container)
+	-- permanent chat frames
+	for i = 1, NUM_CHAT_WINDOWS do
+		local frame = E:HandleChatFrame(_G["ChatFrame"..i])
+		if frame then
+			chatFrames[frame] = true
+		end
+		-- self.state.tabs[i] = CreateChatTab(smf)
+	end
 
-	-- for i=1, NUM_CHAT_WINDOWS do
-	-- 	local chatFrame = _G["ChatFrame"..i]
-	-- 	local smf = self.slidingMessageFramePool:Acquire()
-	-- 	smf:Init(chatFrame)
+	-- temporary chat frames
+	hooksecurefunc("FCF_SetTemporaryWindowType", function(chatFrame, chatType, chatTarget)
+		if not expectedChatFrames[chatType] then
+			expectedChatFrames[chatType] = {}
+		end
 
-	-- 	self.state.frames[i] = smf
-	-- 	self.state.tabs[i] = CreateChatTab(smf)
-	-- end
+		expectedChatFrames[chatType][chatTarget] = chatFrame
+	end)
+
+	hooksecurefunc("FCF_OpenTemporaryWindow", function(chatType, chatTarget)
+		local chatFrame = expectedChatFrames[chatType] and expectedChatFrames[chatType][chatTarget]
+		if chatFrame then
+			local frame = E:HandleChatFrame(chatFrame)
+			if frame then
+				tempChatFrames[frame] = true
+			end
+		end
+	end)
+
+	hooksecurefunc("FCF_Close", function(chatFrame)
+		local frame = chatFrame.SlidingMessageFrame
+		if tempChatFrames[frame] then
+			frame:Release()
+
+			tempChatFrames[frame] = nil
+		end
+	end)
 
 	-- -- Edit box
 	-- self.editBox = CreateEditBox(self.container)
@@ -57,56 +85,21 @@ function UIManager:OnEnable()
 	-- ChatFrameChannelButton:Hide()
 	-- ChatFrameMenuButton:Hide()
 
-	-- -- Force classic chat style
-	-- if GetCVar("chatStyle") ~= "classic" then
-	--   SetCVar("chatStyle", "classic")
-	--   E.notify('Chat Style set to "Classic Style"')
-
-	--   -- Resets the background that IM style causes
-	--   self.editBox:SetFocus()
-	--   self.editBox:ClearFocus()
-	-- end
-
-	-- -- Handle temporary chat frames (whisper popout, pet battle)
-	-- self:RawHook("FCF_OpenTemporaryWindow", function (...)
-	--   local chatFrame = self.hooks["FCF_OpenTemporaryWindow"](...)
-	--   local smf = self.slidingMessageFramePool:Acquire()
-	--   smf:Init(chatFrame)
-
-	--   self.state.temporaryFrames[chatFrame:GetName()] = smf
-	--   self.state.temporaryTabs[chatFrame:GetName()] = CreateChatTab(smf)
-	--   return chatFrame
-	-- end, true)
-
-	-- -- Close window
-	-- self:RawHook("FCF_Close", function (chatFrame)
-	--   self.hooks["FCF_Close"](chatFrame)
-
-	--   self.slidingMessageFramePool:Release(self.state.temporaryFrames[chatFrame:GetName()])
-	--   self.state.temporaryFrames[chatFrame:GetName()] = nil
-	--   self.state.temporaryTabs[chatFrame:GetName()] = nil
-	-- end, true)
-
 	-- Start rendering
 	-- TODO: Consider moving it elsewhere
-	-- self.tickerFrame = CreateFrame("Frame", "GlassUpdaterFrame", UIParent)
+	local updater = CreateFrame("Frame", "LSGlassUpdater", UIParent)
+	updater:SetScript("OnUpdate", function (_, elapsed)
+		self.elapsed = (self.elapsed or 0) + elapsed
+		if self.elapsed >= 0.01 then
+			for frame in next, chatFrames do
+				frame:OnFrame()
+			end
 
-	-- self.timeElapsed = 0
-	-- self.tickerFrame:SetScript("OnUpdate", function (_, elapsed)
-	-- 	self.timeElapsed = self.timeElapsed + elapsed
+			for frame in next, tempChatFrames do
+				frame:OnFrame()
+			end
 
-	-- 	while (self.timeElapsed > 0.01) do
-	-- 		self.timeElapsed = self.timeElapsed - 0.01
-
-	-- 		self.container:OnFrame()
-
-	-- 		for _, smf in ipairs(self.state.frames) do
-	-- 			smf:OnFrame()
-	-- 		end
-
-	-- 		for _, smf in pairs(self.state.temporaryFrames) do
-	-- 			smf:OnFrame()
-	-- 		end
-	-- 	end
-	-- end)
+			self.elapsed = 0
+		end
+	end)
 end

@@ -13,7 +13,15 @@ D.profile = {
 	chat = {
 		mouseover = true,
 		hold_time = 10,
+		opacity = 0.4,
+		padding = 2,
+		slide_in_duration = 0.2,
+		size = 12,
 	},
+
+	indented_word_wrap = true,
+
+	mouseover_tooltips = true,
 
 
 	-- OLD
