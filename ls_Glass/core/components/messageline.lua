@@ -17,6 +17,7 @@ do
 	end
 
 	function message_line_proto:SetText(text, r, g, b, a)
+		self.Text:SetHeight(128)
 		self.Text:SetText(text)
 		self.Text:SetTextColor(r or 1, g or 1, b or 1, a)
 
@@ -43,10 +44,9 @@ do
 	end
 end
 
-
 local function createMessageLine(parent)
 	local frame = Mixin(CreateFrame("Frame", nil, parent), message_line_proto)
-	frame:SetWidth(C.db.profile.width)
+	frame:SetSize(C.db.profile.width, C.db.profile.chat.size + C.db.profile.chat.padding * 2)
 	frame:SetHyperlinksEnabled(true)
 	frame:SetScript("OnHyperlinkClick", frame.OnHyperlinkClick)
 	frame:SetScript("OnHyperlinkEnter", frame.OnHyperlinkEnter)
@@ -60,8 +60,8 @@ local function createMessageLine(parent)
 
 	frame.Text = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 	-- frame.Text = frame:CreateFontString(nil, "ARTWORK", "GlassMessageFont")
-	frame.Text:SetPoint("TOPLEFT", Constants.TEXT_XPADDING, 0)
-	frame.Text:SetPoint("BOTTOMRIGHT", -Constants.TEXT_XPADDING, 0)
+	frame.Text:SetPoint("LEFT", Constants.TEXT_XPADDING, 0)
+	frame.Text:SetPoint("RIGHT", -Constants.TEXT_XPADDING, 0)
 	frame.Text:SetJustifyH("LEFT")
 	frame.Text:SetJustifyV("MIDDLE")
 	frame.Text:SetIndentedWordWrap(C.db.profile.indented_word_wrap)
@@ -80,8 +80,8 @@ local function createMessageLine(parent)
 end
 
 local function resetMessageLine(_, messageLine)
+	messageLine.Text:SetText("")
 	messageLine:ClearAllPoints()
-	messageLine:SetText("")
 	messageLine:Hide()
 end
 
