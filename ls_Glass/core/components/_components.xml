@@ -5,6 +5,5 @@
 	<Script file="fadingframe.lua"/>
 	<Script file="gradientbackground.lua"/>
 	<Script file="messageline.lua"/>
-	<Script file="newmessagealertframe.lua"/>
 	<Script file="slidingmessageframe.lua"/>
 </Ui>
