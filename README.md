@@ -9,6 +9,16 @@ Right now it's basically impossible to handle clicking any chat links (player na
 
 ![Imgur](https://i.imgur.com/D6vpWG6.png)
 
+## An update from 31/10/2022
+
+I found a workaround for the issue mentioned above. There's one handy XML-only attribute called `propagateHyperlinksToParent` that can be chained. As long as a chat message has `ChatFrame#` in its parent hierarchy and all the frames in between use the following template
+
+```xml
+<Frame name="YourHyperlinkPropagator" propagateHyperlinksToParent="true" virtual="true"/>
+```
+
+hyperlinks from that chat message will reach `ChatFrame#` and it'll handle them via `SetItemRef` without tainting anything.
+
 ---
 
 ![Glass](https://user-images.githubusercontent.com/3102758/90884068-9549a600-e3e1-11ea-944f-481bd894560e.png)
