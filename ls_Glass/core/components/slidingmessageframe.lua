@@ -417,7 +417,7 @@ do
 	local slidingMessageFramePool = CreateObjectPool(
 		function(pool)
 			index = index + 1
-			local frame = Mixin(CreateFrame("ScrollFrame", "LSGlassFrame" .. index, UIParent), object_proto)
+			local frame = Mixin(CreateFrame("ScrollFrame", "LSGlassFrame" .. index, UIParent, "LSGlassHyperlinkPropagator"), object_proto)
 			frame:EnableMouse(false)
 			frame:SetClipsChildren(true)
 
@@ -425,7 +425,7 @@ do
 			frame.incomingMessages = {}
 			frame.pool = pool
 
-			local scrollChild = CreateFrame("Frame", nil, frame)
+			local scrollChild = CreateFrame("Frame", nil, frame, "LSGlassHyperlinkPropagator")
 			frame:SetScrollChild(scrollChild)
 			frame.ScrollChild = scrollChild
 

@@ -49,9 +49,9 @@ do
 end
 
 local function createMessageLine(parent)
-	local frame = Mixin(CreateFrame("Frame", nil, parent), message_line_proto)
+	local frame = Mixin(CreateFrame("Frame", nil, parent, "LSGlassHyperlinkPropagator"), message_line_proto)
 	frame:SetSize(C.db.profile.width, C.db.profile.chat.size + C.db.profile.chat.padding * 2)
-	frame:SetHyperlinksEnabled(true)
+	-- frame:SetHyperlinksEnabled(true)
 	-- frame:SetScript("OnHyperlinkClick", frame.OnHyperlinkClick)
 	-- frame:SetScript("OnHyperlinkEnter", frame.OnHyperlinkEnter)
 	-- frame:SetScript("OnHyperlinkLeave", frame.OnHyperlinkLeave)
