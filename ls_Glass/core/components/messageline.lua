@@ -74,6 +74,7 @@ local function resetMessageLine(_, messageLine)
 	messageLine.Text:SetText("")
 	messageLine:ClearAllPoints()
 	messageLine:Hide()
+	E:StopFading(messageLine, 1)
 end
 
 function E:CreateMessageLinePool(parent)

@@ -18,7 +18,12 @@ local Colors = Constants.COLORS
 ----------------
 
 local function chatFrame_OnSizeChanged(self, width, height)
-	-- TODO: Get height, width, etc from here instead of config
+	if self.SlidingMessageFrame then
+		-- TODO: Get height, width, etc from here instead of config
+
+		self.SlidingMessageFrame:SetSize(width, height)
+		self.SlidingMessageFrame.ScrollChild:SetSize(width, height)
+	end
 end
 
 local function chatFrame_ShowHook(self)
@@ -56,7 +61,7 @@ do
 		if num == frame:GetFirstMessageIndex() then
 			num = num + 1
 		else
-			frame:ScrollTo(num)
+			frame:ScrollTo(num, true)
 		end
 
 		local messages = {}
@@ -68,18 +73,35 @@ do
 		end
 
 		frame:SetFirstMessageIndex(0)
-		frame:Update(messages)
+		frame:Update(messages, true)
 
-		self:SetText(L["JUMP_TO_PRESESNT"])
-		self:Hide()
+		E:FadeOut(self, 0, 0.1, function()
+			self:SetText(L["JUMP_TO_PRESESNT"], true)
+			self:Hide()
+		end)
 	end
 
-	function scroll_down_button_proto:SetText(text)
-		-- TODO: fade out > change text > fade in
-		self.Text:SetText(text)
+	function scroll_down_button_proto:SetText(text, instant)
+		if text ~= self.textString then
+			self.textString = text
 
-		self:SetWidth(self.Text:GetUnboundedStringWidth() + 26)
-		self:SetHeight(self.Text:GetStringHeight() + C.db.profile.chat.padding * 2)
+			if instant then
+				self.Text:SetText(text)
+
+				self:SetWidth(self.Text:GetUnboundedStringWidth() + 26)
+				self:SetHeight(self.Text:GetStringHeight() + C.db.profile.chat.padding * 2)
+			else
+				E:StopFading(self.Text, 1)
+				E:FadeOut(self.Text, 0, 0.1, function()
+					self.Text:SetText(text)
+
+					self:SetWidth(self.Text:GetUnboundedStringWidth() + 26)
+					self:SetHeight(self.Text:GetStringHeight() + C.db.profile.chat.padding * 2)
+
+					E:FadeIn(self.Text, 0.1)
+				end)
+			end
+		end
 	end
 
 	function scroll_down_button_proto:SetTextColor(r, g, b)
@@ -118,19 +140,6 @@ local CHAT_FRAME_TEXTURES = {
 local object_proto = {
 	firstMessageIndex = 0,
 }
-
-function object_proto:OnMouseWheel(delta)
-	local scrollingHandler = self:GetScrollingHandler()
-	if scrollingHandler then
-		LibEasing:StopEasing(scrollingHandler)
-
-		self:SetVerticalScroll(0)
-	end
-
-	self:Refresh(delta)
-
-	self.ScrollDownButon:SetShown(self:GetFirstMessageIndex() ~= 0)
-end
 
 function object_proto:CaptureChatFrame(chatFrame)
 	self:ReleaseAllMessageLines()
@@ -175,8 +184,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 	self:SetPoint("TOPLEFT", chatFrame)
 	self:SetSize(width, height)
 
-	self.ScrollChild:SetWidth(width)
-	self.ScrollChild:SetHeight(height)
+	self.ScrollChild:SetSize(width, height)
 
 	-- -- ? do I even want to handle these?
 	-- -- hooksecurefunc(chatFrame, "BackFillMessage", function(cf,...)
@@ -252,28 +260,28 @@ function object_proto:ReleaseAllMessageLines()
 	end
 end
 
+function object_proto:ReleaseMessageLine(messageLine)
+	if self.messageFramePool and messageLine then
+		self.messageFramePool:Release(messageLine)
+	end
+end
+
 function object_proto:GetMaxMessages()
 	return math.ceil(self.ChatFrame:GetHeight() / (C.db.profile.chat.size + 2 * C.db.profile.chat.padding))
 end
 
-function object_proto:ScrollTo(index, fastScrolling)
-	if not fastScrolling then
-		self:ReleaseAllMessageLines()
-	end
+function object_proto:ScrollTo(index, refreshFade)
+	local numVisibleLines = 0
 
 	local maxMessages = self:GetMaxMessages()
 	for i = 1, maxMessages do
-		local messageLine
-		if fastScrolling then
-			messageLine = self.visibleLines[i]
-			if not messageLine then
-				messageLine = self:AcquireMessageLine()
-				self.visibleLines[i] = messageLine
-			end
-		else
+		local messageLine = self.visibleLines[i]
+		if not messageLine then
 			messageLine = self:AcquireMessageLine()
 			self.visibleLines[i] = messageLine
 		end
+
+		messageLine:ClearAllPoints()
 
 		if i == 1 then
 			messageLine:SetPoint("BOTTOMLEFT", self.ScrollChild, "BOTTOMLEFT", 0, 0)
@@ -281,25 +289,62 @@ function object_proto:ScrollTo(index, fastScrolling)
 			messageLine:SetPoint("BOTTOMLEFT", self.visibleLines[i - 1], "TOPLEFT", 0,0)
 		end
 
+		-- bail out if we're beyond the frame capacity
+		if messageLine:GetBottom() > self:GetTop() then break end
+
 		local messageInfo = self:GetHistoryEntryAtIndex(index + i)
 		if messageInfo then
 			messageLine:SetText(messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b)
 			messageLine:Show()
+
+			if refreshFade then
+				E:StopFading(messageLine, 1)
+				E:FadeOut(messageLine, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
+					messageLine:Hide()
+				end)
+			end
+
+			numVisibleLines = numVisibleLines + 1
 		else
 			break
 		end
 	end
 
+	for i = numVisibleLines + 1, #self.visibleLines do
+		self:ReleaseMessageLine(self.visibleLines[i])
+		self.visibleLines[i] = nil
+	end
+
 	self:SetFirstMessageIndex(index)
 end
 
-function object_proto:Refresh(delta, fastScrolling)
+function object_proto:Refresh(delta, resetFading)
 	delta = delta or 0
 
-	self:ScrollTo(Clamp(self:GetFirstMessageIndex() + delta, 0, self:GetNumHistoryElements() - 1), fastScrolling)
+	self:ScrollTo(Clamp(self:GetFirstMessageIndex() + delta, 0, self:GetNumHistoryElements() - 1), resetFading)
 
 	if delta == 0 then
 		self:SetFirstMessageIndex(0)
+	end
+end
+
+function object_proto:OnMouseWheel(delta)
+	local scrollingHandler = self:GetScrollingHandler()
+	if scrollingHandler then
+		LibEasing:StopEasing(scrollingHandler)
+
+		self:SetVerticalScroll(0)
+	end
+
+	self:Refresh(delta)
+
+	if self:GetFirstMessageIndex() ~= 0 then
+		self.ScrollDownButon:Show()
+		E:FadeIn(self.ScrollDownButon, 0.1)
+	else
+		E:FadeOut(self.ScrollDownButon, 0, 0.1, function()
+			self.ScrollDownButon:Hide()
+		end)
 	end
 end
 
@@ -330,10 +375,6 @@ function object_proto:AddMessage(_, ...)
 	end
 end
 
--- function object_proto:BackFillMessage(chatFrame,...)
--- 	t_insert(self.incomingScrollbackMessages, {...})
--- end
-
 function object_proto:OnFrame()
 	if not self:IsShown() or self:GetScrollingHandler() then return end
 
@@ -341,31 +382,34 @@ function object_proto:OnFrame()
 		self:Update({t_removemulti(self.incomingMessages, 1, #self.incomingMessages)}, false)
 	end
 
-	-- if #self.incomingScrollbackMessages > 0 then
-	-- 	self:Update({t_removemulti(self.incomingMessages, 1, #self.incomingMessages)}, true)
-	-- end
-
 	if self:IsMouseOver() then
-		-- if C.db.profile.chat.mouseover then
-		-- 	for _, visibleLine in ipairs(self.visibleLines) do
-		-- 		-- visibleLine:Show()
-		-- 	end
-		-- end
+		if C.db.profile.chat.mouseover then
+			for _, visibleLine in next, self.visibleLines do
+				if not visibleLine:IsShown() or visibleLine:GetAlpha() < 1 then
+					visibleLine:Show()
+					E:FadeIn(visibleLine, C.db.profile.chat.fade_in_duration)
+				end
+			end
+		end
 	else
-		-- for _, visibleLine in ipairs(self.visibleLines) do
-		-- 	-- TODO: Replace with FadeOut() when it's available
-		-- 	-- visibleLine:HideDelay(C.db.profile.chat.hold_time)
-		-- 	-- visibleLine:Hide()
-		-- end
+		for _, visibleLine in next, self.visibleLines do
+			if visibleLine:IsShown() and not E:IsFading(visibleLine) then
+				E:FadeOut(visibleLine, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
+					visibleLine:Hide()
+				end)
+			end
+		end
 	end
 end
 
-function object_proto:Update(incoming, reverse)
+function object_proto:Update(incoming, doNotFade)
 	local totalHeight = 0
 	local prevIncomingMessage
 
 	for i = 1, #incoming do
 		local messageLine = self:AcquireMessageLine()
+
+		t_insert(self.visibleLines, 1, messageLine)
 
 		if prevIncomingMessage then
 			messageLine:SetPoint("TOPLEFT", prevIncomingMessage, "BOTTOMLEFT", 0, 0)
@@ -374,12 +418,16 @@ function object_proto:Update(incoming, reverse)
 		end
 
 		messageLine:SetText(incoming[i][1], incoming[i][2], incoming[i][3], incoming[i][4])
-		messageLine:Show() -- TODO: Replace with FadeIn() when it's available
+		messageLine:Show()
+
+		if not doNotFade then
+			messageLine:SetAlpha(0)
+			E:FadeIn(messageLine, C.db.profile.chat.fade_in_duration)
+		end
 
 		totalHeight = totalHeight + messageLine:GetHeight()
 		prevIncomingMessage = messageLine
 	end
-
 
 	local startOffset = self:GetVerticalScroll()
 	local endOffset = totalHeight - startOffset
@@ -397,13 +445,13 @@ function object_proto:Update(incoming, reverse)
 			LibEasing.OutCubic,
 			function()
 				self:SetVerticalScroll(0)
-				self:Refresh()
+				self:Refresh(0, doNotFade)
 				self:SetScrollingHandler()
 			end
 		))
 	else
 		self:SetVerticalScroll(0)
-		self:Refresh()
+		self:Refresh(0, doNotFade)
 		self:SetScrollingHandler()
 	end
 end
@@ -434,6 +482,7 @@ do
 			local scrollDownButon = Mixin(CreateFrame("Button", nil, frame), scroll_down_button_proto)
 			scrollDownButon:SetPoint("BOTTOMRIGHT", -2, 4)
 			scrollDownButon:SetScript("OnClick", scrollDownButon.OnClick)
+			scrollDownButon:SetAlpha(0)
 			scrollDownButon:Hide()
 			frame.ScrollDownButon = scrollDownButon
 
@@ -447,10 +496,6 @@ do
 
 			scrollDownButon:SetText(L["JUMP_TO_PRESESNT"])
 			scrollDownButon:SetTextColor(Colors.apache.r, Colors.apache.g, Colors.apache.b) -- TODO: Move to config!
-
-			-- button:SetFadeInDuration(0.3) -- ! FadingFrameMixin
-			-- button:SetFadeOutDuration(0.15) -- ! FadingFrameMixin
-			-- button:QuickHide() -- ! FadingFrameMixin
 
 			-- E:Subscribe(UPDATE_CONFIG, function (key)
 			-- 	if self.state.isCombatLog == false then
