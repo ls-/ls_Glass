@@ -32,7 +32,7 @@ local function chatFrame_ShowHook(self)
 
 	if self.SlidingMessageFrame then
 		self.SlidingMessageFrame:Show()
-		self.SlidingMessageFrame:ScrollTo(0)
+		self.SlidingMessageFrame:ScrollTo(0, true)
 	end
 end
 
