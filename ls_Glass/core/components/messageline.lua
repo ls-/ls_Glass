@@ -57,9 +57,6 @@ local function createMessageLine(parent)
 	-- frame:SetScript("OnHyperlinkLeave", frame.OnHyperlinkLeave)
 	frame:Hide()
 
-	-- frame:SetFadeInDuration(Core.db.profile.chatFadeInDuration) -- ! FadingFrameMixin
-	-- frame:SetFadeOutDuration(Core.db.profile.chatFadeOutDuration) -- ! FadingFrameMixin
-
 	E:CreateGradientBackground(frame, 50, math.min(250, C.db.profile.width - 50), 0, 0, 0, C.db.profile.chat.opacity) -- TODO: Add me to config!
 
 	frame.Text = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
@@ -69,16 +66,6 @@ local function createMessageLine(parent)
 	frame.Text:SetJustifyH("LEFT")
 	frame.Text:SetJustifyV("MIDDLE")
 	frame.Text:SetIndentedWordWrap(C.db.profile.indented_word_wrap)
-
-	E:Subscribe(UPDATE_CONFIG, function (key)
-		if key == "chatFadeInDuration" then
-			-- frame:SetFadeInDuration(Core.db.profile.chatFadeInDuration) -- ! FadingFrameMixin
-		end
-
-		if key == "chatFadeOutDuration" then
-			-- frame:SetFadeOutDuration(Core.db.profile.chatFadeOutDuration) -- ! FadingFrameMixin
-		end
-	end)
 
 	return frame
 end

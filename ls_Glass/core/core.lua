@@ -211,3 +211,93 @@ do
 		end
 	end
 end
+
+-----------
+-- FADER --
+-----------
+
+do
+	local function clamp(v)
+		if v > 1 then
+			return 1
+		elseif v < 0 then
+			return 0
+		end
+
+		return v
+	end
+
+	local function lerp(v1, v2, perc)
+		return clamp(v1 + (v2 - v1) * perc)
+	end
+
+	local FADE_IN = 1
+	local FADE_OUT = -1
+
+	local objects = {}
+	local add, remove
+
+	local updater = CreateFrame("Frame", "LSGlassFader")
+
+	local function updater_OnUpdate(_, elapsed)
+		for object, data in next, objects do
+			data.fadeTimer = data.fadeTimer + elapsed
+			data.isFading = true
+
+			object:SetAlpha(lerp(data.initAlpha, data.finalAlpha, data.fadeTimer / data.duration))
+
+			if data.fadeTimer >= data.duration then
+				remove(object)
+
+				if data.callback then
+					data.callback(object)
+					data.callback = nil
+				end
+
+				object:SetAlpha(data.finalAlpha)
+			end
+		end
+	end
+
+	function add(mode, object, holdTime, duration, callback)
+		objects[object] = {
+			fadeTimer = -(holdTime or 0),
+			initAlpha = object:GetAlpha(),
+			finalAlpha = mode == FADE_IN and 1 or 0,
+			duration = duration,
+			callback = callback
+		}
+
+		if not updater:GetScript("OnUpdate") then
+			updater:SetScript("OnUpdate", updater_OnUpdate)
+		end
+	end
+
+	function remove(object)
+		objects[object] = nil
+
+		if not next(objects) then
+			updater:SetScript("OnUpdate", nil)
+		end
+	end
+
+	function E:FadeIn(object, ...)
+		add(FADE_IN, object, 0, ...)
+	end
+
+	function E:FadeOut(...)
+		add(FADE_OUT, ...)
+	end
+
+	function E:StopFading(object, alpha)
+		remove(object)
+
+		if alpha then
+			object:SetAlpha(alpha)
+		end
+	end
+
+	function E:IsFading(object)
+		return not not objects[object]
+	end
+end

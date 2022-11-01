@@ -2,7 +2,6 @@
 	<Script file="tabheader.lua"/>
 	<Script file="chattab.lua"/>
 	<Script file="editbox.lua"/>
-	<Script file="fadingframe.lua"/>
 	<Script file="gradientbackground.lua"/>
 	<Script file="messageline.lua"/>
 	<Script file="slidingmessageframe.lua"/>
