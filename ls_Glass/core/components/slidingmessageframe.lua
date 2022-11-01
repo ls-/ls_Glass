@@ -186,17 +186,6 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 	self.ScrollChild:SetSize(width, height)
 
-	-- -- ? do I even want to handle these?
-	-- -- hooksecurefunc(chatFrame, "BackFillMessage", function(cf,...)
-	-- -- 	if cf.SlidingMessageFrame then
-	-- -- 		cf.SlidingMessageFrame:BackFillMessage(cf,...)
-	-- -- 	end
-	-- -- end)
-
-	-- -- hooksecurefunc(chatFrame.historyBuffer, "PushBack", function (_, message)
-	-- -- 	self:BackFillMessage(nil, message.message, message.r, message.g, message.b)
-	-- -- end)
-
 	self:SetShown(chatFrame:IsShown())
 
 	-- it's safer to hide the string container than the chat frame itself
@@ -554,7 +543,7 @@ do
 
 	function E:HandleChatFrame(chatFrame)
 		if chatFrame == ChatFrame2 then
-			-- Combat Log, I might want to skin in, but without sliding
+			-- Combat Log, I might want to skin it, but without sliding
 		else
 			local frame = slidingMessageFramePool:Acquire()
 			frame:CaptureChatFrame(chatFrame)
