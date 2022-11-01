@@ -6,6 +6,7 @@ local _G = getfenv(0)
 local hooksecurefunc = _G.hooksecurefunc
 local t_insert = _G.table.insert
 local t_removemulti = _G.table.removemulti
+local t_wipe = _G.table.wipe
 
 -- Mine
 local LibEasing = LibStub("LibEasing-1.0")
@@ -213,6 +214,7 @@ function object_proto:ReleaseChatFrame()
 
 		self.ChatFrame = nil
 		self.historyBuffer = nil
+		t_wipe(self.visibleLines)
 		self:ReleaseAllMessageLines()
 		self:SetParent(UIParent)
 		self:Hide()
