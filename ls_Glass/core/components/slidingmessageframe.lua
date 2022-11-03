@@ -82,11 +82,11 @@ do
 		end)
 	end
 
-	function scroll_down_button_proto:SetText(text, instant)
+	function scroll_down_button_proto:SetText(text, isInstant)
 		if text ~= self.textString then
 			self.textString = text
 
-			if instant then
+			if isInstant then
 				self.Text:SetText(text)
 
 				self:SetWidth(self.Text:GetUnboundedStringWidth() + 26)
