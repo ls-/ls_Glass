@@ -31,8 +31,12 @@ local function chatFrame_ShowHook(self)
 	self.FontStringContainer:Hide()
 
 	if self.SlidingMessageFrame then
-		self.SlidingMessageFrame:Show()
-		self.SlidingMessageFrame:ScrollTo(0, true)
+		-- FCF indiscriminately calls :Show() when adding new tabs, I don't need
+		-- to do anything when that happens
+		if not self.SlidingMessageFrame:IsShown() then
+			self.SlidingMessageFrame:Show()
+			self.SlidingMessageFrame:ScrollTo(0, true)
+		end
 	end
 end
 
