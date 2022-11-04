@@ -4,6 +4,8 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 -- Lua
 local _G = getfenv(0)
 local hooksecurefunc = _G.hooksecurefunc
+local m_ceil = _G.math.ceil
+local m_min = _G.math.min
 local t_insert = _G.table.insert
 local t_removemulti = _G.table.removemulti
 local t_wipe = _G.table.wipe
@@ -61,7 +63,7 @@ local scroll_down_button_proto = {}
 do
 	function scroll_down_button_proto:OnClick()
 		local frame = self:GetParent()
-		local num = math.min(frame:GetNumHistoryElements(), frame:GetMaxMessages(), frame:GetFirstMessageIndex())
+		local num = m_min(frame:GetNumHistoryElements(), frame:GetMaxMessages(), frame:GetFirstMessageIndex())
 
 		frame:ScrollTo(num, true)
 
@@ -264,7 +266,7 @@ function object_proto:ReleaseMessageLine(messageLine)
 end
 
 function object_proto:GetMaxMessages()
-	return math.ceil(self.ChatFrame:GetHeight() / (C.db.profile.chat.size + 2 * C.db.profile.chat.padding))
+	return m_ceil(self.ChatFrame:GetHeight() / (C.db.profile.chat.size + 2 * C.db.profile.chat.padding))
 end
 
 function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
