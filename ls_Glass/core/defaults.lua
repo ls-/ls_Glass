@@ -20,6 +20,9 @@ D.profile = {
 		fade_in_duration = 0.6,
 		fade_out_duration = 0.6,
 	},
+	tab = {
+		size = 12,
+	},
 
 	indented_word_wrap = true,
 

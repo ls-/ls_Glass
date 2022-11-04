@@ -27,8 +27,9 @@ local tempChatFrames = {}
 local expectedChatFrames = {}
 
 function UIManager:OnEnable()
-	-- Chat dock
-	-- self.dock = E:CreateTabHeader(ChatFrame1)
+	GeneralDockManager:SetHeight(C.db.profile.tab.size + 4)
+	GeneralDockManager.scrollFrame:SetHeight(C.db.profile.tab.size + 4)
+	GeneralDockManager.scrollFrame.child:SetHeight(C.db.profile.tab.size + 4)
 
 	-- permanent chat frames
 	for i = 1, NUM_CHAT_WINDOWS do
@@ -36,7 +37,8 @@ function UIManager:OnEnable()
 		if frame then
 			chatFrames[frame] = true
 		end
-		-- self.state.tabs[i] = CreateChatTab(smf)
+
+		E:HandleChatTab(_G["ChatFrame" .. i .. "Tab"])
 	end
 
 	-- temporary chat frames
@@ -55,6 +57,8 @@ function UIManager:OnEnable()
 			if frame then
 				tempChatFrames[frame] = true
 			end
+
+			E:HandleChatTab(_G[chatFrame:GetName() .. "Tab"])
 		end
 	end)
 
