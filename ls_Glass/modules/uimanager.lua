@@ -39,7 +39,11 @@ function UIManager:OnEnable()
 	ChatFrame1:HookScript("OnHyperlinkEnter", function(chatFrame, link)
 		if C.db.profile.mouseover_tooltips then
 			GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)
-			GameTooltip:SetHyperlink(link)
+
+			local isOK = pcall(GameTooltip.SetHyperlink, GameTooltip, link)
+			if not isOK then
+				GameTooltip:Hide()
+			end
 		end
 	end)
 
