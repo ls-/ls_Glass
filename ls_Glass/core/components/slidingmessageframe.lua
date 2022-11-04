@@ -291,7 +291,7 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 
 		local messageInfo = self:GetHistoryEntryAtIndex(index + i)
 		if messageInfo then
-			messageLine:SetText(messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b)
+			messageLine:SetText(E:ProcessText(messageInfo.message), messageInfo.r, messageInfo.g, messageInfo.b)
 			messageLine:Show()
 
 			if refreshFading then
@@ -460,7 +460,7 @@ function object_proto:ProcessIncoming(incoming, doNotFade)
 			messageLine:SetPoint("TOPLEFT", self.ScrollChild, "BOTTOMLEFT", 0, 0)
 		end
 
-		messageLine:SetText(incoming[i][1], incoming[i][2], incoming[i][3], incoming[i][4])
+		messageLine:SetText(E:ProcessText(incoming[i][1]), incoming[i][2], incoming[i][3], incoming[i][4])
 		messageLine:Show()
 
 		if not doNotFade then
