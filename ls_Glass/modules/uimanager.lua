@@ -33,7 +33,7 @@ function UIManager:OnEnable()
 
 	-- permanent chat frames
 	for i = 1, NUM_CHAT_WINDOWS do
-		local frame = E:HandleChatFrame(_G["ChatFrame"..i])
+		local frame = E:HandleChatFrame(_G["ChatFrame" .. i])
 		if frame then
 			chatFrames[frame] = true
 		end
