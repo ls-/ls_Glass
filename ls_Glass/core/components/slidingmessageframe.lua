@@ -61,12 +61,12 @@ local scroll_down_button_proto = {}
 do
 	function scroll_down_button_proto:OnClick()
 		local frame = self:GetParent()
-
 		local num = math.min(frame:GetNumHistoryElements(), frame:GetMaxMessages(), frame:GetFirstMessageIndex())
+
+		frame:ScrollTo(num, true)
+
 		if num == frame:GetFirstMessageIndex() then
 			num = num + 1
-		else
-			frame:ScrollTo(num, true)
 		end
 
 		local messages = {}
@@ -78,7 +78,7 @@ do
 		end
 
 		frame:SetFirstMessageIndex(0)
-		frame:Update(messages, true)
+		frame:ProcessIncoming(messages, true)
 
 		E:FadeOut(self, 0, 0.1, function()
 			self:SetText(L["JUMP_TO_PRESESNT"], true)
@@ -150,6 +150,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 	self:ReleaseAllMessageLines()
 
 	self.ChatFrame = chatFrame
+	self.ChatTab = _G[chatFrame:GetName() .. "Tab"]
 	self.historyBuffer = chatFrame.historyBuffer
 	self:SetParent(chatFrame)
 
@@ -217,6 +218,7 @@ function object_proto:ReleaseChatFrame()
 		self.ChatFrame.SlidingMessageFrame = nil
 
 		self.ChatFrame = nil
+		self.ChatTab = nil
 		self.historyBuffer = nil
 		t_wipe(self.visibleLines)
 		self:ReleaseAllMessageLines()
@@ -265,7 +267,7 @@ function object_proto:GetMaxMessages()
 	return math.ceil(self.ChatFrame:GetHeight() / (C.db.profile.chat.size + 2 * C.db.profile.chat.padding))
 end
 
-function object_proto:ScrollTo(index, refreshFade)
+function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 	local numVisibleLines = 0
 
 	local maxMessages = self:GetMaxMessages()
@@ -292,17 +294,35 @@ function object_proto:ScrollTo(index, refreshFade)
 			messageLine:SetText(messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b)
 			messageLine:Show()
 
-			if refreshFade then
-				E:StopFading(messageLine, 1)
-				E:FadeOut(messageLine, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
-					messageLine:Hide()
-				end)
-			end
+			if refreshFading then
+				if tryToFadeIn then
+					E:FadeIn(messageLine, C.db.profile.chat.fade_in_duration, function()
+						if not self.isMouseOver then
+							E:FadeOut(messageLine, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
+								messageLine:Hide()
+							end)
+						end
+					end)
+				else
+					messageLine:SetAlpha(1)
 
-			numVisibleLines = numVisibleLines + 1
+					if not self.isMouseOver then
+						E:FadeOut(messageLine, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
+							messageLine:Hide()
+						end)
+					end
+				end
+			else
+				if messageLine:GetAlpha() == 0 then
+					messageLine:Hide()
+				end
+			end
 		else
-			break
+			messageLine:SetText("", 1, 1, 1)
+			messageLine:Hide()
 		end
+
+		numVisibleLines = numVisibleLines + 1
 	end
 
 	for i = numVisibleLines + 1, #self.visibleLines do
@@ -313,10 +333,10 @@ function object_proto:ScrollTo(index, refreshFade)
 	self:SetFirstMessageIndex(index)
 end
 
-function object_proto:Refresh(delta, resetFading)
+function object_proto:Refresh(delta, refreshFading, tryToFadeIn)
 	delta = delta or 0
 
-	self:ScrollTo(Clamp(self:GetFirstMessageIndex() + delta, 0, self:GetNumHistoryElements() - 1), resetFading)
+	self:ScrollTo(Clamp(self:GetFirstMessageIndex() + delta, 0, self:GetNumHistoryElements() - 1), refreshFading, tryToFadeIn)
 
 	if delta == 0 then
 		self:SetFirstMessageIndex(0)
@@ -331,7 +351,7 @@ function object_proto:OnMouseWheel(delta)
 		self:SetVerticalScroll(0)
 	end
 
-	self:Refresh(delta)
+	self:Refresh(delta, true, true)
 
 	if self:GetFirstMessageIndex() ~= 0 then
 		self.ScrollDownButon:Show()
@@ -374,30 +394,58 @@ function object_proto:OnFrame()
 	if not self:IsShown() or self:GetScrollingHandler() then return end
 
 	if #self.incomingMessages > 0 then
-		self:Update({t_removemulti(self.incomingMessages, 1, #self.incomingMessages)}, false)
+		self:ProcessIncoming({t_removemulti(self.incomingMessages, 1, #self.incomingMessages)}, false)
 	end
 
-	if self:IsMouseOver() then
-		if C.db.profile.chat.mouseover then
+	local isMouseOver = self:IsMouseOver(24, 0, 0, 0)
+	if isMouseOver ~= self.isMouseOver then
+		self.isMouseOver = isMouseOver
+
+		if isMouseOver then
 			for _, visibleLine in next, self.visibleLines do
-				if not visibleLine:IsShown() or visibleLine:GetAlpha() < 1 then
-					visibleLine:Show()
-					E:FadeIn(visibleLine, C.db.profile.chat.fade_in_duration)
+				if visibleLine:IsShown() and visibleLine:GetAlpha() ~= 0 then
+					E:FadeIn(visibleLine, C.db.profile.chat.fade_in_duration, function()
+						E:StopFading(visibleLine, 1)
+					end)
 				end
 			end
-		end
-	else
-		for _, visibleLine in next, self.visibleLines do
-			if visibleLine:IsShown() and not E:IsFading(visibleLine) then
-				E:FadeOut(visibleLine, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
-					visibleLine:Hide()
+
+			if self:GetFirstMessageIndex() ~= 0 then
+				self.ScrollDownButon:Show()
+				E:FadeIn(self.ScrollDownButon, C.db.profile.chat.fade_in_duration, function()
+					E:StopFading(self.ScrollDownButon, 1)
 				end)
 			end
+
+			-- if not self.ChatFrame.isDocked then
+			-- 	self.ChatTab:Show()
+			-- 	E:FadeIn(self.ChatTab, C.db.profile.chat.fade_in_duration, function()
+			-- 		E:StopFading(self.ChatTab, 1)
+			-- 	end)
+			-- end
+		else
+			for _, visibleLine in next, self.visibleLines do
+				if visibleLine:IsShown() and visibleLine:GetAlpha() ~= 0 then
+					E:FadeOut(visibleLine, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
+						visibleLine:Hide()
+					end)
+				end
+			end
+
+			E:FadeOut(self.ScrollDownButon, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
+				self.ScrollDownButon:Hide()
+			end)
+
+			-- if not self.ChatFrame.isDocked then
+			-- 	E:FadeOut(self.ChatTab, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
+			-- 		self.ChatTab:Hide()
+			-- 	end)
+			-- end
 		end
 	end
 end
 
-function object_proto:Update(incoming, doNotFade)
+function object_proto:ProcessIncoming(incoming, doNotFade)
 	local totalHeight = 0
 	local prevIncomingMessage
 
@@ -417,7 +465,15 @@ function object_proto:Update(incoming, doNotFade)
 
 		if not doNotFade then
 			messageLine:SetAlpha(0)
-			E:FadeIn(messageLine, C.db.profile.chat.fade_in_duration)
+			E:FadeIn(messageLine, C.db.profile.chat.fade_in_duration, function()
+				if not self.isMouseOver then
+					E:FadeOut(messageLine, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
+						messageLine:Hide()
+					end)
+				end
+			end)
+		else
+			messageLine:SetAlpha(1)
 		end
 
 		totalHeight = totalHeight + messageLine:GetHeight()

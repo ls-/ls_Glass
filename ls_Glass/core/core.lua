@@ -259,11 +259,18 @@ do
 		end
 	end
 
-	function add(mode, object, holdTime, duration, callback)
+	function add(mode, object, delay, duration, callback)
+		local initAlpha = object:GetAlpha()
+		local finalAlpha = mode == FADE_IN and 1 or 0
+
+		if delay == 0 and (duration == 0 or initAlpha == finalAlpha) then
+			return callback and callback(object)
+		end
+
 		objects[object] = {
-			fadeTimer = -(holdTime or 0),
-			initAlpha = object:GetAlpha(),
-			finalAlpha = mode == FADE_IN and 1 or 0,
+			fadeTimer = -delay,
+			initAlpha = initAlpha,
+			finalAlpha = finalAlpha,
 			duration = duration,
 			callback = callback
 		}
@@ -282,12 +289,7 @@ do
 	end
 
 	function E:FadeIn(object, duration, callback)
-		duration = duration * (1 - object:GetAlpha())
-		if duration == 0 then
-			return callback and callback(object)
-		end
-
-		add(FADE_IN, object, 0, duration, callback)
+		add(FADE_IN, object, 0, duration * (1 - object:GetAlpha()), callback)
 	end
 
 	function E:FadeOut(...)
@@ -298,9 +300,5 @@ do
 		remove(object)
 
 		object:SetAlpha(alpha or object:GetAlpha())
-	end
-
-	function E:IsFading(object)
-		return not not objects[object]
 	end
 end
