@@ -31,6 +31,17 @@ function UIManager:OnEnable()
 	GeneralDockManager.scrollFrame:SetHeight(C.db.profile.tab.size + 4)
 	GeneralDockManager.scrollFrame.child:SetHeight(C.db.profile.tab.size + 4)
 
+	ChatFrame1:HookScript("OnHyperlinkEnter", function(chatFrame, link)
+		if C.db.profile.mouseover_tooltips then
+			GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)
+			GameTooltip:SetHyperlink(link)
+		end
+	end)
+
+	ChatFrame1:HookScript("OnHyperlinkLeave", function()
+		GameTooltip:Hide()
+	end)
+
 	-- permanent chat frames
 	for i = 1, NUM_CHAT_WINDOWS do
 		local frame = E:HandleChatFrame(_G["ChatFrame" .. i])
