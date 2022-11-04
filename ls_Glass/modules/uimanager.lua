@@ -32,9 +32,9 @@ local tempChatFrames = {}
 local expectedChatFrames = {}
 
 function UIManager:OnEnable()
-	GeneralDockManager:SetHeight(C.db.profile.tab.size + 4)
-	GeneralDockManager.scrollFrame:SetHeight(C.db.profile.tab.size + 4)
-	GeneralDockManager.scrollFrame.child:SetHeight(C.db.profile.tab.size + 4)
+	-- GeneralDockManager:SetHeight(C.db.profile.tab.size + 4)
+	-- GeneralDockManager.scrollFrame:SetHeight(C.db.profile.tab.size + 4)
+	-- GeneralDockManager.scrollFrame.child:SetHeight(C.db.profile.tab.size + 4)
 
 	ChatFrame1:HookScript("OnHyperlinkEnter", function(chatFrame, link)
 		if C.db.profile.mouseover_tooltips then

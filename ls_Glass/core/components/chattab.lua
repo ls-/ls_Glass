@@ -36,13 +36,13 @@ function E:HandleChatTab(frame)
 		frame[texture]:SetTexture(0)
 	end
 
-	frame:SetHeight(C.db.profile.tab.size + 4)
+	-- frame:SetHeight(C.db.profile.tab.size + 4)
 
-	frame:SetNormalFontObject("GameFontNormal") -- TODO: Fix me!
-	frame.Text:SetJustifyH("LEFT")
-	frame.Text:SetJustifyV("MIDDLE")
-	frame.Text:SetPoint("TOPLEFT", 2, -2)
-	frame.Text:SetPoint("BOTTOMRIGHT", -2, 2)
+	-- frame:SetNormalFontObject("GameFontNormal") -- TODO: Fix me!
+	-- frame.Text:SetJustifyH("LEFT")
+	-- frame.Text:SetJustifyV("MIDDLE")
+	-- frame.Text:SetPoint("TOPLEFT", 2, -2)
+	-- frame.Text:SetPoint("BOTTOMRIGHT", -2, 2)
 
 	if not hookedChatTabs[frame] then
 		hooksecurefunc(frame.Text, "SetTextColor", chatTabText_SetTextColor)
