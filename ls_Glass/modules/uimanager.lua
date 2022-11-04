@@ -1,6 +1,11 @@
 local addonName, ns = ...
 local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
+-- Lua
+local _G = getfenv(0)
+local hooksecurefunc = _G.hooksecurefunc
+
+-- Mine
 local Core, Constants = unpack(select(2, ...))
 local UIManager = Core:GetModule("UIManager")
 
