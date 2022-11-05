@@ -1,4 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="backdrop.lua"/>
 	<Script file="chattab.lua"/>
 	<Script file="editbox.lua"/>
 	<Script file="gradientbackground.lua"/>
