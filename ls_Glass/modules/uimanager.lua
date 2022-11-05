@@ -9,14 +9,6 @@ local hooksecurefunc = _G.hooksecurefunc
 local Core, Constants = unpack(select(2, ...))
 local UIManager = Core:GetModule("UIManager")
 
--- local CreateChatDock = Core.Components.CreateChatDock
--- local CreateChatTab = Core.Components.CreateChatTab
--- local CreateEditBox = Core.Components.CreateEditBox
--- local CreateMoverDialog = Core.Components.CreateMoverDialog
--- local CreateMoverFrame = Core.Components.CreateMoverFrame
--- local CreateSlidingMessageFramePool = Core.Components.CreateSlidingMessageFramePool
-
-
 -- UIManager Module
 function UIManager:OnInitialize()
 	self.state = {
