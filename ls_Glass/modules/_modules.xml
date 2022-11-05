@@ -1,7 +1,3 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<!-- <Script file="config.lua"/> -->
-	<Script file="fonts.lua"/>
-	<Script file="uimanager.lua"/>
-
-	<Frame name="LSGlassHyperlinkPropagator" propagateHyperlinksToParent="true" virtual="true"/>
 </Ui>

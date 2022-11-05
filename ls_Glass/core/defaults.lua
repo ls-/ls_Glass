@@ -1,11 +1,19 @@
 local _, ns = ...
-
--- Mine
-local C, D = {}, {}
-ns.C, ns.D = C, D
+local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
 -- Lua
 local _G = getfenv(0)
+
+-- Mine
+local function rgb(r, g, b)
+	return E:CreateColor(r, g, b)
+end
+
+D.global = {
+	colors = {
+		lanzones = rgb(224, 188, 91)
+	},
+}
 
 D.profile = {
 	width = 448,
@@ -25,9 +33,7 @@ D.profile = {
 	},
 
 	indented_word_wrap = true,
-
 	mouseover_tooltips = true,
-
 
 	-- OLD
 	-- General

@@ -6,15 +6,13 @@ local _G = getfenv(0)
 local hooksecurefunc = _G.hooksecurefunc
 local m_ceil = _G.math.ceil
 local m_min = _G.math.min
+local next = _G.next
 local t_insert = _G.table.insert
 local t_removemulti = _G.table.removemulti
 local t_wipe = _G.table.wipe
 
 -- Mine
 local LibEasing = LibStub("LibEasing-1.0")
-
-local _, Constants = unpack(select(2, ...))
-local Colors = Constants.COLORS
 
 ----------------
 -- BLIZZ CHAT --
@@ -33,8 +31,8 @@ local function chatFrame_ShowHook(self)
 	self.FontStringContainer:Hide()
 
 	if self.SlidingMessageFrame then
-		-- FCF indiscriminately calls :Show() when adding new tabs, I don't need
-		-- to do anything when that happens
+		-- FCF indiscriminately calls :Show() when adding new tabs, I don't need to do
+		-- anything when that happens
 		if not self.SlidingMessageFrame:IsShown() then
 			self.SlidingMessageFrame:Show()
 			self.SlidingMessageFrame:ScrollTo(0, true)
@@ -162,18 +160,19 @@ function object_proto:CaptureChatFrame(chatFrame)
 	chatFrame.SlidingMessageFrame = self
 
 	-- TODO: Comment me out!
-	chatFrame.bg1 = chatFrame:CreateTexture(nil, "BACKGROUND")
-	chatFrame.bg1:SetColorTexture(0, 0.6, 0.3, 0.3)
-	chatFrame.bg1:SetPoint("TOPLEFT")
-	chatFrame.bg1:SetPoint("BOTTOMLEFT")
-	chatFrame.bg1:SetWidth(25)
+	if not chatFrame.bg1 then
+		chatFrame.bg1 = chatFrame:CreateTexture(nil, "BACKGROUND")
+		chatFrame.bg1:SetColorTexture(0, 0.6, 0.3, 0.3)
+		chatFrame.bg1:SetPoint("TOPLEFT")
+		chatFrame.bg1:SetPoint("BOTTOMLEFT")
+		chatFrame.bg1:SetWidth(25)
 
-	-- TODO: Comment me out!
-	chatFrame.bg2 = chatFrame:CreateTexture(nil, "BACKGROUND")
-	chatFrame.bg2:SetColorTexture(0, 0.6, 0.3, 0.3)
-	chatFrame.bg2:SetPoint("TOPRIGHT")
-	chatFrame.bg2:SetPoint("BOTTOMRIGHT")
-	chatFrame.bg2:SetWidth(25)
+		chatFrame.bg2 = chatFrame:CreateTexture(nil, "BACKGROUND")
+		chatFrame.bg2:SetColorTexture(0, 0.6, 0.3, 0.3)
+		chatFrame.bg2:SetPoint("TOPRIGHT")
+		chatFrame.bg2:SetPoint("BOTTOMRIGHT")
+		chatFrame.bg2:SetWidth(25)
+	end
 
 	chatFrame:SetClampedToScreen(false)
 	chatFrame:SetClampRectInsets(0, 0, 0, 0)
@@ -436,8 +435,8 @@ function object_proto:OnFrame()
 				end)
 			end
 
-			-- these use custom values for fading in/out because Blizz fade chat
-			-- as well, so I'm trying not to interfere with that
+			-- these use custom values for fading in/out because Blizz fade chat as well,
+			-- so I'm trying not to interfere with that
 			if not self.ChatFrame.isDocked then
 				self.ChatTab:Show()
 				E:FadeIn(self.ChatTab, 0.1, function()
@@ -488,14 +487,15 @@ function object_proto:OnFrame()
 				self.ScrollDownButon:Hide()
 			end)
 
-			-- these use custom values for fading in/out because Blizz fade chat
-			-- as well, so I'm trying not to interfere with that
+			-- these use custom values for fading in/out because Blizz fade chat as well,
+			-- so I'm trying not to interfere with that
 			if not self.ChatFrame.isDocked then
 				E:FadeOut(self.ChatTab, 4, C.db.profile.chat.fade_out_duration, function()
 					self.ChatTab:Hide()
 				end)
 			end
 
+			-- IM style chat frame have their own edit boxes
 			if GetCVar("chatStyle") == "im" then
 				if not self.EditBox:HasFocus() and self.EditBox:GetText() == "" then
 					E:FadeOut(self.EditBox.Fader, 4, C.db.profile.chat.fade_out_duration, function()
@@ -622,7 +622,7 @@ do
 			scrollDownButon.Text = text
 
 			scrollDownButon:SetText(L["JUMP_TO_PRESESNT"])
-			scrollDownButon:SetTextColor(Colors.apache.r, Colors.apache.g, Colors.apache.b) -- TODO: Move to config!
+			scrollDownButon:SetTextColor(C.db.global.colors.lanzones:GetRGB())
 
 			-- E:Subscribe(UPDATE_CONFIG, function (key)
 			-- 	if self.state.isCombatLog == false then

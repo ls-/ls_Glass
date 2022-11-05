@@ -1,59 +1,24 @@
 local addonName, ns = ...
-local C, L = ns.C, ns.L
+local L = ns.L
 
 -- Lua
 local _G = getfenv(0)
+local ipairs = _G.ipairs
+local m_floor = _G.math.floor
+local next= _G.next
+local pcall = _G.pcall
+local s_format = _G.string.format
 local t_insert = _G.table.insert
 
 -- Mine
-local E = {}
-ns.E = E
+local E, C, D = LibStub("AceAddon-3.0"):NewAddon(addonName), {}, {}
+ns.E, ns.C, ns.D = E, C, D
 
--- TODO: Remove Me!
-local AceAddon = _G.LibStub("AceAddon-3.0")
-
-local Core = AceAddon:NewAddon(addonName)
-_G[addonName] = Core
-
--- Core
-Core.Libs = {
-	AceConfig = _G.LibStub("AceConfig-3.0"),
-	AceConfigDialog = _G.LibStub("AceConfigDialog-3.0"),
-	AceDB = _G.LibStub("AceDB-3.0"),
-	AceDBOptions = _G.LibStub("AceDBOptions-3.0"),
-	AceGUI = _G.LibStub("AceGUI-3.0"),
-	AceHook = _G.LibStub("AceHook-3.0"),
-	LSM = _G.LibStub("LibSharedMedia-3.0"),
-	LibEasing = _G.LibStub("LibEasing-1.0"),
-	lodash = _G.LibStub("lodash.wow")
+_G[addonName] = {
+	[1] = E,
+	[2] = C,
+	[3] = L,
 }
-
-local Constants = {}
-ns[1] = Core
-ns[2] = Constants
-
-Core.Components = {}
-Core.Version = tonumber(GetAddOnMetadata(addonName, "Version"):gsub("%D", ""), nil)
-
--- Modules
-Core:NewModule("Config", "AceConsole-3.0")
-Core:NewModule("Fonts")
-Core:NewModule("Hyperlinks")
-Core:NewModule("News")
-Core:NewModule("UIManager", "AceHook-3.0")
-
--- TODO: Remove Me!
--- Utility functions
-function E.super(obj)
-	return getmetatable(obj).__index
-end
-
--- TODO: Remove Me!
--- Prints Glass' notification messages
-function E.notify(message)
-	print("|c00DFBA69Glass|r: ", message)
-end
-
 
 --------------------
 -- TEXT PROCESSOR --
@@ -102,7 +67,6 @@ do
 	end
 end
 
-
 -----------
 -- UTILS --
 -----------
@@ -136,6 +100,7 @@ do
 
 		if object.SetUserPlaced then
 			pcall(object.SetUserPlaced, object, true)
+			pcall(object.SetDontSavePosition, object, true)
 		end
 	end
 end
@@ -239,4 +204,54 @@ do
 			return data.mode
 		end
 	end
+end
+
+-------------
+-- COLOURS --
+-------------
+
+do
+	local color_proto = {}
+
+	function color_proto:GetHex()
+		return self.hex
+	end
+
+	-- override ColorMixin:GetRGBA
+	function color_proto:GetRGBA(a)
+		return self.r, self.g, self.b, a or self.a
+	end
+
+	-- override ColorMixin:SetRGBA
+	function color_proto:SetRGBA(r, g, b, a)
+		if r > 1 or g > 1 or b > 1 then
+			r, g, b = r / 255, g / 255, b / 255
+		end
+
+		self.r = r
+		self.g = g
+		self.b = b
+		self.a = a
+		self.hex = s_format('ff%02x%02x%02x', self:GetRGBAsBytes())
+	end
+
+	-- override ColorMixin:WrapTextInColorCode
+	function color_proto:WrapTextInColorCode(text)
+		return "|c" .. self.hex .. text .. "|r"
+	end
+
+	function E:CreateColor(r, g, b, a)
+		local color = Mixin({}, ColorMixin, color_proto)
+		color:SetRGBA(r, g, b, a)
+
+		return color
+	end
+end
+
+-----------
+-- MATHS --
+-----------
+
+function E:Round(v)
+	return m_floor(v + 0.5)
 end

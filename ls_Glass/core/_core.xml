@@ -1,6 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="core.lua"/>
 	<Script file="defaults.lua"/>
-	<Script file="constants.lua"/>
+	<!-- can sort -->
 	<Include file="components\_components.xml"/>
+
+	<Frame name="LSGlassHyperlinkPropagator" propagateHyperlinksToParent="true" virtual="true"/>
 </Ui>
