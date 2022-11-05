@@ -68,9 +68,8 @@ do
 
 	function E:ProcessText(text)
 		for _, processor in ipairs(TEXT_PROCESSORS) do
-			-- Prevent failing processors from bringing down the whole pipeline
-			local isOk, val = pcall(processor, text)
-			if isOk then
+			local isOK, val = pcall(processor, text)
+			if isOK then
 				text = val
 			end
 		end
