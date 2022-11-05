@@ -2,7 +2,6 @@
 	<!-- <Script file="config.lua"/> -->
 	<Script file="fonts.lua"/>
 	<Script file="hyperlinks.lua"/>
-	<Script file="news.lua"/>
 	<Script file="uimanager.lua"/>
 
 	<Frame name="LSGlassHyperlinkPropagator" propagateHyperlinksToParent="true" virtual="true"/>
