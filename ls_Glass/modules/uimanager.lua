@@ -24,9 +24,12 @@ local tempChatFrames = {}
 local expectedChatFrames = {}
 
 function UIManager:OnEnable()
-	-- GeneralDockManager:SetHeight(C.db.profile.tab.size + 4)
-	-- GeneralDockManager.scrollFrame:SetHeight(C.db.profile.tab.size + 4)
-	-- GeneralDockManager.scrollFrame.child:SetHeight(C.db.profile.tab.size + 4)
+	GeneralDockManager:SetHeight(20)
+	GeneralDockManager.scrollFrame:SetHeight(20)
+
+	-- tabs that are parented to it are shifted down, so instead of messing with
+	-- all those points, it's easier to just resize this frame
+	GeneralDockManager.scrollFrame.child:SetHeight(18)
 
 	ChatFrame1:HookScript("OnHyperlinkEnter", function(chatFrame, link)
 		if C.db.profile.mouseover_tooltips then
@@ -115,6 +118,30 @@ function UIManager:OnEnable()
 
 			for frame in next, tempChatFrames do
 				frame:OnFrame()
+			end
+
+			-- these use custom values for fading in/out because Blizz fade chat
+			-- as well, so I'm trying not to interfere with that
+			local isMouseOver = ChatFrame1:IsMouseOver(26, -36, 0, 0)
+			if self.isMouseOver ~= isMouseOver then
+				self.isMouseOver = isMouseOver
+
+				if isMouseOver then
+					GeneralDockManager:Show()
+					E:FadeIn(GeneralDockManager, 0.1, function()
+						if self.isMouseOver then
+							E:StopFading(GeneralDockManager, 1)
+						else
+							E:FadeOut(GeneralDockManager, 4, C.db.profile.chat.fade_out_duration, function()
+								GeneralDockManager:Hide()
+							end)
+						end
+					end)
+				else
+					E:FadeOut(GeneralDockManager, 4, C.db.profile.chat.fade_out_duration, function()
+						GeneralDockManager:Hide()
+					end)
+				end
 			end
 
 			self.elapsed = 0
