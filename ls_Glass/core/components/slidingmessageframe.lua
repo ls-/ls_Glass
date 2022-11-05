@@ -153,6 +153,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 	self.ChatFrame = chatFrame
 	self.ChatTab = _G[chatFrame:GetName() .. "Tab"]
+	self.EditBox = _G[chatFrame:GetName() .. "EditBox"]
 	self.historyBuffer = chatFrame.historyBuffer
 	self:SetParent(chatFrame)
 
@@ -221,6 +222,7 @@ function object_proto:ReleaseChatFrame()
 
 		self.ChatFrame = nil
 		self.ChatTab = nil
+		self.EditBox = nil
 		self.historyBuffer = nil
 		t_wipe(self.visibleLines)
 		self:ReleaseAllMessageLines()
@@ -399,7 +401,7 @@ function object_proto:OnFrame()
 		self:ProcessIncoming({t_removemulti(self.incomingMessages, 1, #self.incomingMessages)}, false)
 	end
 
-	local isMouseOver = self:IsMouseOver(24, 0, 0, 0)
+	local isMouseOver = self:IsMouseOver(26, -36, 0, 0)
 	if isMouseOver ~= self.isMouseOver then
 		self.isMouseOver = isMouseOver
 
@@ -407,7 +409,13 @@ function object_proto:OnFrame()
 			for _, visibleLine in next, self.visibleLines do
 				if visibleLine:IsShown() and visibleLine:GetAlpha() ~= 0 then
 					E:FadeIn(visibleLine, C.db.profile.chat.fade_in_duration, function()
-						E:StopFading(visibleLine, 1)
+						if self.isMouseOver then
+							E:StopFading(visibleLine, 1)
+						else
+							E:FadeOut(visibleLine, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
+								visibleLine:Hide()
+							end)
+						end
 					end)
 				end
 			end
@@ -415,19 +423,58 @@ function object_proto:OnFrame()
 			if self:GetFirstMessageIndex() ~= 0 then
 				self.ScrollDownButon:Show()
 				E:FadeIn(self.ScrollDownButon, C.db.profile.chat.fade_in_duration, function()
-					E:StopFading(self.ScrollDownButon, 1)
+					if self.isMouseOver then
+						E:StopFading(self.ScrollDownButon, 1)
+					else
+						E:FadeOut(self.ScrollDownButon, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
+							self.ScrollDownButon:Hide()
+						end)
+					end
 				end)
 			end
 
-			-- if not self.ChatFrame.isDocked then
-			-- 	self.ChatTab:Show()
-			-- 	E:FadeIn(self.ChatTab, C.db.profile.chat.fade_in_duration, function()
-			-- 		E:StopFading(self.ChatTab, 1)
-			-- 	end)
-			-- end
+			-- these use custom values for fading in/out because Blizz fade chat
+			-- as well, so I'm trying not to interfere with that
+			if not self.ChatFrame.isDocked then
+				self.ChatTab:Show()
+				E:FadeIn(self.ChatTab, 0.1, function()
+					if self.isMouseOver then
+						E:StopFading(self.ChatTab, 1)
+					else
+						E:FadeOut(self.ChatTab, 4, C.db.profile.chat.fade_out_duration, function()
+							self.ChatTab:Hide()
+						end)
+					end
+				end)
+			end
+
+			-- IM style chat frame have their own edit boxes
+			if GetCVar("chatStyle") == "im" then
+				self.EditBox.Fader:Show()
+				E:FadeIn(self.EditBox.Fader, 0.1, function()
+					if self.isMouseOver then
+						E:StopFading(self.EditBox.Fader, 1)
+					else
+						E:FadeOut(self.EditBox.Fader, 4, C.db.profile.chat.fade_out_duration, function()
+							self.EditBox.Fader:Hide()
+						end)
+					end
+				end)
+			else
+				ChatFrame1EditBox.Fader:Show()
+				E:FadeIn(ChatFrame1EditBox.Fader, 0.1, function()
+					if self.isMouseOver then
+						E:StopFading(ChatFrame1EditBox.Fader, 1)
+					else
+						E:FadeOut(ChatFrame1EditBox.Fader, 4, C.db.profile.chat.fade_out_duration, function()
+							ChatFrame1EditBox.Fader:Hide()
+						end)
+					end
+				end)
+			end
 		else
 			for _, visibleLine in next, self.visibleLines do
-				if visibleLine:IsShown() and visibleLine:GetAlpha() ~= 0 then
+				if visibleLine:IsShown() and not E:IsFading(visibleLine) then
 					E:FadeOut(visibleLine, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
 						visibleLine:Hide()
 					end)
@@ -438,11 +485,35 @@ function object_proto:OnFrame()
 				self.ScrollDownButon:Hide()
 			end)
 
-			-- if not self.ChatFrame.isDocked then
-			-- 	E:FadeOut(self.ChatTab, C.db.profile.chat.hold_time, C.db.profile.chat.fade_out_duration, function()
-			-- 		self.ChatTab:Hide()
-			-- 	end)
-			-- end
+			-- these use custom values for fading in/out because Blizz fade chat
+			-- as well, so I'm trying not to interfere with that
+			if not self.ChatFrame.isDocked then
+				E:FadeOut(self.ChatTab, 4, C.db.profile.chat.fade_out_duration, function()
+					self.ChatTab:Hide()
+				end)
+			end
+
+			if GetCVar("chatStyle") == "im" then
+				if not self.EditBox:HasFocus() and self.EditBox:GetText() == "" then
+					E:FadeOut(self.EditBox.Fader, 4, C.db.profile.chat.fade_out_duration, function()
+						self.EditBox.Fader:Hide()
+					end)
+				else
+					E:FadeIn(self.EditBox.Fader, 0.1, function()
+						E:StopFading(self.EditBox.Fader, 1)
+					end)
+				end
+			else
+				if not ChatFrame1EditBox:HasFocus() and ChatFrame1EditBox:GetText() == "" then
+					E:FadeOut(ChatFrame1EditBox.Fader, 4, C.db.profile.chat.fade_out_duration, function()
+						ChatFrame1EditBox.Fader:Hide()
+					end)
+				else
+					E:FadeIn(ChatFrame1EditBox.Fader, 0.1, function()
+						E:StopFading(ChatFrame1EditBox.Fader, 1)
+					end)
+				end
+			end
 		end
 	end
 end
