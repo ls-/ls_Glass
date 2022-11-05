@@ -38,6 +38,8 @@ local function chatFrame_ShowHook(self)
 		if not self.SlidingMessageFrame:IsShown() then
 			self.SlidingMessageFrame:Show()
 			self.SlidingMessageFrame:ScrollTo(0, true)
+
+			self.SlidingMessageFrame.ScrollDownButon:Hide()
 		end
 	end
 end
