@@ -451,15 +451,13 @@ function object_proto:OnFrame()
 			end
 
 			-- IM style chat frame have their own edit boxes
+			-- don't hide them, hiding them resets a bunch of stuff
 			if GetCVar("chatStyle") == "im" then
-				self.EditBox.Fader:Show()
 				E:FadeIn(self.EditBox.Fader, 0.1, function()
 					if self.isMouseOver then
 						E:StopFading(self.EditBox.Fader, 1)
 					else
-						E:FadeOut(self.EditBox.Fader, 4, C.db.profile.chat.fade_out_duration, function()
-							self.EditBox.Fader:Hide()
-						end)
+						E:FadeOut(self.EditBox.Fader, 4, C.db.profile.chat.fade_out_duration)
 					end
 				end)
 			else
@@ -468,9 +466,7 @@ function object_proto:OnFrame()
 					if self.isMouseOver then
 						E:StopFading(ChatFrame1EditBox.Fader, 1)
 					else
-						E:FadeOut(ChatFrame1EditBox.Fader, 4, C.db.profile.chat.fade_out_duration, function()
-							ChatFrame1EditBox.Fader:Hide()
-						end)
+						E:FadeOut(ChatFrame1EditBox.Fader, 4, C.db.profile.chat.fade_out_duration)
 					end
 				end)
 			end
@@ -496,11 +492,10 @@ function object_proto:OnFrame()
 			end
 
 			-- IM style chat frame have their own edit boxes
+			-- don't hide them, hiding them resets a bunch of stuff
 			if GetCVar("chatStyle") == "im" then
 				if not self.EditBox:HasFocus() and self.EditBox:GetText() == "" then
-					E:FadeOut(self.EditBox.Fader, 4, C.db.profile.chat.fade_out_duration, function()
-						self.EditBox.Fader:Hide()
-					end)
+					E:FadeOut(self.EditBox.Fader, 4, C.db.profile.chat.fade_out_duration)
 				else
 					E:FadeIn(self.EditBox.Fader, 0.1, function()
 						E:StopFading(self.EditBox.Fader, 1)
@@ -508,9 +503,7 @@ function object_proto:OnFrame()
 				end
 			else
 				if not ChatFrame1EditBox:HasFocus() and ChatFrame1EditBox:GetText() == "" then
-					E:FadeOut(ChatFrame1EditBox.Fader, 4, C.db.profile.chat.fade_out_duration, function()
-						ChatFrame1EditBox.Fader:Hide()
-					end)
+					E:FadeOut(ChatFrame1EditBox.Fader, 4, C.db.profile.chat.fade_out_duration)
 				else
 					E:FadeIn(ChatFrame1EditBox.Fader, 0.1, function()
 						E:StopFading(ChatFrame1EditBox.Fader, 1)
