@@ -385,8 +385,9 @@ function object_proto:AddMessage(_, ...)
 
 			self:SetFirstMessageIndex(self:GetFirstMessageIndex() + 1)
 		else
-			-- I'm pulling message data .historyBuffer, so by the time our frame is done scrolling,
-			-- there might be messages that are already there, but they weren't animated yet
+			-- I'm pulling message data from .historyBuffer, so by the time our
+			-- frame is done scrolling, there might be messages that are already
+			-- there, but they weren't animated yet
 			if self:GetScrollingHandler() then
 				self:SetFirstMessageIndex(self:GetFirstMessageIndex() + 1)
 			end
@@ -612,7 +613,7 @@ do
 			scrollDownButon:Hide()
 			frame.ScrollDownButon = scrollDownButon
 
-			local text = scrollDownButon:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+			local text = scrollDownButon:CreateFontString(nil, "ARTWORK", "GameFontNormal") -- TODO: Fix me!
 			-- local text = scrollDownButon:CreateFontString(nil, "ARTWORK", "GlassMessageFont")
 			text:SetPoint("TOPLEFT", 2, 0)
 			text:SetPoint("BOTTOMRIGHT", -2, 0)
