@@ -57,11 +57,11 @@ function E:OnEnable()
 	for i = 1, NUM_CHAT_WINDOWS do
 		local frame = E:HandleChatFrame(_G["ChatFrame" .. i])
 		if frame then
+			E:HandleChatTab(_G["ChatFrame" .. i .. "Tab"])
+			E:HandleEditBox(_G["ChatFrame" .. i .. "EditBox"])
+
 			chatFrames[frame] = true
 		end
-
-		E:HandleChatTab(_G["ChatFrame" .. i .. "Tab"])
-		E:HandleEditBox(_G["ChatFrame" .. i .. "EditBox"])
 	end
 
 	-- temporary chat frames
@@ -78,11 +78,11 @@ function E:OnEnable()
 		if chatFrame then
 			local frame = E:HandleChatFrame(chatFrame)
 			if frame then
+				E:HandleChatTab(_G[chatFrame:GetName() .. "Tab"])
+				E:HandleEditBox(_G[chatFrame:GetName() .. "EditBox"])
+
 				tempChatFrames[frame] = true
 			end
-
-			E:HandleChatTab(_G[chatFrame:GetName() .. "Tab"])
-			E:HandleEditBox(_G[chatFrame:GetName() .. "EditBox"])
 		end
 	end)
 
