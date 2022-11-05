@@ -4,6 +4,8 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 -- Lua
 local _G = getfenv(0)
 local hooksecurefunc = _G.hooksecurefunc
+local next = _G.next
+local pcall = _G.pcall
 
 -- Mine
 local Core, Constants = unpack(select(2, ...))
@@ -31,18 +33,27 @@ function UIManager:OnEnable()
 	-- all those points, it's easier to just resize this frame
 	GeneralDockManager.scrollFrame.child:SetHeight(18)
 
-	ChatFrame1:HookScript("OnHyperlinkEnter", function(chatFrame, link)
+	ChatFrame1:HookScript("OnHyperlinkEnter", function(chatFrame, link, text)
 		if C.db.profile.mouseover_tooltips then
-			GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)
+			local linkType = LinkUtil.SplitLinkData(link)
+			if linkType == "battlepet" then
+				GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)
+				BattlePetToolTip_ShowLink(text)
+			else
+				GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)
 
-			local isOK = pcall(GameTooltip.SetHyperlink, GameTooltip, link)
-			if not isOK then
-				GameTooltip:Hide()
+				local isOK = pcall(GameTooltip.SetHyperlink, GameTooltip, link)
+				if not isOK then
+					GameTooltip:Hide()
+				else
+					GameTooltip:Show()
+				end
 			end
 		end
 	end)
 
 	ChatFrame1:HookScript("OnHyperlinkLeave", function()
+		BattlePetTooltip:Hide()
 		GameTooltip:Hide()
 	end)
 
