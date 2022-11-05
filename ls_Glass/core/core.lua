@@ -170,19 +170,21 @@ do
 	local function updater_OnUpdate(_, elapsed)
 		for object, data in next, objects do
 			data.fadeTimer = data.fadeTimer + elapsed
-			data.isFading = true
+			if data.fadeTimer > 0 then
+				data.initAlpha = data.initAlpha or object:GetAlpha()
 
-			object:SetAlpha(lerp(data.initAlpha, data.finalAlpha, data.fadeTimer / data.duration))
+				object:SetAlpha(lerp(data.initAlpha, data.finalAlpha, data.fadeTimer / data.duration))
 
-			if data.fadeTimer >= data.duration then
-				remove(object)
+				if data.fadeTimer >= data.duration then
+					remove(object)
 
-				if data.callback then
-					data.callback(object)
-					data.callback = nil
+					if data.callback then
+						data.callback(object)
+						data.callback = nil
+					end
+
+					object:SetAlpha(data.finalAlpha)
 				end
-
-				object:SetAlpha(data.finalAlpha)
 			end
 		end
 	end
@@ -196,8 +198,9 @@ do
 		end
 
 		objects[object] = {
+			mode = mode,
 			fadeTimer = -delay,
-			initAlpha = initAlpha,
+			-- initAlpha = initAlpha,
 			finalAlpha = finalAlpha,
 			duration = duration,
 			callback = callback
@@ -228,5 +231,12 @@ do
 		remove(object)
 
 		object:SetAlpha(alpha or object:GetAlpha())
+	end
+
+	function E:IsFading(object)
+		local data = objects[object]
+		if data then
+			return data.mode
+		end
 	end
 end
