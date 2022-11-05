@@ -1,143 +1,62 @@
-local addonName, ns = ...
+local _, ns = ...
 local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
-local Core, Constants = unpack(select(2, ...))
+-- Lua
+local _G = getfenv(0)
+local hooksecurefunc = _G.hooksecurefunc
 
-local AceHook = Core.Libs.AceHook
+-- Mine
+hooksecurefunc("ChatEdit_DeactivateChat", function(self)
+	local frame = self.chatFrame.SlidingMessageFrame
+	if frame then
+		if not frame.isMouseOver then
+			frame.isMouseOver = nil
+		end
+	end
+end)
 
-local Colors = Constants.COLORS
+hooksecurefunc("ChatEdit_ActivateChat", function(self)
+	local frame = self.chatFrame.SlidingMessageFrame
+	if frame then
+		if not frame.isMouseOver then
+			frame.isMouseOver = nil
+		end
+	end
+end)
 
-local UPDATE_CONFIG = Constants.EVENTS.UPDATE_CONFIG
+hooksecurefunc("ChatEdit_OnChar", function(self)
+	local frame = self.chatFrame.SlidingMessageFrame
+	if frame then
+		if not frame.isMouseOver then
+			frame.isMouseOver = nil
+		end
+	end
+end)
 
--- luacheck: push ignore 113
-local Mixin = Mixin
--- luacheck: pop
+local CHAT_EDIT_BOX_TEXTURES = {
+	"Left",
+	"Mid",
+	"Right",
 
-local EditBoxMixin = {}
+	"FocusLeft",
+	"FocusMid",
+	"FocusRight",
+}
 
-function EditBoxMixin:Init(parent)
-  -- Hide default styling
-  _G[self:GetName().."Left"]:Hide()
-  _G[self:GetName().."Mid"]:Hide()
-  _G[self:GetName().."Right"]:Hide()
+function E:HandleEditBox(frame)
+	for _, texture in ipairs(CHAT_EDIT_BOX_TEXTURES) do
+		_G[frame:GetName() .. texture]:SetTexture(0)
+	end
 
-  self:RawHook(_G[self:GetName().."Left"], "Show", function () end, true)
-  self:RawHook(_G[self:GetName().."Mid"], "Show", function () end, true)
-  self:RawHook(_G[self:GetName().."Right"], "Show", function () end, true)
+	-- Blizz change the edit box's alpha so frequently that trying to adjust it
+	-- directly only produces jank
+	local fader = CreateFrame("Frame", nil, UIParent)
+	frame.Fader = fader
 
-  if Constants.ENV == "retail" then
-    _G[self:GetName().."FocusLeft"]:Hide()
-    _G[self:GetName().."FocusMid"]:Hide()
-    _G[self:GetName().."FocusRight"]:Hide()
-    self:RawHook(_G[self:GetName().."FocusLeft"], "Show", function () end, true)
-    self:RawHook(_G[self:GetName().."FocusMid"], "Show", function () end, true)
-    self:RawHook(_G[self:GetName().."FocusRight"], "Show", function () end, true)
-  end
+	frame:SetParent(fader)
+	frame:ClearAllPoints()
+	frame:SetPoint("TOPLEFT", frame.chatFrame, "BOTTOMLEFT", 0, -2)
+	frame:SetPoint("TOPRIGHT", frame.chatFrame, "BOTTOMRIGHT", 0, -2)
 
-  -- New styling
-  self:ClearAllPoints()
-
-  self:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 8, Core.db.profile.editBoxAnchor.yOfs)
-
-  if Core.db.profile.editBoxAnchor.position == "ABOVE" then
-    self:ClearAllPoints()
-    self:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 8, Core.db.profile.editBoxAnchor.yOfs)
-  end
-
-  self:SetFontObject("GlassEditBoxFont")
-  self:SetWidth(Core.db.profile.frameWidth - 8 * 2)
-  self.header:SetFontObject("GlassEditBoxFont")
-  self.header:SetPoint("LEFT", 8, 0)
-
-  local bg = self:CreateTexture(nil, "BACKGROUND")
-  bg:SetColorTexture(
-    Colors.codGray.r, Colors.codGray.g, Colors.codGray.b, Core.db.profile.editBoxBackgroundOpacity
-  )
-  bg:SetAllPoints()
-
-  local Ypadding = self.header:GetLineHeight() * 0.66
-  self:SetHeight(self.header:GetLineHeight() + Ypadding * 2)
-
-  self:RawHook(self, "SetTextInsets", function ()
-    Ypadding = self.header:GetLineHeight() * 0.66
-    self.hooks[self].SetTextInsets(
-      self,
-      self.header:GetStringWidth() + 8,
-      8, Ypadding, Ypadding
-    )
-  end, true)
-
-  self:SetTextInsets()
-
-  -- Animations
-  -- Intro animations
-  local introAg = self:CreateAnimationGroup()
-  local fadeIn = introAg:CreateAnimation("Alpha")
-  fadeIn:SetFromAlpha(0)
-  fadeIn:SetToAlpha(1)
-  fadeIn:SetDuration(0.2)
-  fadeIn:SetSmoothing("OUT")
-
-  -- Outro animations
-  local outroAg = self:CreateAnimationGroup()
-  local fadeOut = outroAg:CreateAnimation("Alpha")
-  fadeOut:SetFromAlpha(1)
-  fadeOut:SetToAlpha(0)
-  fadeOut:SetDuration(0.05)
-
-  -- Workaround for editbox being open on login
-  self.glassInitialized = false
-
-  self:SetScript("OnShow", function ()
-    if self.glassInitialized then
-      introAg:Play()
-    else
-      self.glassInitialized = true
-    end
-  end)
-
-  outroAg:SetScript("OnFinished", function ()
-    if not introAg:IsPlaying() then
-      self.hooks[self].Hide(self)
-    end
-  end)
-
-  self:RawHook(self, "Hide", function ()
-    outroAg:Play()
-  end, true)
-
-  E:Subscribe(UPDATE_CONFIG, function (key)
-    if key == "font" or key == "editBoxFontSize" then
-      Ypadding = self.header:GetLineHeight() * 0.66
-      self:SetHeight(self.header:GetLineHeight() + Ypadding * 2)
-      self:SetTextInsets()
-    end
-
-    if key == "frameWidth" then
-      self:SetWidth(Core.db.profile.frameWidth - 8 * 2)
-    end
-
-    if key == "editBoxBackgroundOpacity" then
-      bg:SetColorTexture(
-        Colors.codGray.r, Colors.codGray.g, Colors.codGray.b, Core.db.profile.editBoxBackgroundOpacity
-      )
-    end
-
-    if key == "editBoxAnchor" then
-      if Core.db.profile.editBoxAnchor.position == "ABOVE" then
-        self:ClearAllPoints()
-        self:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 8, Core.db.profile.editBoxAnchor.yOfs)
-      else
-        self:ClearAllPoints()
-        self:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 8, Core.db.profile.editBoxAnchor.yOfs)
-      end
-    end
-  end)
-end
-
-Core.Components.CreateEditBox = function (parent)
-  local object = Mixin(_G.ChatFrame1EditBox, EditBoxMixin)
-  AceHook:Embed(object)
-  object:Init(parent)
-  return object
+	frame.Backdrop = E:CreateBackdrop(frame, 0, 2)
 end

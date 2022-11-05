@@ -59,6 +59,7 @@ function UIManager:OnEnable()
 		end
 
 		E:HandleChatTab(_G["ChatFrame" .. i .. "Tab"])
+		E:HandleEditBox(_G["ChatFrame" .. i .. "EditBox"])
 	end
 
 	-- temporary chat frames
@@ -79,6 +80,7 @@ function UIManager:OnEnable()
 			end
 
 			E:HandleChatTab(_G[chatFrame:GetName() .. "Tab"])
+			E:HandleEditBox(_G[chatFrame:GetName() .. "EditBox"])
 		end
 	end)
 
