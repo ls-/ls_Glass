@@ -33,6 +33,12 @@ hooksecurefunc("ChatEdit_OnChar", function(self)
 	end
 end)
 
+local function chatEdit_Show(self)
+	self.Fader:Show()
+end
+
+local hookedEditBoxes = {}
+
 local CHAT_EDIT_BOX_TEXTURES = {
 	"Left",
 	"Mid",
@@ -59,4 +65,10 @@ function E:HandleEditBox(frame)
 	frame:SetPoint("TOPRIGHT", frame.chatFrame, "BOTTOMRIGHT", 0, -2)
 
 	frame.Backdrop = E:CreateBackdrop(frame, 0, 2)
+
+	if not hookedEditBoxes[frame] then
+		hooksecurefunc(frame, "Show", chatEdit_Show)
+
+		hookedEditBoxes[frame] = true
+	end
 end
