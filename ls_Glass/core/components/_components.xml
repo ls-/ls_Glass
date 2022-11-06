@@ -1,6 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="backdrop.lua"/>
 	<Script file="tab.lua"/>
+	<Script file="dock.lua"/>
 	<Script file="editbox.lua"/>
 	<!-- <Script file="fonts.lua"/> -->
 	<Script file="gradientbackground.lua"/>

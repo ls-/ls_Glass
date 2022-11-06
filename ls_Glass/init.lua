@@ -22,10 +22,9 @@ local tempChatFrames = {}
 local expectedChatFrames = {}
 
 function E:OnEnable()
-	GeneralDockManager:SetHeight(20)
-	GeneralDockManager.scrollFrame:SetHeight(20)
-	GeneralDockManager.scrollFrame.child:SetHeight(20)
+	E:HandleDock(GeneralDockManager)
 
+	-- TODO: Move these somewhere better
 	ChatFrame1:HookScript("OnHyperlinkEnter", function(chatFrame, link, text)
 		if C.db.profile.mouseover_tooltips then
 			local linkType = LinkUtil.SplitLinkData(link)
