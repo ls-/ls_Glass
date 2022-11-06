@@ -143,13 +143,13 @@ function E:OnEnable()
 							if self.isMouseOver then
 								E:StopFading(GeneralDockManager, 1)
 							else
-								E:FadeOut(GeneralDockManager, 4, C.db.profile.chat.fade_out_duration, function()
+								E:FadeOut(GeneralDockManager, 4, C.db.profile.dock.fade.out_duration, function()
 									GeneralDockManager:Hide()
 								end)
 							end
 						end)
 					else
-						E:FadeOut(GeneralDockManager, 4, C.db.profile.chat.fade_out_duration, function()
+						E:FadeOut(GeneralDockManager, 4, C.db.profile.dock.fade.out_duration, function()
 							GeneralDockManager:Hide()
 						end)
 					end

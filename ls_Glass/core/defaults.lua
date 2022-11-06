@@ -44,7 +44,7 @@ D.profile = {
 			outline = false,
 		},
 		fade = {
-			enabled = false,
+			enabled = true,
 			-- in_duration = 0.1, -- * hardcoded
 			-- out_delay = 4, -- * hardcoded
 			out_duration = 0.6,
