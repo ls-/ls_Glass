@@ -24,10 +24,7 @@ local expectedChatFrames = {}
 function E:OnEnable()
 	GeneralDockManager:SetHeight(20)
 	GeneralDockManager.scrollFrame:SetHeight(20)
-
-	-- tabs that are parented to it are shifted down, so instead of messing with
-	-- all those points, it's easier to just resize this frame
-	GeneralDockManager.scrollFrame.child:SetHeight(18)
+	GeneralDockManager.scrollFrame.child:SetHeight(20)
 
 	ChatFrame1:HookScript("OnHyperlinkEnter", function(chatFrame, link, text)
 		if C.db.profile.mouseover_tooltips then

@@ -7,6 +7,13 @@ local hooksecurefunc = _G.hooksecurefunc
 local next = _G.next
 
 -- Mine
+local function chatTab_SetPoint(self, _, anchor, _, _, _, shouldIgnore)
+	if anchor == GeneralDockManager.scrollFrame.child and not shouldIgnore then
+		self:ClearAllPoints()
+		self:SetPoint("BOTTOMLEFT", anchor, "BOTTOMLEFT", 0, 0, true)
+	end
+end
+
 local function chatTabText_SetPoint(self, p, anchor, rP, x, _, shouldIgnore)
 	if not shouldIgnore then
 		self:SetPoint(p, anchor, rP, x, p == "CENTER" and 0 or -6, true)
@@ -39,6 +46,7 @@ function E:HandleChatTab(frame)
 	if not handledChatTabs[frame] then
 		frame.Backdrop = E:CreateBackdrop(frame)
 
+		hooksecurefunc(frame, "SetPoint", chatTab_SetPoint)
 		hooksecurefunc(frame.Text, "SetPoint", chatTabText_SetPoint)
 		hooksecurefunc(frame.Text, "SetTextColor", chatTabText_SetTextColor)
 
