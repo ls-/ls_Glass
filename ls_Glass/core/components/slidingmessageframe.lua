@@ -562,26 +562,20 @@ function object_proto:ProcessIncoming(incoming, doNotFade)
 
 	LibEasing:StopEasing(self:GetScrollingHandler())
 
-	if C.db.profile.chat.slide_in_duration > 0 then
-		self:SetScrollingHandler(LibEasing:Ease(
-			function (n)
-				self:SetVerticalScroll(n)
-			end,
-			startOffset,
-			endOffset,
-			C.db.profile.chat.slide_in_duration,
-			LibEasing.OutCubic,
-			function()
-				self:SetVerticalScroll(0)
-				self:Refresh(0, doNotFade)
-				self:SetScrollingHandler()
-			end
-		))
-	else
-		self:SetVerticalScroll(0)
-		self:Refresh(0, doNotFade)
-		self:SetScrollingHandler()
-	end
+	self:SetScrollingHandler(LibEasing:Ease(
+		function (n)
+			self:SetVerticalScroll(n)
+		end,
+		startOffset,
+		endOffset,
+		C.db.profile.chat.slide_in_duration,
+		LibEasing.OutCubic,
+		function()
+			self:SetVerticalScroll(0)
+			self:Refresh(0, doNotFade)
+			self:SetScrollingHandler()
+		end
+	))
 end
 
 function object_proto:Release()
