@@ -435,40 +435,42 @@ function object_proto:OnFrame()
 				end)
 			end
 
-			-- these use custom values for fading in/out because Blizz fade chat as well,
-			-- so I'm trying not to interfere with that
-			if not self.ChatFrame.isDocked then
-				self.ChatTab:Show()
-				E:FadeIn(self.ChatTab, 0.1, function()
-					if self.isMouseOver then
-						E:StopFading(self.ChatTab, 1)
-					else
-						E:FadeOut(self.ChatTab, 4, C.db.profile.chat.fade_out_duration, function()
-							self.ChatTab:Hide()
-						end)
-					end
-				end)
-			end
+			if C.db.profile.dock.fade.enabled then
+				-- these use custom values for fading in/out because Blizz fade chat as well,
+				-- so I'm trying not to interfere with that
+				if not self.ChatFrame.isDocked then
+					self.ChatTab:Show()
+					E:FadeIn(self.ChatTab, 0.1, function()
+						if self.isMouseOver then
+							E:StopFading(self.ChatTab, 1)
+						else
+							E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration, function()
+								self.ChatTab:Hide()
+							end)
+						end
+					end)
+				end
 
-			-- IM style chat frame have their own edit boxes
-			-- don't hide them, hiding them resets a bunch of stuff
-			if GetCVar("chatStyle") == "im" then
-				E:FadeIn(self.EditBox.Fader, 0.1, function()
-					if self.isMouseOver then
-						E:StopFading(self.EditBox.Fader, 1)
-					else
-						E:FadeOut(self.EditBox.Fader, 4, C.db.profile.chat.fade_out_duration)
-					end
-				end)
-			else
-				ChatFrame1EditBox.Fader:Show()
-				E:FadeIn(ChatFrame1EditBox.Fader, 0.1, function()
-					if self.isMouseOver then
-						E:StopFading(ChatFrame1EditBox.Fader, 1)
-					else
-						E:FadeOut(ChatFrame1EditBox.Fader, 4, C.db.profile.chat.fade_out_duration)
-					end
-				end)
+				-- IM style chat frame have their own edit boxes
+				-- don't hide them, hiding them resets a bunch of stuff
+				if GetCVar("chatStyle") == "im" then
+					E:FadeIn(self.EditBox.Fader, 0.1, function()
+						if self.isMouseOver then
+							E:StopFading(self.EditBox.Fader, 1)
+						else
+							E:FadeOut(self.EditBox.Fader, 4, C.db.profile.dock.fade.out_duration)
+						end
+					end)
+				else
+					ChatFrame1EditBox.Fader:Show()
+					E:FadeIn(ChatFrame1EditBox.Fader, 0.1, function()
+						if self.isMouseOver then
+							E:StopFading(ChatFrame1EditBox.Fader, 1)
+						else
+							E:FadeOut(ChatFrame1EditBox.Fader, 4, C.db.profile.dock.fade.out_duration)
+						end
+					end)
+				end
 			end
 		else
 			for _, visibleLine in next, self.visibleLines do
@@ -483,35 +485,37 @@ function object_proto:OnFrame()
 				self.ScrollDownButon:Hide()
 			end)
 
-			-- these use custom values for fading in/out because Blizz fade chat as well,
-			-- so I'm trying not to interfere with that
-			if not self.ChatFrame.isDocked then
-				if not self.ChatTab.isDragging then
-					E:FadeOut(self.ChatTab, 4, C.db.profile.chat.fade_out_duration, function()
-						self.ChatTab:Hide()
-					end)
-				else
-					E:StopFading(self.ChatTab, 1)
+			if C.db.profile.dock.fade.enabled then
+				-- these use custom values for fading in/out because Blizz fade chat as well,
+				-- so I'm trying not to interfere with that
+				if not self.ChatFrame.isDocked then
+					if not self.ChatTab.isDragging then
+						E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration, function()
+							self.ChatTab:Hide()
+						end)
+					else
+						E:StopFading(self.ChatTab, 1)
+					end
 				end
-			end
 
-			-- IM style chat frame have their own edit boxes
-			-- don't hide them, hiding them resets a bunch of stuff
-			if GetCVar("chatStyle") == "im" then
-				if not self.EditBox:HasFocus() and self.EditBox:GetText() == "" then
-					E:FadeOut(self.EditBox.Fader, 4, C.db.profile.chat.fade_out_duration)
+				-- IM style chat frame have their own edit boxes
+				-- don't hide them, hiding them resets a bunch of stuff
+				if GetCVar("chatStyle") == "im" then
+					if not self.EditBox:HasFocus() and self.EditBox:GetText() == "" then
+						E:FadeOut(self.EditBox.Fader, 4, C.db.profile.dock.fade.out_duration)
+					else
+						E:FadeIn(self.EditBox.Fader, 0.1, function()
+							E:StopFading(self.EditBox.Fader, 1)
+						end)
+					end
 				else
-					E:FadeIn(self.EditBox.Fader, 0.1, function()
-						E:StopFading(self.EditBox.Fader, 1)
-					end)
-				end
-			else
-				if not ChatFrame1EditBox:HasFocus() and ChatFrame1EditBox:GetText() == "" then
-					E:FadeOut(ChatFrame1EditBox.Fader, 4, C.db.profile.chat.fade_out_duration)
-				else
-					E:FadeIn(ChatFrame1EditBox.Fader, 0.1, function()
-						E:StopFading(ChatFrame1EditBox.Fader, 1)
-					end)
+					if not ChatFrame1EditBox:HasFocus() and ChatFrame1EditBox:GetText() == "" then
+						E:FadeOut(ChatFrame1EditBox.Fader, 4, C.db.profile.dock.fade.out_duration)
+					else
+						E:FadeIn(ChatFrame1EditBox.Fader, 0.1, function()
+							E:StopFading(ChatFrame1EditBox.Fader, 1)
+						end)
+					end
 				end
 			end
 		end

@@ -19,7 +19,6 @@ D.profile = {
 	width = 448,
 	height = 256,
 	chat = {
-		mouseover = true,
 		hold_time = 10,
 		opacity = 0.4,
 		padding = 2,
@@ -28,8 +27,14 @@ D.profile = {
 		fade_in_duration = 0.6,
 		fade_out_duration = 0.6,
 	},
-	dock = {
+	dock = { -- and edit boxes
 		alpha = 0.8,
+		fade = {
+			enabled = false,
+			-- in_duration = 0.1, -- * hardcoded
+			-- out_delay = 4, -- * hardcoded
+			out_duration = 0.6,
+		},
 	},
 
 	indented_word_wrap = true,

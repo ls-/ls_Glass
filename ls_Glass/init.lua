@@ -128,27 +128,29 @@ function E:OnEnable()
 				frame:OnFrame()
 			end
 
-			-- these use custom values for fading in/out because Blizz fade chat as well,
-			-- so I'm trying not to interfere with that
-			local isMouseOver = ChatFrame1:IsMouseOver(26, -36, 0, 0)
-			if self.isMouseOver ~= isMouseOver then
-				self.isMouseOver = isMouseOver
+			if C.db.profile.dock.fade.enabled then
+				-- these use custom values for fading in/out because Blizz fade chat as well,
+				-- so I'm trying not to interfere with that
+				local isMouseOver = ChatFrame1:IsMouseOver(26, -36, 0, 0)
+				if self.isMouseOver ~= isMouseOver then
+					self.isMouseOver = isMouseOver
 
-				if isMouseOver then
-					GeneralDockManager:Show()
-					E:FadeIn(GeneralDockManager, 0.1, function()
-						if self.isMouseOver then
-							E:StopFading(GeneralDockManager, 1)
-						else
-							E:FadeOut(GeneralDockManager, 4, C.db.profile.chat.fade_out_duration, function()
-								GeneralDockManager:Hide()
-							end)
-						end
-					end)
-				else
-					E:FadeOut(GeneralDockManager, 4, C.db.profile.chat.fade_out_duration, function()
-						GeneralDockManager:Hide()
-					end)
+					if isMouseOver then
+						GeneralDockManager:Show()
+						E:FadeIn(GeneralDockManager, 0.1, function()
+							if self.isMouseOver then
+								E:StopFading(GeneralDockManager, 1)
+							else
+								E:FadeOut(GeneralDockManager, 4, C.db.profile.chat.fade_out_duration, function()
+									GeneralDockManager:Hide()
+								end)
+							end
+						end)
+					else
+						E:FadeOut(GeneralDockManager, 4, C.db.profile.chat.fade_out_duration, function()
+							GeneralDockManager:Hide()
+						end)
+					end
 				end
 			end
 
