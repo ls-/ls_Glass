@@ -10,7 +10,7 @@ local message_line_proto = {}
 
 do
 	function message_line_proto:SetIndentedWordWrap()
-		self.Text:SetIndentedWordWrap(C.db.profile.indented_word_wrap)
+		self.Text:SetIndentedWordWrap(C.db.profile.chat.font.indented_word_wrap)
 	end
 
 	function message_line_proto:SetText(text, r, g, b, a)
@@ -23,7 +23,7 @@ do
 
 	function message_line_proto:UpdateGradient()
 		self:SetGradientBackgroundSize(50, m_min(250, C.db.profile.width - 50))
-		self:SetGradientBackgroundColor(0, 0, 0, C.db.profile.chat.opacity) -- TODO: Add me to config!
+		self:SetGradientBackgroundColor(0, 0, 0, C.db.profile.chat.alpha) -- TODO: Add me to config!
 	end
 end
 
@@ -33,7 +33,7 @@ local function createMessageLine(parent)
 	frame:SetAlpha(0)
 	frame:Hide()
 
-	E:CreateGradientBackground(frame, 50, m_min(250, C.db.profile.width - 50), 0, 0, 0, C.db.profile.chat.opacity) -- TODO: Add me to config!
+	E:CreateGradientBackground(frame, 50, m_min(250, C.db.profile.width - 50), 0, 0, 0, C.db.profile.chat.alpha) -- TODO: Add me to config!
 
 	frame.Text = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal") -- TODO: Fix me!
 	-- frame.Text = frame:CreateFontString(nil, "ARTWORK", "GlassMessageFont")
@@ -41,7 +41,7 @@ local function createMessageLine(parent)
 	frame.Text:SetPoint("RIGHT", -15, 0)
 	frame.Text:SetJustifyH("LEFT")
 	frame.Text:SetJustifyV("MIDDLE")
-	frame.Text:SetIndentedWordWrap(C.db.profile.indented_word_wrap)
+	frame.Text:SetIndentedWordWrap(C.db.profile.chat.font.indented_word_wrap)
 
 	return frame
 end

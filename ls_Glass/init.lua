@@ -26,7 +26,7 @@ function E:OnEnable()
 
 	-- TODO: Move these somewhere better
 	ChatFrame1:HookScript("OnHyperlinkEnter", function(chatFrame, link, text)
-		if C.db.profile.mouseover_tooltips then
+		if C.db.profile.chat.tooltips then
 			local linkType = LinkUtil.SplitLinkData(link)
 			if linkType == "battlepet" then
 				GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)

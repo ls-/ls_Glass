@@ -18,17 +18,31 @@ D.global = {
 D.profile = {
 	width = 448,
 	height = 256,
+	font = LibStub("LibSharedMedia-3.0"):GetDefault("font"), -- "Friz Quadrata TT"
 	chat = {
-		hold_time = 10,
-		opacity = 0.4,
-		padding = 2,
+		alpha = 0.4,
 		size = 12,
-		slide_in_duration = 0.3,
-		fade_in_duration = 0.6,
-		fade_out_duration = 0.6,
+		padding = 2,
+		tooltips = true,
+		font = {
+			shadow = true,
+			outline = false,
+			indented_word_wrap = true,
+		},
+		slide_in_duration = 0.0,
+		fade = {
+			-- enabled = true, -- * hardcoded
+			in_duration = 0.6,
+			out_delay = 10,
+			out_duration = 0.6,
+		},
 	},
 	dock = { -- and edit boxes
 		alpha = 0.8,
+		font = {
+			shadow = true,
+			outline = false,
+		},
 		fade = {
 			enabled = false,
 			-- in_duration = 0.1, -- * hardcoded
@@ -37,12 +51,8 @@ D.profile = {
 		},
 	},
 
-	indented_word_wrap = true,
-	mouseover_tooltips = true,
-
 	-- OLD
 	-- General
-	font = "Friz Quadrata TT",
 	fontFlags = "",
 	frameWidth = 450,
 	frameHeight = 230,
