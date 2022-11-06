@@ -21,7 +21,6 @@ D.profile = {
 	font = LibStub("LibSharedMedia-3.0"):GetDefault("font"), -- "Friz Quadrata TT"
 	chat = {
 		alpha = 0.4,
-		padding = 2,
 		tooltips = true,
 		font = {
 			size = 12,

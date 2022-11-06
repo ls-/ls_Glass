@@ -13,7 +13,7 @@ do
 		self.Text:SetText(text)
 		self.Text:SetTextColor(r or 1, g or 1, b or 1, a)
 
-		self:SetHeight(self.Text:GetStringHeight() + C.db.profile.chat.padding * 2)
+		self:SetHeight(self.Text:GetStringHeight() + 4)
 	end
 
 	function message_line_proto:UpdateGradient()
@@ -28,7 +28,7 @@ local function createMessageLine(parent)
 	local width = parent:GetWidth()
 
 	local frame = Mixin(CreateFrame("Frame", nil, parent, "LSGlassHyperlinkPropagator"), message_line_proto)
-	frame:SetSize(width, C.db.profile.chat.font.size + C.db.profile.chat.padding * 2)
+	frame:SetSize(width, C.db.profile.chat.font.size + 4)
 	frame:SetAlpha(0)
 	frame:Hide()
 
@@ -45,7 +45,7 @@ local function resetMessageLine(messageLine, parent)
 	messageLine.Text:SetText("")
 	messageLine:ClearAllPoints()
 	messageLine:Hide()
-	messageLine:SetSize(parent:GetWidth(), C.db.profile.chat.font.size + C.db.profile.chat.padding * 2)
+	messageLine:SetSize(parent:GetWidth(), C.db.profile.chat.font.size + 4)
 	messageLine:UpdateGradient()
 	E:StopFading(messageLine, 0)
 end

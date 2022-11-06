@@ -103,14 +103,14 @@ do
 				self.Text:SetText(text)
 
 				self:SetWidth(self.Text:GetUnboundedStringWidth() + 26)
-				self:SetHeight(self.Text:GetStringHeight() + C.db.profile.chat.padding * 2)
+				self:SetHeight(self.Text:GetStringHeight() + 4)
 			else
 				E:StopFading(self.Text, 1)
 				E:FadeOut(self.Text, 0, 0.1, function()
 					self.Text:SetText(text)
 
 					self:SetWidth(self.Text:GetUnboundedStringWidth() + 26)
-					self:SetHeight(self.Text:GetStringHeight() + C.db.profile.chat.padding * 2)
+					self:SetHeight(self.Text:GetStringHeight() + 4)
 
 					E:FadeIn(self.Text, 0.1)
 				end)
@@ -277,7 +277,7 @@ function object_proto:ReleaseMessageLine(messageLine)
 end
 
 function object_proto:GetMaxMessages()
-	return m_ceil(self.ChatFrame:GetHeight() / (C.db.profile.chat.font.size + 2 * C.db.profile.chat.padding))
+	return m_ceil(self.ChatFrame:GetHeight() / (C.db.profile.chat.font.size + 4))
 end
 
 function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
