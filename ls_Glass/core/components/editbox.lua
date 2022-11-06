@@ -73,4 +73,10 @@ function E:HandleEditBox(frame)
 	frame:ClearAllPoints()
 	frame:SetPoint("TOPLEFT", frame.chatFrame, "BOTTOMLEFT", 0, -2)
 	frame:SetPoint("TOPRIGHT", frame.chatFrame, "BOTTOMRIGHT", 0, -2)
+
+	frame:SetFontObject("LSGlassEditBoxFont")
+	frame.header:SetFontObject("LSGlassEditBoxFont")
+	frame.headerSuffix:SetFontObject("LSGlassEditBoxFont")
+	frame.NewcomerHint:SetFontObject("LSGlassEditBoxFont")
+	frame.prompt:SetFontObject("LSGlassEditBoxFont")
 end

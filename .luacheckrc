@@ -41,18 +41,19 @@ read_globals = {
 	"Clamp",
 	"ColorMixin",
 	"CreateObjectPool",
+	"DEFAULT_TAB_SELECTED_COLOR_TABLE",
 	"GameTooltip",
 	"GeneralDockManager",
 	"Mixin",
 	"NORMAL_FONT_COLOR",
 	"NUM_CHAT_WINDOWS",
 	"UIParent",
-	"DEFAULT_TAB_SELECTED_COLOR_TABLE",
 
 	-- Namespace
 	"LinkUtil",
 
 	-- API
+	"CreateFont",
 	"CreateFrame",
 	"GetAddOnMetadata",
 	"GetCVar",

@@ -15,6 +15,8 @@ function E:OnInitialize()
 	self.VER.number = tonumber(self.VER.string:gsub("%D", ""), nil)
 
 	C.db = LibStub("AceDB-3.0"):New("LS_GLASS_GLOBAL_CONFIG", D, true)
+
+	E:CreateFonts()
 end
 
 local chatFrames = {}

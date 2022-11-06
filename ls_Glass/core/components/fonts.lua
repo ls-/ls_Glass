@@ -1,88 +1,75 @@
-local addonName, ns = ...
+local _, ns = ...
 local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
-local Core, Constants = unpack(select(2, ...))
-local Fonts = Core:GetModule("Fonts")
+-- Lua
+local _G = getfenv(0)
 
-local LSM = Core.Libs.LSM
+-- Mine
+local LSM = LibStub("LibSharedMedia-3.0")
 
-local UPDATE_CONFIG = Constants.EVENTS.UPDATE_CONFIG
+function E:CreateFonts()
+	local messageFont = CreateFont("LSGlassMessageFont")
+	messageFont:SetFont(
+		LSM:Fetch("font", C.db.profile.font),
+		C.db.profile.chat.font.size,
+		C.db.profile.chat.font.outline and "OUTLINE" or ""
+	)
 
--- luacheck: push ignore 113
-local CreateFont = CreateFont
--- luacheck: pop
+	messageFont:SetShadowColor(0, 0, 0, 1)
 
-function Fonts:OnInitialize()
-  self.fonts = {}
+	if C.db.profile.chat.font.shadow then
+		messageFont:SetShadowOffset(1, -1)
+	else
+		messageFont:SetShadowOffset(0, 0)
+	end
+
+	messageFont:SetJustifyH("LEFT")
+	messageFont:SetJustifyV("MIDDLE")
+	messageFont:SetIndentedWordWrap(C.db.profile.chat.font.indented_word_wrap)
+
+	local editBoxFont = CreateFont("LSGlassEditBoxFont")
+	editBoxFont:SetFont(
+		LSM:Fetch("font", C.db.profile.font), -- ? Add eparate font?
+		C.db.profile.dock.font.size,
+		C.db.profile.dock.font.outline and "OUTLINE" or ""
+	)
+
+	editBoxFont:SetShadowColor(0, 0, 0, 1)
+
+	if C.db.profile.dock.font.shadow then
+		editBoxFont:SetShadowOffset(1, -1)
+	else
+		editBoxFont:SetShadowOffset(0, 0)
+	end
+
+	editBoxFont:SetJustifyH("LEFT")
+	editBoxFont:SetJustifyV("MIDDLE")
 end
 
-function Fonts:OnEnable()
-  -- GlassMessageFont
-  self.fonts.GlassMessageFont = CreateFont("GlassMessageFont")
-  self.fonts.GlassMessageFont:SetFont(
-    LSM:Fetch(LSM.MediaType.FONT, Core.db.profile.font),
-    Core.db.profile.messageFontSize,
-    Core.db.profile.fontFlags
-  )
-  self.fonts.GlassMessageFont:SetShadowColor(0, 0, 0, 1)
-  self.fonts.GlassMessageFont:SetShadowOffset(1, -1)
-  self.fonts.GlassMessageFont:SetJustifyH("LEFT")
-  self.fonts.GlassMessageFont:SetJustifyV("MIDDLE")
-  self.fonts.GlassMessageFont:SetSpacing(Core.db.profile.messageLeading)
+function E:UpdateFonts()
+	LSGlassMessageFont:SetFont(
+		LSM:Fetch("font", C.db.profile.font),
+		C.db.profile.chat.font.size,
+		C.db.profile.chat.font.outline and "OUTLINE" or ""
+	)
 
-  -- GlassChatDockFont
-  self.fonts.GlassChatDockFont = CreateFont("GlassChatDockFont")
-  self.fonts.GlassChatDockFont:SetFont(
-    LSM:Fetch(LSM.MediaType.FONT, Core.db.profile.font),
-    12,
-    Core.db.profile.fontFlags
-  )
-  self.fonts.GlassChatDockFont:SetShadowColor(0, 0, 0, 0)
-  self.fonts.GlassChatDockFont:SetShadowOffset(1, -1)
-  self.fonts.GlassChatDockFont:SetJustifyH("LEFT")
-  self.fonts.GlassChatDockFont:SetJustifyV("MIDDLE")
-  self.fonts.GlassChatDockFont:SetSpacing(3)
+	if C.db.profile.chat.font.shadow then
+		LSGlassMessageFont:SetShadowOffset(1, -1)
+	else
+		LSGlassMessageFont:SetShadowOffset(0, 0)
+	end
 
-  -- GlassEditBoxFont
-  self.fonts.GlassEditBoxFont = CreateFont("GlassEditBoxFont")
-  self.fonts.GlassEditBoxFont:SetFont(
-    LSM:Fetch(LSM.MediaType.FONT, Core.db.profile.font),
-    Core.db.profile.editBoxFontSize,
-    Core.db.profile.fontFlags
-  )
-  self.fonts.GlassEditBoxFont:SetShadowColor(0, 0, 0, 0)
-  self.fonts.GlassEditBoxFont:SetShadowOffset(1, -1)
-  self.fonts.GlassEditBoxFont:SetJustifyH("LEFT")
-  self.fonts.GlassEditBoxFont:SetJustifyV("MIDDLE")
-  self.fonts.GlassEditBoxFont:SetSpacing(3)
+	LSGlassMessageFont:SetIndentedWordWrap(C.db.profile.chat.font.indented_word_wrap)
 
-  E:Subscribe(UPDATE_CONFIG, function (key)
-    if key == "font" or key == "messageFontSize" then
-      self.fonts.GlassMessageFont:SetFont(
-        LSM:Fetch(LSM.MediaType.FONT, Core.db.profile.font),
-        Core.db.profile.messageFontSize,
-        Core.db.profile.fontFlags
-      )
-    end
+	LSGlassEditBoxFont:SetFont(
+		LSM:Fetch("font", C.db.profile.font),
+		C.db.profile.dock.font.size,
+		C.db.profile.dock.font.outline and "OUTLINE" or ""
+	)
 
-    if key == "messageLeading" then
-      self.fonts.GlassMessageFont:SetSpacing(Core.db.profile.messageLeading)
-    end
-
-    if key == "font" then
-      self.fonts.GlassChatDockFont:SetFont(
-        LSM:Fetch(LSM.MediaType.FONT, Core.db.profile.font),
-        12,
-        Core.db.profile.fontFlags
-      )
-    end
-
-    if key == "font" or key == "editBoxFontSize" then
-      self.fonts.GlassEditBoxFont:SetFont(
-        LSM:Fetch(LSM.MediaType.FONT, Core.db.profile.font),
-        Core.db.profile.editBoxFontSize,
-        Core.db.profile.fontFlags
-      )
-    end
-  end)
+	if C.db.profile.dock.font.shadow then
+		LSGlassEditBoxFont:SetShadowOffset(1, -1)
+	else
+		LSGlassEditBoxFont:SetShadowOffset(0, 0)
+	end
 end

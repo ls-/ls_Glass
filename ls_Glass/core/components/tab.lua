@@ -117,12 +117,6 @@ function E:HandleChatTab(frame)
 	frame.HighlightMiddle:SetTexCoord(0, 1, 0, 0.5)
 	frame.HighlightMiddle:SetSize(8, 8)
 
-	-- frame:SetNormalFontObject("GameFontNormal") -- TODO: Fix me!
-	-- frame.Text:SetJustifyH("LEFT")
-	-- frame.Text:SetJustifyV("MIDDLE")
-	-- frame.Text:SetPoint("TOPLEFT", 2, -2)
-	-- frame.Text:SetPoint("BOTTOMRIGHT", -2, 2)
-
 	-- reset the tab
 	frame:SetPoint(frame:GetPoint(1))
 

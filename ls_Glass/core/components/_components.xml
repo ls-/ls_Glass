@@ -2,7 +2,7 @@
 	<Script file="backdrop.lua"/>
 	<Script file="dock.lua"/>
 	<Script file="editbox.lua"/>
-	<!-- <Script file="fonts.lua"/> -->
+	<Script file="fonts.lua"/>
 	<Script file="gradientbackground.lua"/>
 	<Script file="messageline.lua"/>
 	<Script file="slidingmessageframe.lua"/>

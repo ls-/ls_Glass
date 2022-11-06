@@ -269,7 +269,7 @@ function object_proto:ReleaseMessageLine(messageLine)
 end
 
 function object_proto:GetMaxMessages()
-	return m_ceil(self.ChatFrame:GetHeight() / (C.db.profile.chat.size + 2 * C.db.profile.chat.padding))
+	return m_ceil(self.ChatFrame:GetHeight() / (C.db.profile.chat.font.size + 2 * C.db.profile.chat.padding))
 end
 
 function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
