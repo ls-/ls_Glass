@@ -47,6 +47,7 @@ read_globals = {
 	"NORMAL_FONT_COLOR",
 	"NUM_CHAT_WINDOWS",
 	"UIParent",
+	"DEFAULT_TAB_SELECTED_COLOR_TABLE",
 
 	-- Namespace
 	"LinkUtil",
