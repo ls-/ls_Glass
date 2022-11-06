@@ -21,9 +21,16 @@ local LibEasing = LibStub("LibEasing-1.0")
 local function chatFrame_OnSizeChanged(self, width, height)
 	if self.SlidingMessageFrame then
 		-- TODO: Get height, width, etc from here instead of config
+		width, height = E:Round(width), E:Round(height)
 
 		self.SlidingMessageFrame:SetSize(width, height)
 		self.SlidingMessageFrame.ScrollChild:SetSize(width, height)
+
+		t_wipe(self.SlidingMessageFrame.visibleLines)
+		self.SlidingMessageFrame:ReleaseAllMessageLines()
+		self.SlidingMessageFrame:ScrollTo(0)
+
+		self.SlidingMessageFrame.ScrollDownButon:Hide()
 	end
 end
 
@@ -160,19 +167,19 @@ function object_proto:CaptureChatFrame(chatFrame)
 	chatFrame.SlidingMessageFrame = self
 
 	-- TODO: Comment me out!
-	if not chatFrame.bg1 then
-		chatFrame.bg1 = chatFrame:CreateTexture(nil, "BACKGROUND")
-		chatFrame.bg1:SetColorTexture(0, 0.6, 0.3, 0.3)
-		chatFrame.bg1:SetPoint("TOPLEFT")
-		chatFrame.bg1:SetPoint("BOTTOMLEFT")
-		chatFrame.bg1:SetWidth(25)
+	-- if not chatFrame.bg1 then
+	-- 	chatFrame.bg1 = chatFrame:CreateTexture(nil, "BACKGROUND")
+	-- 	chatFrame.bg1:SetColorTexture(0, 0.6, 0.3, 0.3)
+	-- 	chatFrame.bg1:SetPoint("TOPLEFT")
+	-- 	chatFrame.bg1:SetPoint("BOTTOMLEFT")
+	-- 	chatFrame.bg1:SetWidth(25)
 
-		chatFrame.bg2 = chatFrame:CreateTexture(nil, "BACKGROUND")
-		chatFrame.bg2:SetColorTexture(0, 0.6, 0.3, 0.3)
-		chatFrame.bg2:SetPoint("TOPRIGHT")
-		chatFrame.bg2:SetPoint("BOTTOMRIGHT")
-		chatFrame.bg2:SetWidth(25)
-	end
+	-- 	chatFrame.bg2 = chatFrame:CreateTexture(nil, "BACKGROUND")
+	-- 	chatFrame.bg2:SetColorTexture(0, 0.6, 0.3, 0.3)
+	-- 	chatFrame.bg2:SetPoint("TOPRIGHT")
+	-- 	chatFrame.bg2:SetPoint("BOTTOMRIGHT")
+	-- 	chatFrame.bg2:SetWidth(25)
+	-- end
 
 	chatFrame:SetClampedToScreen(false)
 	chatFrame:SetClampRectInsets(0, 0, 0, 0)
@@ -190,6 +197,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 	end
 
 	local width, height = chatFrame:GetSize()
+	width, height = E:Round(width), E:Round(height)
 
 	self:SetPoint("TOPLEFT", chatFrame)
 	self:SetSize(width, height)
@@ -618,52 +626,6 @@ do
 
 			scrollDownButon:SetText(L["JUMP_TO_PRESESNT"])
 			scrollDownButon:SetTextColor(C.db.global.colors.lanzones:GetRGB())
-
-			-- E:Subscribe(UPDATE_CONFIG, function (key)
-			-- 	if self.state.isCombatLog == false then
-			-- 	if (
-			-- 		key == "font" or
-			-- 		key == "messageFontSize" or
-			-- 		key == "frameWidth" or
-			-- 		key == "frameHeight" or
-			-- 		key == "messageLeading" or
-			-- 		key == "messageLinePadding" or
-			-- 		key == "indentWordWrap"
-			-- 	) then
-			-- 		-- Adjust frame dimensions first
-			-- 		self.config.height = Core.db.profile.frameHeight - Constants.DOCK_HEIGHT - 5
-			-- 		self.config.width = Core.db.profile.frameWidth
-
-			-- 		self:SetHeight(self.config.height + OVERFLOW_HEIGHT)
-			-- 		self:SetWidth(self.config.width)
-
-			-- 		-- Then adjust message line dimensions
-			-- 		for _, message in ipairs(self.state.messages) do
-			-- 			message:UpdateFrame()
-			-- 		end
-
-			-- 		-- Then update scroll values
-			-- 		local contentHeight = reduce(self.state.messages, function (acc, message)
-			-- 		return acc + message:GetHeight()
-			-- 		end, 0)
-			-- 		self.ScrollChild:SetHeight(self.config.height + OVERFLOW_HEIGHT + contentHeight)
-			-- 		self.ScrollChild:SetWidth(self.config.width)
-
-			-- 		self.state.scrollAtBottom = true
-			-- 		self.state.unreadMessages = false
-			-- 		self:UpdateScrollChildRect()
-			-- 		self:SetVerticalScroll(self:GetVerticalScrollRange() + OVERFLOW_HEIGHT)
-			-- 		self.ScrollDownButon:Hide()
-			-- 		self.ScrollDownButon:HideNewMessageAlert()
-			-- 	end
-
-			-- 	if key == "chatBackgroundOpacity" then
-			-- 		for _, message in ipairs(self.state.messages) do
-			-- 		message:UpdateGradient()
-			-- 		end
-			-- 	end
-			-- 	end
-			-- end)
 
 			return frame
 		end,

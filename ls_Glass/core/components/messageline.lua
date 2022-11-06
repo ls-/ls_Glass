@@ -17,18 +17,22 @@ do
 	end
 
 	function message_line_proto:UpdateGradient()
-		self:SetGradientBackgroundSize(50, m_min(250, C.db.profile.width - 50))
-		self:SetGradientBackgroundColor(0, 0, 0, C.db.profile.chat.alpha) -- TODO: Add me to config!
+		local width = self:GetWidth()
+
+		self:SetGradientBackgroundSize(E:Round(width * 0.1), E:Round(width * 0.4))
+		self:SetGradientBackgroundColor(0, 0, 0, C.db.profile.chat.alpha)
 	end
 end
 
 local function createMessageLine(parent)
+	local width = parent:GetWidth()
+
 	local frame = Mixin(CreateFrame("Frame", nil, parent, "LSGlassHyperlinkPropagator"), message_line_proto)
-	frame:SetSize(C.db.profile.width, C.db.profile.chat.size + C.db.profile.chat.padding * 2)
+	frame:SetSize(width, C.db.profile.chat.font.size + C.db.profile.chat.padding * 2)
 	frame:SetAlpha(0)
 	frame:Hide()
 
-	E:CreateGradientBackground(frame, 50, m_min(250, C.db.profile.width - 50), 0, 0, 0, C.db.profile.chat.alpha) -- TODO: Add me to config!
+	E:CreateGradientBackground(frame, E:Round(width * 0.1), E:Round(width * 0.5), 0, 0, 0, C.db.profile.chat.alpha)
 
 	frame.Text = frame:CreateFontString(nil, "ARTWORK", "LSGlassMessageFont")
 	frame.Text:SetPoint("LEFT", 15, 0)
@@ -37,13 +41,19 @@ local function createMessageLine(parent)
 	return frame
 end
 
-local function resetMessageLine(_, messageLine)
+local function resetMessageLine(messageLine, parent)
 	messageLine.Text:SetText("")
 	messageLine:ClearAllPoints()
 	messageLine:Hide()
+	messageLine:SetSize(parent:GetWidth(), C.db.profile.chat.font.size + C.db.profile.chat.padding * 2)
+	messageLine:UpdateGradient()
 	E:StopFading(messageLine, 0)
 end
 
 function E:CreateMessageLinePool(parent)
-	return CreateObjectPool(function() return createMessageLine(parent) end, resetMessageLine)
+	return CreateObjectPool(function()
+		return createMessageLine(parent)
+	end, function(_, messageLine)
+		resetMessageLine(messageLine, parent)
+	end)
 end
