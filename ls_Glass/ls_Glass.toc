@@ -1,9 +1,9 @@
 ## Interface: 100000
-## Author: lightspark, mixxorz
+## Author: lightspark
 ## Version: 100000.01
 
 ## Title: LS: |cffe0bc5bGlass|r
-## Notes: Immersive and minimalistic chat UI.
+## Notes: Smooth as glass.
 
 ## SavedVariables: LS_GLASS_GLOBAL_CONFIG
 
