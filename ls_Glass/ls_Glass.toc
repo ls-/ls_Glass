@@ -14,8 +14,8 @@ embeds\AceDB-3.0\AceDB-3.0.xml
 embeds\AceDBOptions-3.0\AceDBOptions-3.0.xml
 embeds\AceGUI-3.0\AceGUI-3.0.xml
 embeds\AceConfig-3.0\AceConfig-3.0.xml
-embeds\AceGUI-3.0-SharedMediaWidgets\widget.xml
 embeds\LibSharedMedia-3.0\lib.xml
+embeds\AceGUI-3.0-SharedMediaWidgets\widget.xml
 embeds\LibEasing\LibEasing.lua
 
 locales\_locales.xml
