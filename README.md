@@ -1,37 +1,28 @@
-# Disclaimer
+# LS: Glass
 
-This fork is largely for my own personal use and experiments. I'm still not sure about taking the addon over because it'll require a pretty substantial rewrite to make it not break anything in the default UI. If someone else takes it over in the meantime, no biggie 😁
+Smooth as glass.
 
-## An update from 31/10/2022
+## Download
 
-I found a workaround for the issue mentioned above. There's one handy XML-only attribute called `propagateHyperlinksToParent` that can be chained. As long as a chat message has `ChatFrame#` in its parent hierarchy and all the frames in between use the following template
+TBD.
 
-```xml
-<Frame name="YourHyperlinkPropagator" propagateHyperlinksToParent="true" virtual="true"/>
-```
+## Options
 
-hyperlinks from that chat message will reach `ChatFrame#` and it'll handle them via `SetItemRef` without tainting anything.
+TBD.
 
-## An update from 28/10/2022
+## Feedback and Feature Requests
 
-Right now it's basically impossible to handle clicking any chat links (player names, item links, etc) via `SetItemRef` in an addon that replaces the default chat output (like this one) and doesn't just customise/reskin it (like Prat). If you call it, you won't be able to close chat tabs while in combat, the default layout editor will go haywire, etc. It's not something I can ignore because it's the most basic and fundamental chat feature. This project is def put on the backburner. 
+If you found a bug or want to share an idea on how to improve my addon, either use the issue tracker on [GitHub](https://github.com/ls-/ls_Glass/issues) or join our [Discord](https://discord.gg/7QcJgQkDYD) server.
 
+## Localisation
 
-![Imgur](https://i.imgur.com/D6vpWG6.png)
+TBD.
 
----
+## FAQ
 
-![Glass](https://user-images.githubusercontent.com/3102758/90884068-9549a600-e3e1-11ea-944f-481bd894560e.png)
-
-#### An immersive and minimalistic chat UI for World of Warcraft
-
-[![Demo](https://thumbs.gfycat.com/SkinnyPopularIsabellineshrike-size_restricted.gif)](https://gfycat.com/skinnypopularisabellineshrike)
-
-(Click for slightly higher resolution)
+**Q:** How is this addon related to Glass by mixxorz?  
+**A:** Originally, the goal was to take over that addon and maintain it. However, after reviewing the original code to figure out what I needed to do to update it for the Dragonflight expansion I decided to start from scratch. But it's fair to say that the addon is inspired by Glass, hence its name.
 
 ## License
 
-MIT License
-
-Copyright (c) 2022 Val Voronov  
-Copyright (c) 2020 Mitchel Cabuloy
+Please see [LICENSE](https://github.com/ls-/ls_Glass/blob/master/LICENSE.txt) file.
