@@ -28,5 +28,5 @@ function E:CreateBackdrop(parent, xOffset, yOffset)
 	backdrop:SetBackdropColor(0, 0, 0, C.db.profile.dock.alpha)
 	backdrop:SetBackdropBorderColor(0, 0, 0, C.db.profile.dock.alpha)
 
-	-- TODO: Add listeners to change opacity
+	return backdrop
 end
