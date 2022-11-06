@@ -486,9 +486,13 @@ function object_proto:OnFrame()
 			-- these use custom values for fading in/out because Blizz fade chat as well,
 			-- so I'm trying not to interfere with that
 			if not self.ChatFrame.isDocked then
-				E:FadeOut(self.ChatTab, 4, C.db.profile.chat.fade_out_duration, function()
-					self.ChatTab:Hide()
-				end)
+				if not self.ChatTab.isDragging then
+					E:FadeOut(self.ChatTab, 4, C.db.profile.chat.fade_out_duration, function()
+						self.ChatTab:Hide()
+					end)
+				else
+					E:StopFading(self.ChatTab, 1)
+				end
 			end
 
 			-- IM style chat frame have their own edit boxes
