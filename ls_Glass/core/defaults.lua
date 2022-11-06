@@ -29,7 +29,7 @@ D.profile = {
 			outline = false,
 			indented_word_wrap = true,
 		},
-		slide_in_duration = 0.0,
+		slide_in_duration = 0.3,
 		fade = {
 			-- enabled = true, -- * hardcoded
 			in_duration = 0.6,
