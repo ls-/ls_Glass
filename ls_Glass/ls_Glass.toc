@@ -7,20 +7,15 @@
 
 ## SavedVariables: LS_GLASS_GLOBAL_CONFIG
 
-# Libs
 embeds\LibStub\LibStub.lua
 embeds\CallbackHandler-1.0\CallbackHandler-1.0.xml
-embeds\LibSharedMedia-3.0\lib.xml
-embeds\AceGUI-3.0\AceGUI-3.0.xml
-
 embeds\AceAddon-3.0\AceAddon-3.0.xml
-embeds\AceConfig-3.0\AceConfig-3.0.xml
-embeds\AceConsole-3.0\AceConsole-3.0.xml
 embeds\AceDB-3.0\AceDB-3.0.xml
 embeds\AceDBOptions-3.0\AceDBOptions-3.0.xml
+embeds\AceGUI-3.0\AceGUI-3.0.xml
+embeds\AceConfig-3.0\AceConfig-3.0.xml
 embeds\AceGUI-3.0-SharedMediaWidgets\widget.xml
-embeds\AceHook-3.0\AceHook-3.0.xml
-embeds\lodash.wow\lodash.wow.xml
+embeds\LibSharedMedia-3.0\lib.xml
 embeds\LibEasing\LibEasing.lua
 
 locales\_locales.xml

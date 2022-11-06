@@ -1,7 +1,0 @@
-## Interface: 80300
-## Title: lodash.wow
-## Author: mixxorz
-## Version: e695a00
-
-
-lodash.wow.lua
