@@ -3,10 +3,10 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
 -- Lua
 local _G = getfenv(0)
-local tonumber = _G.tonumber
 local hooksecurefunc = _G.hooksecurefunc
 local next = _G.next
 local pcall = _G.pcall
+local tonumber = _G.tonumber
 
 -- Mine
 function E:OnInitialize()
