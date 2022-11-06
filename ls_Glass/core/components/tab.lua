@@ -46,9 +46,9 @@ local TAB_TEXTURES = {
 	"Middle",
 	"Right",
 
-	"ActiveLeft",
-	"ActiveMiddle",
-	"ActiveRight",
+	-- "ActiveLeft",
+	-- "ActiveMiddle",
+	-- "ActiveRight",
 
 	-- "HighlightLeft",
 	-- "HighlightMiddle",
@@ -78,6 +78,25 @@ function E:HandleChatTab(frame)
 	frame.glow:ClearAllPoints()
 	frame.glow:SetPoint("BOTTOMLEFT", 8, 2)
 	frame.glow:SetPoint("BOTTOMRIGHT", -8, 2)
+
+	frame.ActiveLeft:ClearAllPoints()
+	frame.ActiveLeft:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -2)
+	frame.ActiveLeft:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\border-highlight")
+	frame.ActiveLeft:SetTexCoord(0, 1, 0.5, 1)
+	frame.ActiveLeft:SetSize(8, 8)
+
+	frame.ActiveRight:ClearAllPoints()
+	frame.ActiveRight:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, -2)
+	frame.ActiveRight:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\border-highlight")
+	frame.ActiveRight:SetTexCoord(1, 0, 0.5, 1)
+	frame.ActiveRight:SetSize(8, 8)
+
+	frame.ActiveMiddle:ClearAllPoints()
+	frame.ActiveMiddle:SetPoint("TOPLEFT", frame.HighlightLeft, "TOPRIGHT", 0, 0)
+	frame.ActiveMiddle:SetPoint("TOPRIGHT", frame.HighlightRight, "TOPLEFT", 0, 0)
+	frame.ActiveMiddle:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\border-highlight")
+	frame.ActiveMiddle:SetTexCoord(0, 1, 0, 0.5)
+	frame.ActiveMiddle:SetSize(8, 8)
 
 	frame.HighlightLeft:ClearAllPoints()
 	frame.HighlightLeft:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -2)
@@ -170,17 +189,22 @@ function E:HandleMinimizedTab(frame)
 	frame.HighlightMiddle:SetSize(8, 8)
 
 	local maximizeButton = _G[frame:GetName() .. "MaximizeButton"]
-	maximizeButton:SetNormalTexture("Interface\\AddOns\\ls_Glass\\assets\\icons")
-	maximizeButton:GetNormalTexture():SetTexCoord(0.5, 1, 0, 0.5)
-	maximizeButton:GetNormalTexture():ClearAllPoints()
-	maximizeButton:GetNormalTexture():SetPoint("TOPLEFT", 2, -2)
-	maximizeButton:GetNormalTexture():SetPoint("BOTTOMRIGHT", -2, 2)
-	maximizeButton:GetNormalTexture():SetVertexColor(C.db.global.colors.lanzones:GetRGB())
+	maximizeButton:SetNormalTexture(0)
+	maximizeButton:SetPushedTexture(0)
 
-	maximizeButton:SetPushedTexture("Interface\\AddOns\\ls_Glass\\assets\\icons")
-	maximizeButton:GetPushedTexture():SetTexCoord(0.5, 1, 0, 0.5)
-	maximizeButton:GetPushedTexture():ClearAllPoints()
-	maximizeButton:GetPushedTexture():SetPoint("TOPLEFT", 3, -3)
-	maximizeButton:GetPushedTexture():SetPoint("BOTTOMRIGHT", -1, 1)
-	maximizeButton:GetPushedTexture():SetVertexColor(C.db.global.colors.lanzones:GetRGB())
+	local normalTexture = maximizeButton:GetNormalTexture()
+	normalTexture:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\icons")
+	normalTexture:SetTexCoord(0.5, 1, 0, 0.5)
+	normalTexture:ClearAllPoints()
+	normalTexture:SetPoint("TOPLEFT", 2, -2)
+	normalTexture:SetPoint("BOTTOMRIGHT", -2, 2)
+	normalTexture:SetVertexColor(C.db.global.colors.lanzones:GetRGB())
+
+	local psuhedTexture = maximizeButton:GetPushedTexture()
+	psuhedTexture:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\icons")
+	psuhedTexture:SetTexCoord(0.5, 1, 0, 0.5)
+	psuhedTexture:ClearAllPoints()
+	psuhedTexture:SetPoint("TOPLEFT", 3, -3)
+	psuhedTexture:SetPoint("BOTTOMRIGHT", -1, 1)
+	psuhedTexture:SetVertexColor(C.db.global.colors.lanzones:GetRGB())
 end

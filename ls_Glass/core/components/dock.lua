@@ -9,7 +9,11 @@ function E:HandleDock(frame)
 	frame:SetHeight(20)
 	frame.scrollFrame:SetHeight(20)
 	frame.scrollFrame.child:SetHeight(20)
+
 	frame.overflowButton:SetSize(20, 20)
+	frame.overflowButton:SetNormalTexture(0)
+	frame.overflowButton:SetPushedTexture(0)
+	frame.overflowButton:SetHighlightTexture(0)
 
 	frame.overflowButton.Backdrop = E:CreateBackdrop(frame.overflowButton)
 
@@ -21,8 +25,6 @@ function E:HandleDock(frame)
 	normalTexture:SetPoint("BOTTOMRIGHT", -2, 2)
 	normalTexture:SetVertexColor(C.db.global.colors.lanzones:GetRGB())
 
-	frame.overflowButton:SetPushedTexture(0)
-
 	local pushedTexture = frame.overflowButton:GetPushedTexture()
 	pushedTexture:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\icons")
 	pushedTexture:SetTexCoord(0, 0.5, 0, 0.5)
@@ -30,8 +32,6 @@ function E:HandleDock(frame)
 	pushedTexture:SetPoint("TOPLEFT", 3, -3)
 	pushedTexture:SetPoint("BOTTOMRIGHT", -1, 1)
 	pushedTexture:SetVertexColor(C.db.global.colors.lanzones:GetRGB())
-
-	frame.overflowButton:SetHighlightTexture(0)
 
 	local highlightLeft = frame.overflowButton:CreateTexture(nil, "HIGHLIGHT")
 	highlightLeft:SetPoint("TOPLEFT", frame.overflowButton, "TOPLEFT", 0, -2)
