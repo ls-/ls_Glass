@@ -27,5 +27,3 @@ locales\_locales.xml
 
 core\_core.xml
 init.lua
-
-modules\_modules.xml
