@@ -72,7 +72,7 @@ end
 -----------
 
 do
-	local hidden = _G.CreateFrame("Frame", nil, UIParent)
+	local hidden = CreateFrame("Frame", nil, UIParent)
 	hidden:Hide()
 
 	function E:ForceHide(object, skipEvents)

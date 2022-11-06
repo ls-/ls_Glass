@@ -9,28 +9,22 @@ local next = _G.next
 -- Mine
 hooksecurefunc("ChatEdit_DeactivateChat", function(self)
 	local frame = self.chatFrame.SlidingMessageFrame
-	if frame then
-		if not frame.isMouseOver then
-			frame.isMouseOver = nil
-		end
+	if frame and not frame.isMouseOver then
+		frame.isMouseOver = nil
 	end
 end)
 
 hooksecurefunc("ChatEdit_ActivateChat", function(self)
 	local frame = self.chatFrame.SlidingMessageFrame
-	if frame then
-		if not frame.isMouseOver then
-			frame.isMouseOver = nil
-		end
+	if frame and not frame.isMouseOver then
+		frame.isMouseOver = nil
 	end
 end)
 
 hooksecurefunc("ChatEdit_OnChar", function(self)
 	local frame = self.chatFrame.SlidingMessageFrame
-	if frame then
-		if not frame.isMouseOver then
-			frame.isMouseOver = nil
-		end
+	if frame and not frame.isMouseOver then
+		frame.isMouseOver = nil
 	end
 end)
 
