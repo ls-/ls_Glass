@@ -310,7 +310,7 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 			if refreshFading then
 				if tryToFadeIn then
 					E:FadeIn(messageLine, C.db.profile.chat.fade.in_duration, function()
-						if not self.isMouseOver then
+						if not self.isMouseOver and not C.db.profile.chat.fade.persistent then
 							E:FadeOut(messageLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
 								messageLine:Hide()
 							end)
@@ -319,7 +319,7 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 				else
 					messageLine:SetAlpha(1)
 
-					if not self.isMouseOver then
+					if not self.isMouseOver and not C.db.profile.chat.fade.persistent then
 						E:FadeOut(messageLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
 							messageLine:Hide()
 						end)
@@ -421,7 +421,7 @@ function object_proto:OnFrame()
 					E:FadeIn(visibleLine, C.db.profile.chat.fade.in_duration, function()
 						if self.isMouseOver then
 							E:StopFading(visibleLine, 1)
-						else
+						elseif not C.db.profile.chat.fade.persistent then
 							E:FadeOut(visibleLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
 								visibleLine:Hide()
 							end)
@@ -435,7 +435,7 @@ function object_proto:OnFrame()
 				E:FadeIn(self.ScrollDownButon, C.db.profile.chat.fade.in_duration, function()
 					if self.isMouseOver then
 						E:StopFading(self.ScrollDownButon, 1)
-					else
+					elseif not C.db.profile.chat.fade.persistent then
 						E:FadeOut(self.ScrollDownButon, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
 							self.ScrollDownButon:Hide()
 						end)
@@ -481,17 +481,19 @@ function object_proto:OnFrame()
 				end
 			end
 		else
-			for _, visibleLine in next, self.visibleLines do
-				if visibleLine:IsShown() and not E:IsFading(visibleLine) then
-					E:FadeOut(visibleLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-						visibleLine:Hide()
-					end)
+			if not C.db.profile.chat.fade.persistent then
+				for _, visibleLine in next, self.visibleLines do
+					if visibleLine:IsShown() and not E:IsFading(visibleLine) then
+						E:FadeOut(visibleLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
+							visibleLine:Hide()
+						end)
+					end
 				end
-			end
 
-			E:FadeOut(self.ScrollDownButon, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-				self.ScrollDownButon:Hide()
-			end)
+				E:FadeOut(self.ScrollDownButon, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
+					self.ScrollDownButon:Hide()
+				end)
+			end
 
 			if C.db.profile.dock.fade.enabled then
 				-- these use custom values for fading in/out because Blizz fade chat as well,
@@ -551,7 +553,7 @@ function object_proto:ProcessIncoming(incoming, doNotFade)
 		if not doNotFade then
 			messageLine:SetAlpha(0)
 			E:FadeIn(messageLine, C.db.profile.chat.fade.in_duration, function()
-				if not self.isMouseOver then
+				if not self.isMouseOver and not C.db.profile.chat.fade.persistent then
 					E:FadeOut(messageLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
 						messageLine:Hide()
 					end)

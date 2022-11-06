@@ -31,6 +31,7 @@ D.profile = {
 		slide_in_duration = 0.3,
 		fade = {
 			-- enabled = true, -- * hardcoded
+			persistent = false, -- messages can fade in, but don't fade out
 			in_duration = 0.6,
 			out_delay = 10,
 			out_duration = 0.6,
