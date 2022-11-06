@@ -92,6 +92,12 @@ function E:OnEnable()
 		end
 	end)
 
+	hooksecurefunc("FCF_MinimizeFrame", function(chatFrame)
+		if chatFrame.minFrame then
+			E:HandleMinimizedTab(chatFrame.minFrame)
+		end
+	end)
+
 	-- -- Edit box
 	-- self.editBox = CreateEditBox(self.container)
 
