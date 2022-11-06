@@ -25,8 +25,8 @@ function E:CreateBackdrop(parent, xOffset, yOffset)
 	backdrop.Center:SetPoint("TOPLEFT", backdrop.TopLeftCorner, "BOTTOMRIGHT", 0, 0)
 	backdrop.Center:SetPoint("BOTTOMRIGHT", backdrop.BottomRightCorner, "TOPLEFT", 0, 0)
 
-	backdrop:SetBackdropColor(0, 0, 0, C.db.profile.chat.opacity)
-	backdrop:SetBackdropBorderColor(0, 0, 0, C.db.profile.chat.opacity)
+	backdrop:SetBackdropColor(0, 0, 0, C.db.profile.dock.alpha)
+	backdrop:SetBackdropBorderColor(0, 0, 0, C.db.profile.dock.alpha)
 
 	-- TODO: Add listeners to change opacity
 end

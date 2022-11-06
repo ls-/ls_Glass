@@ -28,8 +28,8 @@ D.profile = {
 		fade_in_duration = 0.6,
 		fade_out_duration = 0.6,
 	},
-	tab = {
-		size = 12,
+	dock = {
+		alpha = 0.8,
 	},
 
 	indented_word_wrap = true,
