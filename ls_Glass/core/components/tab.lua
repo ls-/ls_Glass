@@ -32,9 +32,9 @@ local function chatTab_OnDragStop(self)
 	end
 end
 
-local function chatTabText_SetPoint(self, p, anchor, rP, x, _, shouldIgnore)
+local function chatTabText_SetPoint(self, p, anchor, rP, x, y, shouldIgnore)
 	if not shouldIgnore then
-		self:SetPoint(p, anchor, rP, x, p == "CENTER" and 0 or -6, true)
+		self:SetPoint(p, anchor, rP, p == "LEFT" and 8 or x, p == "CENTER" and 0 or y, true)
 	end
 end
 
@@ -122,6 +122,10 @@ function E:HandleChatTab(frame)
 	frame.HighlightMiddle:SetTexCoord(0, 1, 0, 0.5)
 	frame.HighlightMiddle:SetSize(8, 8)
 
+	if frame.conversationIcon then
+		frame.conversationIcon:SetPoint("RIGHT", frame.Text, "LEFT", 0, 0)
+	end
+
 	-- reset the tab
 	frame:SetPoint(frame:GetPoint(1))
 
@@ -129,7 +133,7 @@ function E:HandleChatTab(frame)
 		frame.Text:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 	end
 
-	-- It can be "CENTER" or "LEFT", so just use the index
+	-- it can be "CENTER" or "LEFT", so just use the index
 	frame.Text:SetPoint(frame.Text:GetPoint(1))
 end
 
@@ -150,10 +154,12 @@ local MINI_TAB_TEXTURES = {
 }
 
 function E:HandleMinimizedTab(frame)
-	if not frame then return end
-
 	if not handledMiniTabs[frame] then
 		frame.Backdrop = E:CreateBackdrop(frame)
+
+		_G[frame:GetName() .. "MaximizeButton"].Backdrop = E:CreateBackdrop(_G[frame:GetName() .. "MaximizeButton"])
+
+		hooksecurefunc(frame.Text, "SetTextColor", chatTabText_SetTextColor)
 
 		handledMiniTabs[frame] = true
 	end
@@ -188,12 +194,16 @@ function E:HandleMinimizedTab(frame)
 	frame.HighlightMiddle:SetSize(8, 8)
 
 	local maximizeButton = _G[frame:GetName() .. "MaximizeButton"]
+	maximizeButton:SetSize(20, 20)
+	maximizeButton:ClearAllPoints()
+	maximizeButton:SetPoint("BOTTOMLEFT", frame, "BOTTOMRIGHT", 1, 0)
 	maximizeButton:SetNormalTexture(0)
 	maximizeButton:SetPushedTexture(0)
+	maximizeButton:SetHighlightTexture(0)
 
 	local normalTexture = maximizeButton:GetNormalTexture()
 	normalTexture:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\icons")
-	normalTexture:SetTexCoord(0.5, 1, 0, 0.5)
+	normalTexture:SetTexCoord(0.5, 0.75, 0, 0.5)
 	normalTexture:ClearAllPoints()
 	normalTexture:SetPoint("TOPLEFT", 2, -2)
 	normalTexture:SetPoint("BOTTOMRIGHT", -2, 2)
@@ -201,9 +211,38 @@ function E:HandleMinimizedTab(frame)
 
 	local psuhedTexture = maximizeButton:GetPushedTexture()
 	psuhedTexture:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\icons")
-	psuhedTexture:SetTexCoord(0.5, 1, 0, 0.5)
+	psuhedTexture:SetTexCoord(0.5, 0.75, 0, 0.5)
 	psuhedTexture:ClearAllPoints()
 	psuhedTexture:SetPoint("TOPLEFT", 3, -3)
 	psuhedTexture:SetPoint("BOTTOMRIGHT", -1, 1)
 	psuhedTexture:SetVertexColor(C.db.global.colors.lanzones:GetRGB())
+
+	local highlightLeft = maximizeButton:CreateTexture(nil, "HIGHLIGHT")
+	highlightLeft:SetPoint("TOPLEFT", maximizeButton, "TOPLEFT", 0, -2)
+	highlightLeft:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\border-highlight")
+	highlightLeft:SetVertexColor(DEFAULT_TAB_SELECTED_COLOR_TABLE.r, DEFAULT_TAB_SELECTED_COLOR_TABLE.g, DEFAULT_TAB_SELECTED_COLOR_TABLE.b)
+	highlightLeft:SetTexCoord(0, 1, 0.5, 1)
+	highlightLeft:SetSize(8, 8)
+
+	local highlightRight = maximizeButton:CreateTexture(nil, "HIGHLIGHT")
+	highlightRight:SetPoint("TOPRIGHT", maximizeButton, "TOPRIGHT", 0, -2)
+	highlightRight:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\border-highlight")
+	highlightRight:SetVertexColor(DEFAULT_TAB_SELECTED_COLOR_TABLE.r, DEFAULT_TAB_SELECTED_COLOR_TABLE.g, DEFAULT_TAB_SELECTED_COLOR_TABLE.b)
+	highlightRight:SetTexCoord(1, 0, 0.5, 1)
+	highlightRight:SetSize(8, 8)
+
+	local highlightMiddle = maximizeButton:CreateTexture(nil, "HIGHLIGHT")
+	highlightMiddle:SetPoint("TOPLEFT", highlightLeft, "TOPRIGHT", 0, 0)
+	highlightMiddle:SetPoint("TOPRIGHT", highlightRight, "TOPLEFT", 0, 0)
+	highlightMiddle:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\border-highlight")
+	highlightMiddle:SetVertexColor(DEFAULT_TAB_SELECTED_COLOR_TABLE.r, DEFAULT_TAB_SELECTED_COLOR_TABLE.g, DEFAULT_TAB_SELECTED_COLOR_TABLE.b)
+	highlightMiddle:SetTexCoord(0, 1, 0, 0.5)
+	highlightMiddle:SetSize(8, 8)
+
+	-- reset the tab
+	if not frame.selectedColorTable then
+		frame.Text:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+	end
+
+	frame.conversationIcon:SetPoint("RIGHT", frame.Text, "LEFT", 0, 0)
 end

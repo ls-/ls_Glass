@@ -60,6 +60,7 @@ function E:OnEnable()
 
 		E:HandleChatTab(_G["ChatFrame" .. i .. "Tab"])
 		E:HandleEditBox(_G["ChatFrame" .. i .. "EditBox"])
+		E:HandleMinimizeButton(_G["ChatFrame" .. i .. "ButtonFrameMinimizeButton"])
 	end
 
 	-- temporary chat frames
@@ -78,6 +79,7 @@ function E:OnEnable()
 			if frame then
 				E:HandleChatTab(_G[chatFrame:GetName() .. "Tab"])
 				E:HandleEditBox(_G[chatFrame:GetName() .. "EditBox"])
+				E:HandleMinimizeButton(_G[chatFrame:GetName() .. "ButtonFrameMinimizeButton"])
 
 				tempChatFrames[frame] = true
 			end

@@ -180,6 +180,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 	self.ChatFrame = chatFrame
 	self.ChatTab = _G[chatFrame:GetName() .. "Tab"]
 	self.EditBox = _G[chatFrame:GetName() .. "EditBox"]
+	self.MinimizeButton = _G[chatFrame:GetName() .. "ButtonFrameMinimizeButton"]
 	self.historyBuffer = chatFrame.historyBuffer
 	self:SetParent(chatFrame)
 
@@ -205,7 +206,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 	chatFrame:SetResizeBounds(CHAT_FRAME_MIN_WIDTH, CHAT_FRAME_NORMAL_MIN_HEIGHT)
 	chatFrame:EnableMouse(false)
 
-	E:ForceHide(chatFrame.buttonFrame)
+	-- E:ForceHide(chatFrame.buttonFrame)
 	E:ForceHide(chatFrame.ScrollBar)
 	E:ForceHide(chatFrame.ScrollToBottomButton)
 
@@ -251,6 +252,7 @@ function object_proto:ReleaseChatFrame()
 		self.ChatFrame = nil
 		self.ChatTab = nil
 		self.EditBox = nil
+		self.MinimizeButton = nil
 		self.historyBuffer = nil
 		t_wipe(self.visibleLines)
 		self:ReleaseAllMessageLines()
@@ -482,6 +484,12 @@ function object_proto:OnFrame()
 							E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration)
 						end
 					end)
+
+					E:FadeIn(self.MinimizeButton, 0.1, function()
+						if self.isMouseOver then
+							E:StopFading(self.MinimizeButton, 1)
+						else
+							E:FadeOut(self.MinimizeButton, 4, C.db.profile.dock.fade.out_duration)
 						end
 					end)
 				end
@@ -532,6 +540,8 @@ function object_proto:OnFrame()
 					else
 						E:StopFading(self.ChatTab, 1)
 					end
+
+					E:FadeOut(self.MinimizeButton, 4, C.db.profile.dock.fade.out_duration)
 				end
 
 				-- IM style chat frame have their own edit boxes
