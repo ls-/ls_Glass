@@ -185,14 +185,20 @@ do
 	end
 
 	function E:FadeIn(object, duration, callback)
+		if not object then return end
+
 		add(FADE_IN, object, 0, duration * (1 - object:GetAlpha()), callback)
 	end
 
-	function E:FadeOut(...)
-		add(FADE_OUT, ...)
+	function E:FadeOut(object, ...)
+		if not object then return end
+
+		add(FADE_OUT, object, ...)
 	end
 
 	function E:StopFading(object, alpha)
+		if not object then return end
+
 		remove(object)
 
 		object:SetAlpha(alpha or object:GetAlpha())
