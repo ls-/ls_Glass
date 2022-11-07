@@ -16,8 +16,6 @@ D.global = {
 }
 
 D.profile = {
-	width = 448,
-	height = 256,
 	font = LibStub("LibSharedMedia-3.0"):GetDefault("font"), -- "Friz Quadrata TT"
 	chat = {
 		alpha = 0.4,
