@@ -20,7 +20,6 @@ local LibEasing = LibStub("LibEasing-1.0")
 
 local function chatFrame_OnSizeChanged(self, width, height)
 	if self.SlidingMessageFrame then
-		-- TODO: Get height, width, etc from here instead of config
 		width, height = E:Round(width), E:Round(height)
 
 		self.SlidingMessageFrame:SetSize(width, height)
@@ -166,7 +165,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 	chatFrame.SlidingMessageFrame = self
 
-	-- TODO: Comment me out!
+	-- ! Comment me out!
 	-- if not chatFrame.bg1 then
 	-- 	chatFrame.bg1 = chatFrame:CreateTexture(nil, "BACKGROUND")
 	-- 	chatFrame.bg1:SetColorTexture(0, 0.6, 0.3, 0.3)
