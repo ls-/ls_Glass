@@ -26,8 +26,12 @@ local function chatFrame_OnSizeChanged(self, width, height)
 		self.SlidingMessageFrame.ScrollChild:SetSize(width, height)
 
 		t_wipe(self.SlidingMessageFrame.visibleLines)
-		self.SlidingMessageFrame:ReleaseAllMessageLines()
-		self.SlidingMessageFrame:ScrollTo(0)
+
+		if self.SlidingMessageFrame:GetNumActiveMessageLines() > 0 then
+			self.SlidingMessageFrame:ReleaseAllMessageLines()
+		end
+
+		self.SlidingMessageFrame:SetFirstMessageIndex(0)
 
 		self.SlidingMessageFrame.ScrollDownButon:Hide()
 	end
@@ -270,6 +274,14 @@ function object_proto:ReleaseAllMessageLines()
 	end
 end
 
+function object_proto:GetNumActiveMessageLines()
+	if self.messageFramePool then
+		return self.messageFramePool:GetNumActive()
+	end
+
+	return 0
+end
+
 function object_proto:ReleaseMessageLine(messageLine)
 	if self.messageFramePool and messageLine then
 		self.messageFramePool:Release(messageLine)
@@ -339,8 +351,8 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 	end
 
 	for i = numVisibleLines + 1, #self.visibleLines do
-		self:ReleaseMessageLine(self.visibleLines[i])
-		self.visibleLines[i] = nil
+		E:StopFading(self.visibleLines[i], 0)
+		self.visibleLines[i]:Hide()
 	end
 
 	self:SetFirstMessageIndex(index)
