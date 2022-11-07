@@ -187,19 +187,19 @@ function object_proto:CaptureChatFrame(chatFrame)
 	E:SetSlidingFrameForChatFrame(chatFrame, self)
 
 	-- ! Comment me out!
-	if not chatFrame.bg1 then
-		chatFrame.bg1 = chatFrame:CreateTexture(nil, "BACKGROUND")
-		chatFrame.bg1:SetColorTexture(0, 0.6, 0.3, 0.3)
-		chatFrame.bg1:SetPoint("TOPLEFT")
-		chatFrame.bg1:SetPoint("BOTTOMLEFT")
-		chatFrame.bg1:SetWidth(25)
+	-- if not chatFrame.bg1 then
+	-- 	chatFrame.bg1 = chatFrame:CreateTexture(nil, "BACKGROUND")
+	-- 	chatFrame.bg1:SetColorTexture(0, 0.6, 0.3, 0.3)
+	-- 	chatFrame.bg1:SetPoint("TOPLEFT")
+	-- 	chatFrame.bg1:SetPoint("BOTTOMLEFT")
+	-- 	chatFrame.bg1:SetWidth(25)
 
-		chatFrame.bg2 = chatFrame:CreateTexture(nil, "BACKGROUND")
-		chatFrame.bg2:SetColorTexture(0, 0.6, 0.3, 0.3)
-		chatFrame.bg2:SetPoint("TOPRIGHT")
-		chatFrame.bg2:SetPoint("BOTTOMRIGHT")
-		chatFrame.bg2:SetWidth(25)
-	end
+	-- 	chatFrame.bg2 = chatFrame:CreateTexture(nil, "BACKGROUND")
+	-- 	chatFrame.bg2:SetColorTexture(0, 0.6, 0.3, 0.3)
+	-- 	chatFrame.bg2:SetPoint("TOPRIGHT")
+	-- 	chatFrame.bg2:SetPoint("BOTTOMRIGHT")
+	-- 	chatFrame.bg2:SetWidth(25)
+	-- end
 
 	chatFrame:SetClampedToScreen(false)
 	chatFrame:SetClampRectInsets(0, 0, 0, 0)

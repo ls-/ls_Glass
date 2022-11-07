@@ -120,7 +120,7 @@ function E:OnEnable()
 			end
 
 			if C.db.profile.dock.fade.enabled then
-				-- these use custom values for fading in/out because Blizz fade chat as well,
+				-- these use custom values for fading in/out because Blizz fade chat as well
 				-- so I'm trying not to interfere with that
 				local isMouseOver = ChatFrame1:IsMouseOver(26, -36, 0, 0)
 				if self.isMouseOver ~= isMouseOver then
