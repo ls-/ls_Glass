@@ -40,6 +40,8 @@ read_globals = {
 	"ChatFrame1",
 	"ChatFrame1EditBox",
 	"ChatFrame2",
+	"ChatFrameChannelButton",
+	"ChatFrameMenuButton",
 	"Clamp",
 	"ColorMixin",
 	"CreateObjectPool",
