@@ -35,6 +35,8 @@ read_globals = {
 	-- FrameXML
 	"BattlePetTooltip",
 	"BattlePetToolTip_ShowLink",
+	"CHAT_FRAME_MIN_WIDTH",
+	"CHAT_FRAME_NORMAL_MIN_HEIGHT",
 	"ChatFrame1",
 	"ChatFrame1EditBox",
 	"ChatFrame2",

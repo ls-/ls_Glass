@@ -183,6 +183,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 	chatFrame:SetClampedToScreen(false)
 	chatFrame:SetClampRectInsets(0, 0, 0, 0)
+	chatFrame:SetResizeBounds(CHAT_FRAME_MIN_WIDTH, CHAT_FRAME_NORMAL_MIN_HEIGHT)
 	chatFrame:EnableMouse(false)
 
 	E:ForceHide(chatFrame.buttonFrame)
