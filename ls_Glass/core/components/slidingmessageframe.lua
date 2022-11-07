@@ -612,8 +612,7 @@ do
 			scrollDownButon:Hide()
 			frame.ScrollDownButon = scrollDownButon
 
-			local text = scrollDownButon:CreateFontString(nil, "ARTWORK", "GameFontNormal") -- TODO: Fix me!
-			-- local text = scrollDownButon:CreateFontString(nil, "ARTWORK", "GlassMessageFont")
+			local text = scrollDownButon:CreateFontString(nil, "ARTWORK", "LSGlassMessageFont")
 			text:SetPoint("TOPLEFT", 2, 0)
 			text:SetPoint("BOTTOMRIGHT", -2, 0)
 			text:SetJustifyH("RIGHT")
