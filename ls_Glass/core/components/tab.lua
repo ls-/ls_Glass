@@ -15,15 +15,20 @@ local function chatTab_SetPoint(self, _, anchor, _, _, _, shouldIgnore)
 end
 
 local function chatTab_OnDragStart(self)
-	self.isDragging = true
+	local frame = E:GetSlidingFrameForChatFrame(_G["ChatFrame" .. self:GetID()])
+	if frame then
+		frame.isDragging = true
+	end
 end
 
 local function chatTab_OnDragStop(self)
-	self.isDragging = false
+	local frame = E:GetSlidingFrameForChatFrame(_G["ChatFrame" .. self:GetID()])
+	if frame then
+		if frame.isMouseOver then
+			frame.isMouseOver = nil
+		end
 
-	local frame = _G["ChatFrame" .. self:GetID()]
-	if frame and frame.SlidingMessageFrame and not frame.SlidingMessageFrame.isMouseOver then
-		frame.SlidingMessageFrame.isMouseOver = nil
+		frame.isDragging = nil
 	end
 end
 

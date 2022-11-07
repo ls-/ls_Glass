@@ -9,7 +9,7 @@ local next = _G.next
 -- Mine
 hooksecurefunc("ChatEdit_DeactivateChat", function(self)
 	if C.db.profile.dock.fade.enabled then
-		local frame = self.chatFrame.SlidingMessageFrame
+		local frame = E:GetSlidingFrameForChatFrame(self.chatFrame)
 		if frame and not frame.isMouseOver then
 			frame.isMouseOver = nil
 		end
@@ -18,7 +18,7 @@ end)
 
 hooksecurefunc("ChatEdit_ActivateChat", function(self)
 	if C.db.profile.dock.fade.enabled then
-		local frame = self.chatFrame.SlidingMessageFrame
+		local frame = E:GetSlidingFrameForChatFrame(self.chatFrame)
 		if frame and not frame.isMouseOver then
 			frame.isMouseOver = nil
 		end
@@ -27,7 +27,7 @@ end)
 
 hooksecurefunc("ChatEdit_OnChar", function(self)
 	if C.db.profile.dock.fade.enabled then
-		local frame = self.chatFrame.SlidingMessageFrame
+		local frame = E:GetSlidingFrameForChatFrame(self.chatFrame)
 		if frame and not frame.isMouseOver then
 			frame.isMouseOver = nil
 		end

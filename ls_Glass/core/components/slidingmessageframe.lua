@@ -14,53 +14,69 @@ local t_wipe = _G.table.wipe
 -- Mine
 local LibEasing = LibStub("LibEasing-1.0")
 
+do
+	local map = {}
+
+	function E:GetSlidingFrameForChatFrame(chatFrame)
+		return map[chatFrame]
+	end
+
+	function E:SetSlidingFrameForChatFrame(chatFrame, slidingFrame)
+		map[chatFrame] = slidingFrame
+	end
+end
+
 ----------------
 -- BLIZZ CHAT --
 ----------------
 
 local function chatFrame_OnSizeChanged(self, width, height)
-	if self.SlidingMessageFrame then
+	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
+	if slidingFrame then
 		width, height = E:Round(width), E:Round(height)
 
-		self.SlidingMessageFrame:SetSize(width, height)
-		self.SlidingMessageFrame.ScrollChild:SetSize(width, height)
+		slidingFrame:SetSize(width, height)
+		slidingFrame.ScrollChild:SetSize(width, height)
 
-		t_wipe(self.SlidingMessageFrame.visibleLines)
+		t_wipe(slidingFrame.visibleLines)
 
-		if self.SlidingMessageFrame:GetNumActiveMessageLines() > 0 then
-			self.SlidingMessageFrame:ReleaseAllMessageLines()
+		if slidingFrame:GetNumActiveMessageLines() > 0 then
+			slidingFrame:ReleaseAllMessageLines()
 		end
 
-		self.SlidingMessageFrame:SetFirstMessageIndex(0)
+		slidingFrame:SetFirstMessageIndex(0)
 
-		self.SlidingMessageFrame.ScrollDownButon:Hide()
+		slidingFrame.ScrollDownButon:Hide()
 	end
 end
 
 local function chatFrame_ShowHook(self)
 	self.FontStringContainer:Hide()
 
-	if self.SlidingMessageFrame then
+	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
+	if slidingFrame then
 		-- FCF indiscriminately calls :Show() when adding new tabs, I don't need to do
 		-- anything when that happens
-		if not self.SlidingMessageFrame:IsShown() then
-			self.SlidingMessageFrame:Show()
-			self.SlidingMessageFrame:ScrollTo(0, true)
+		if not slidingFrame:IsShown() then
+			slidingFrame:Show()
+			slidingFrame:ScrollTo(0, true)
 
-			self.SlidingMessageFrame.ScrollDownButon:Hide()
+			slidingFrame.ScrollDownButon:Hide()
 		end
 	end
 end
 
 local function chatFrame_HideHook(self)
-	if self.SlidingMessageFrame then
-		self.SlidingMessageFrame:Hide()
+	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
+	if slidingFrame then
+		slidingFrame:Hide()
 	end
 end
 
 local function chatFrame_AddMessageHook(self, ...)
-	if self.SlidingMessageFrame then
-		self.SlidingMessageFrame:AddMessage(self,...)
+	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
+	if slidingFrame then
+		slidingFrame:AddMessage(self,...)
 	end
 end
 
@@ -167,7 +183,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 	self.historyBuffer = chatFrame.historyBuffer
 	self:SetParent(chatFrame)
 
-	chatFrame.SlidingMessageFrame = self
+	E:SetSlidingFrameForChatFrame(chatFrame, self)
 
 	-- ! Comment me out!
 	-- if not chatFrame.bg1 then
@@ -205,10 +221,9 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 	self:SetPoint("TOPLEFT", chatFrame)
 	self:SetSize(width, height)
+	self:SetShown(chatFrame:IsShown())
 
 	self.ScrollChild:SetSize(width, height)
-
-	self:SetShown(chatFrame:IsShown())
 
 	-- it's safer to hide the string container than the chat frame itself
 	chatFrame.FontStringContainer:Hide()
@@ -231,7 +246,7 @@ end
 
 function object_proto:ReleaseChatFrame()
 	if self.ChatFrame then
-		self.ChatFrame.SlidingMessageFrame = nil
+		E:SetSlidingFrameForChatFrame(self.ChatFrame, nil)
 
 		self.ChatFrame = nil
 		self.ChatTab = nil
@@ -456,17 +471,17 @@ function object_proto:OnFrame()
 			end
 
 			if C.db.profile.dock.fade.enabled then
-				-- these use custom values for fading in/out because Blizz fade chat as well,
+				-- these use custom values for fading in/out because Blizz fade chat as well
 				-- so I'm trying not to interfere with that
+				-- ! DO NOT SHOW/HIDE the tab, it'll taint EVERYTHING, just adjust its alpha
 				if not self.ChatFrame.isDocked then
-					self.ChatTab:Show()
 					E:FadeIn(self.ChatTab, 0.1, function()
 						if self.isMouseOver then
 							E:StopFading(self.ChatTab, 1)
 						else
-							E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration, function()
-								self.ChatTab:Hide()
-							end)
+							E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration)
+						end
+					end)
 						end
 					end)
 				end
@@ -508,13 +523,12 @@ function object_proto:OnFrame()
 			end
 
 			if C.db.profile.dock.fade.enabled then
-				-- these use custom values for fading in/out because Blizz fade chat as well,
+				-- these use custom values for fading in/out because Blizz fade chat as well
 				-- so I'm trying not to interfere with that
+				-- ! DO NOT SHOW/HIDE the tab, it'll taint EVERYTHING, just adjust its alpha
 				if not self.ChatFrame.isDocked then
-					if not self.ChatTab.isDragging then
-						E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration, function()
-							self.ChatTab:Hide()
-						end)
+					if not self.isDragging then
+						E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration)
 					else
 						E:StopFading(self.ChatTab, 1)
 					end

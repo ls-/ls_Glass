@@ -85,7 +85,7 @@ function E:OnEnable()
 	end)
 
 	hooksecurefunc("FCF_Close", function(chatFrame)
-		local frame = chatFrame.SlidingMessageFrame
+		local frame = E:GetSlidingFrameForChatFrame(chatFrame)
 		if tempChatFrames[frame] then
 			frame:Release()
 
