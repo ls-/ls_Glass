@@ -180,33 +180,32 @@ function object_proto:CaptureChatFrame(chatFrame)
 	self.ChatFrame = chatFrame
 	self.ChatTab = _G[chatFrame:GetName() .. "Tab"]
 	self.EditBox = _G[chatFrame:GetName() .. "EditBox"]
-	self.MinimizeButton = _G[chatFrame:GetName() .. "ButtonFrameMinimizeButton"]
+	self.ButtonFrame = chatFrame.buttonFrame
 	self.historyBuffer = chatFrame.historyBuffer
 	self:SetParent(chatFrame)
 
 	E:SetSlidingFrameForChatFrame(chatFrame, self)
 
 	-- ! Comment me out!
-	-- if not chatFrame.bg1 then
-	-- 	chatFrame.bg1 = chatFrame:CreateTexture(nil, "BACKGROUND")
-	-- 	chatFrame.bg1:SetColorTexture(0, 0.6, 0.3, 0.3)
-	-- 	chatFrame.bg1:SetPoint("TOPLEFT")
-	-- 	chatFrame.bg1:SetPoint("BOTTOMLEFT")
-	-- 	chatFrame.bg1:SetWidth(25)
+	if not chatFrame.bg1 then
+		chatFrame.bg1 = chatFrame:CreateTexture(nil, "BACKGROUND")
+		chatFrame.bg1:SetColorTexture(0, 0.6, 0.3, 0.3)
+		chatFrame.bg1:SetPoint("TOPLEFT")
+		chatFrame.bg1:SetPoint("BOTTOMLEFT")
+		chatFrame.bg1:SetWidth(25)
 
-	-- 	chatFrame.bg2 = chatFrame:CreateTexture(nil, "BACKGROUND")
-	-- 	chatFrame.bg2:SetColorTexture(0, 0.6, 0.3, 0.3)
-	-- 	chatFrame.bg2:SetPoint("TOPRIGHT")
-	-- 	chatFrame.bg2:SetPoint("BOTTOMRIGHT")
-	-- 	chatFrame.bg2:SetWidth(25)
-	-- end
+		chatFrame.bg2 = chatFrame:CreateTexture(nil, "BACKGROUND")
+		chatFrame.bg2:SetColorTexture(0, 0.6, 0.3, 0.3)
+		chatFrame.bg2:SetPoint("TOPRIGHT")
+		chatFrame.bg2:SetPoint("BOTTOMRIGHT")
+		chatFrame.bg2:SetWidth(25)
+	end
 
 	chatFrame:SetClampedToScreen(false)
 	chatFrame:SetClampRectInsets(0, 0, 0, 0)
 	chatFrame:SetResizeBounds(CHAT_FRAME_MIN_WIDTH, CHAT_FRAME_NORMAL_MIN_HEIGHT)
 	chatFrame:EnableMouse(false)
 
-	-- E:ForceHide(chatFrame.buttonFrame)
 	E:ForceHide(chatFrame.ScrollBar)
 	E:ForceHide(chatFrame.ScrollToBottomButton)
 
@@ -252,7 +251,7 @@ function object_proto:ReleaseChatFrame()
 		self.ChatFrame = nil
 		self.ChatTab = nil
 		self.EditBox = nil
-		self.MinimizeButton = nil
+		self.ButtonFrame = nil
 		self.historyBuffer = nil
 		t_wipe(self.visibleLines)
 		self:ReleaseAllMessageLines()
@@ -484,15 +483,15 @@ function object_proto:OnFrame()
 							E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration)
 						end
 					end)
-
-					E:FadeIn(self.MinimizeButton, 0.1, function()
-						if self.isMouseOver then
-							E:StopFading(self.MinimizeButton, 1)
-						else
-							E:FadeOut(self.MinimizeButton, 4, C.db.profile.dock.fade.out_duration)
-						end
-					end)
 				end
+
+				E:FadeIn(self.ButtonFrame, 0.1, function()
+					if self.isMouseOver then
+						E:StopFading(self.ButtonFrame, 1)
+					else
+						E:FadeOut(self.ButtonFrame, 4, C.db.profile.dock.fade.out_duration)
+					end
+				end)
 
 				-- IM style chat frame have their own edit boxes
 				-- don't hide them, hiding them resets a bunch of stuff
@@ -540,9 +539,9 @@ function object_proto:OnFrame()
 					else
 						E:StopFading(self.ChatTab, 1)
 					end
-
-					E:FadeOut(self.MinimizeButton, 4, C.db.profile.dock.fade.out_duration)
 				end
+
+				E:FadeOut(self.ButtonFrame, 4, C.db.profile.dock.fade.out_duration)
 
 				-- IM style chat frame have their own edit boxes
 				-- don't hide them, hiding them resets a bunch of stuff

@@ -61,6 +61,11 @@ function E:OnEnable()
 		E:HandleChatTab(_G["ChatFrame" .. i .. "Tab"])
 		E:HandleEditBox(_G["ChatFrame" .. i .. "EditBox"])
 		E:HandleMinimizeButton(_G["ChatFrame" .. i .. "ButtonFrameMinimizeButton"])
+
+		if i == 1 then
+			E:HandleChannelButton(ChatFrameChannelButton)
+			E:HandleMenuButton(ChatFrameMenuButton)
+		end
 	end
 
 	-- temporary chat frames
@@ -100,24 +105,6 @@ function E:OnEnable()
 			E:HandleMinimizedTab(chatFrame.minFrame)
 		end
 	end)
-
-	-- -- Edit box
-	-- self.editBox = CreateEditBox(self.container)
-
-	-- -- Fix Battle.net Toast frame position
-	-- BNToastFrame:ClearAllPoints()
-	-- BNToastFrame:SetPoint("BOTTOMLEFT", ChatAlertFrame, "BOTTOMLEFT", 0, 0)
-
-	-- ChatAlertFrame:ClearAllPoints()
-	-- ChatAlertFrame:SetPoint("BOTTOMLEFT", self.container, "TOPLEFT", 15, 10)
-
-	-- -- Hide other chat elements
-	-- if Constants.ENV == "retail" then
-	--   QuickJoinToastButton:Hide()
-	-- end
-
-	-- ChatFrameChannelButton:Hide()
-	-- ChatFrameMenuButton:Hide()
 
 	-- ? consider moving it elsewhere
 	local updater = CreateFrame("Frame", "LSGlassUpdater", UIParent)

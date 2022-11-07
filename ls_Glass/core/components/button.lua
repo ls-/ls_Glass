@@ -3,16 +3,10 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
 -- Lua
 local _G = getfenv(0)
-local hooksecurefunc = _G.hooksecurefunc
-local next = _G.next
 
 -- Mine
-function E:HandleMinimizeButton(frame)
-	-- due to how this button works, I can't reparent it
-
+local function handleButton(frame, ...)
 	frame:SetSize(20, 20)
-	frame:ClearAllPoints()
-	frame:SetPoint("BOTTOMLEFT", _G[frame:GetParent():GetParent():GetName() .. "Tab"], "BOTTOMRIGHT", 1, 0)
 	frame:SetNormalTexture(0)
 	frame:SetPushedTexture(0)
 	frame:SetHighlightTexture(0)
@@ -21,7 +15,7 @@ function E:HandleMinimizeButton(frame)
 
 	local normalTexture = frame:GetNormalTexture()
 	normalTexture:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\icons")
-	normalTexture:SetTexCoord(0.25, 0.5, 0, 0.5)
+	normalTexture:SetTexCoord(...)
 	normalTexture:ClearAllPoints()
 	normalTexture:SetPoint("TOPLEFT", 2, -2)
 	normalTexture:SetPoint("BOTTOMRIGHT", -2, 2)
@@ -29,7 +23,7 @@ function E:HandleMinimizeButton(frame)
 
 	local psuhedTexture = frame:GetPushedTexture()
 	psuhedTexture:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\icons")
-	psuhedTexture:SetTexCoord(0.25, 0.5, 0, 0.5)
+	psuhedTexture:SetTexCoord(...)
 	psuhedTexture:ClearAllPoints()
 	psuhedTexture:SetPoint("TOPLEFT", 3, -3)
 	psuhedTexture:SetPoint("BOTTOMRIGHT", -1, 1)
@@ -56,4 +50,43 @@ function E:HandleMinimizeButton(frame)
 	highlightMiddle:SetVertexColor(DEFAULT_TAB_SELECTED_COLOR_TABLE.r, DEFAULT_TAB_SELECTED_COLOR_TABLE.g, DEFAULT_TAB_SELECTED_COLOR_TABLE.b)
 	highlightMiddle:SetTexCoord(0, 1, 0, 0.5)
 	highlightMiddle:SetSize(8, 8)
+end
+
+function E:HandleMinimizeButton(frame)
+	handleButton(frame, 0.25, 0.5, 0, 0.5)
+
+	frame:ClearAllPoints()
+	frame:SetPoint("BOTTOMLEFT", _G[frame:GetParent():GetParent():GetName() .. "Tab"], "BOTTOMRIGHT", 1, 0)
+end
+
+function E:HandleMaximizeButton(frame)
+	handleButton(frame, 0.5, 0.75, 0, 0.5)
+
+	frame:ClearAllPoints()
+	frame:SetPoint("BOTTOMLEFT", frame:GetParent(), "BOTTOMRIGHT", 1, 0)
+end
+
+function E:HandleChannelButton(frame)
+	handleButton(frame, 0, 0.25, 0.5, 1)
+
+	frame:ClearAllPoints()
+	frame:SetPoint("TOPRIGHT", frame:GetParent(), "TOPRIGHT", 2, 0)
+
+	frame.Icon:SetTexture(0)
+
+	local flash = frame.Flash
+	flash:ClearAllPoints()
+	flash:SetPoint("TOPLEFT", -3, 3)
+	flash:SetPoint("BOTTOMRIGHT", 3, -3)
+end
+
+function E:HandleMenuButton(frame)
+	handleButton(frame, 0.75, 1, 0, 0.5)
+
+	frame:ClearAllPoints()
+	frame:SetPoint("TOPRIGHT", ChatFrameChannelButton, "BOTTOMRIGHT", 0, -1)
+end
+
+function E:HandleOverflowButton(frame)
+	handleButton(frame, 0, 0.25, 0, 0.5)
 end
