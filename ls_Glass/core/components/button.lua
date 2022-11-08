@@ -5,13 +5,22 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 local _G = getfenv(0)
 
 -- Mine
+local handledbuttons = {}
+
 local function handleButton(frame, ...)
+	if not handledbuttons[frame] then
+		frame.Backdrop = E:CreateBackdrop(frame)
+		frame.HighlightLeft = frame:CreateTexture(nil, "HIGHLIGHT")
+		frame.HighlightMiddle = frame:CreateTexture(nil, "HIGHLIGHT")
+		frame.HighlightRight = frame:CreateTexture(nil, "HIGHLIGHT")
+
+		handledbuttons[frame] = true
+	end
+
 	frame:SetSize(20, 20)
 	frame:SetNormalTexture(0)
 	frame:SetPushedTexture(0)
 	frame:SetHighlightTexture(0)
-
-	frame.Backdrop = E:CreateBackdrop(frame)
 
 	local normalTexture = frame:GetNormalTexture()
 	normalTexture:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\icons")
@@ -29,21 +38,21 @@ local function handleButton(frame, ...)
 	psuhedTexture:SetPoint("BOTTOMRIGHT", -1, 1)
 	psuhedTexture:SetVertexColor(C.db.global.colors.lanzones:GetRGB())
 
-	local highlightLeft = frame:CreateTexture(nil, "HIGHLIGHT")
+	local highlightLeft = frame.HighlightLeft
 	highlightLeft:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -2)
 	highlightLeft:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\border-highlight")
 	highlightLeft:SetVertexColor(DEFAULT_TAB_SELECTED_COLOR_TABLE.r, DEFAULT_TAB_SELECTED_COLOR_TABLE.g, DEFAULT_TAB_SELECTED_COLOR_TABLE.b)
 	highlightLeft:SetTexCoord(0, 1, 0.5, 1)
 	highlightLeft:SetSize(8, 8)
 
-	local highlightRight = frame:CreateTexture(nil, "HIGHLIGHT")
+	local highlightRight = frame.HighlightRight
 	highlightRight:SetPoint("TOPRIGHT", frame, "TOPRIGHT", 0, -2)
 	highlightRight:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\border-highlight")
 	highlightRight:SetVertexColor(DEFAULT_TAB_SELECTED_COLOR_TABLE.r, DEFAULT_TAB_SELECTED_COLOR_TABLE.g, DEFAULT_TAB_SELECTED_COLOR_TABLE.b)
 	highlightRight:SetTexCoord(1, 0, 0.5, 1)
 	highlightRight:SetSize(8, 8)
 
-	local highlightMiddle = frame:CreateTexture(nil, "HIGHLIGHT")
+	local highlightMiddle = frame.HighlightMiddle
 	highlightMiddle:SetPoint("TOPLEFT", highlightLeft, "TOPRIGHT", 0, 0)
 	highlightMiddle:SetPoint("TOPRIGHT", highlightRight, "TOPLEFT", 0, 0)
 	highlightMiddle:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\border-highlight")

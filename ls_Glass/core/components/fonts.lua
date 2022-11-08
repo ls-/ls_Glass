@@ -46,7 +46,7 @@ function E:CreateFonts()
 	editBoxFont:SetJustifyV("MIDDLE")
 end
 
-function E:UpdateFonts()
+function E:UpdateMessageFont()
 	LSGlassMessageFont:SetFont(
 		LSM:Fetch("font", C.db.profile.font),
 		C.db.profile.chat.font.size,
@@ -58,7 +58,9 @@ function E:UpdateFonts()
 	else
 		LSGlassMessageFont:SetShadowOffset(0, 0)
 	end
+end
 
+function E:UpdateEditBoxFont()
 	LSGlassEditBoxFont:SetFont(
 		LSM:Fetch("font", C.db.profile.font),
 		C.db.profile.dock.font.size,

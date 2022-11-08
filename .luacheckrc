@@ -48,17 +48,23 @@ read_globals = {
 	"DEFAULT_TAB_SELECTED_COLOR_TABLE",
 	"GameTooltip",
 	"GeneralDockManager",
+	"HideUIPanel",
+	"LinkUtil",
 	"Mixin",
 	"NORMAL_FONT_COLOR",
 	"NUM_CHAT_WINDOWS",
+	"Settings",
+	"SettingsPanel",
+	"SlashCmdList",
 	"UIParent",
 
 	-- Namespace
-	"LinkUtil",
 
 	-- API
 	"CreateFont",
 	"CreateFrame",
 	"GetAddOnMetadata",
 	"GetCVar",
+	"GetLocale",
+	"InCombatLockdown",
 }

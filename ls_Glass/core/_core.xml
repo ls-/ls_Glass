@@ -2,6 +2,7 @@
 	<Script file="core.lua"/>
 	<Script file="defaults.lua"/>
 	<!-- can sort -->
+	<Script file="changelog.lua"/>
 	<Include file="components\_components.xml"/>
 
 	<Frame name="LSGlassHyperlinkPropagator" propagateHyperlinksToParent="true" virtual="true"/>

@@ -587,11 +587,11 @@ function object_proto:Release()
 end
 
 do
-	local index = 0
+	local frames = {}
+
 	local slidingMessageFramePool = CreateObjectPool(
 		function(pool)
-			index = index + 1
-			local frame = Mixin(CreateFrame("ScrollFrame", "LSGlassFrame" .. index, UIParent, "LSGlassHyperlinkPropagator"), object_proto)
+			local frame = Mixin(CreateFrame("ScrollFrame", "LSGlassFrame" .. (#frames + 1), UIParent, "LSGlassHyperlinkPropagator"), object_proto)
 			frame:EnableMouse(false)
 			frame:SetClipsChildren(true)
 
@@ -622,6 +622,8 @@ do
 			scrollDownButon:SetText(L["JUMP_TO_PRESESNT"])
 			scrollDownButon:SetTextColor(C.db.global.colors.lanzones:GetRGB())
 
+			t_insert(frames, frame)
+
 			return frame
 		end,
 		function(_, frame)
@@ -639,6 +641,43 @@ do
 			frame:CaptureChatFrame(chatFrame)
 
 			return frame
+		end
+	end
+
+	function E:ResetSlidingFrameDockFading()
+		for i, frame in next, frames do
+			if frame:IsShown() then
+				frame.isMouseOver = nil
+
+				E:StopFading(frame.ChatTab, 1)
+				E:StopFading(frame.ButtonFrame, 1)
+
+				-- ? I don't like this... Should I attach to the first frame?
+				if i == 1 then
+					LSGlassUpdater.isMouseOver = nil
+
+					E:StopFading(GeneralDockManager, 1)
+				end
+			end
+		end
+	end
+
+	function E:ResetSlidingFrameChatFading()
+		for _, frame in next, frames do
+			if frame:IsShown() then
+				frame.isMouseOver = nil
+
+				for _, visibleLine in next, frame.visibleLines do
+					if visibleLine:IsShown() then
+						E:StopFading(visibleLine, 1)
+					end
+				end
+
+				if frame:GetFirstMessageIndex() ~= 0 then
+					frame.ScrollDownButon:Show()
+					E:StopFading(frame.ScrollDownButon, 1)
+				end
+			end
 		end
 	end
 end

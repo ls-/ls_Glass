@@ -20,12 +20,12 @@ D.profile = {
 	chat = {
 		alpha = 0.4,
 		tooltips = true,
+		slide_in_duration = 0.3,
 		font = {
 			size = 12,
 			shadow = true,
 			outline = false,
 		},
-		slide_in_duration = 0.3,
 		fade = {
 			-- enabled = true, -- * hardcoded
 			persistent = false, -- messages can fade in, but don't fade out
