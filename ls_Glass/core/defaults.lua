@@ -24,7 +24,6 @@ D.profile = {
 			size = 12,
 			shadow = true,
 			outline = false,
-			indented_word_wrap = true,
 		},
 		slide_in_duration = 0.3,
 		fade = {

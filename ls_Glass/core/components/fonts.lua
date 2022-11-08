@@ -25,7 +25,7 @@ function E:CreateFonts()
 
 	messageFont:SetJustifyH("LEFT")
 	messageFont:SetJustifyV("MIDDLE")
-	messageFont:SetIndentedWordWrap(C.db.profile.chat.font.indented_word_wrap)
+	messageFont:SetIndentedWordWrap(true)
 
 	local editBoxFont = CreateFont("LSGlassEditBoxFont")
 	editBoxFont:SetFont(
@@ -58,8 +58,6 @@ function E:UpdateFonts()
 	else
 		LSGlassMessageFont:SetShadowOffset(0, 0)
 	end
-
-	LSGlassMessageFont:SetIndentedWordWrap(C.db.profile.chat.font.indented_word_wrap)
 
 	LSGlassEditBoxFont:SetFont(
 		LSM:Fetch("font", C.db.profile.font),
