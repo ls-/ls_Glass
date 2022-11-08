@@ -59,9 +59,6 @@ local function chatFrame_ShowHook(self)
 		-- anything when that happens
 		if not slidingFrame:IsShown() then
 			slidingFrame:Show()
-			slidingFrame:ScrollTo(0, true)
-
-			slidingFrame.ScrollDownButon:Hide()
 		end
 	end
 end
@@ -254,10 +251,24 @@ function object_proto:ReleaseChatFrame()
 		self.ButtonFrame = nil
 		self.historyBuffer = nil
 		t_wipe(self.visibleLines)
+		t_wipe(self.incomingMessages)
 		self:ReleaseAllMessageLines()
 		self:SetParent(UIParent)
 		self:Hide()
 	end
+end
+
+function object_proto:OnShow()
+	LibEasing:StopEasing(self:GetScrollingHandler())
+	self:SetScrollingHandler(nil)
+
+	self:SetVerticalScroll(0)
+	self:ScrollTo(self:GetFirstMessageIndex(), true)
+
+	self:SetFirstMessageIndex(0)
+	self:ProcessIncoming({t_removemulti(self.incomingMessages, 1, #self.incomingMessages)}, true)
+
+	self.ScrollDownButon:Hide()
 end
 
 function object_proto:GetNumHistoryElements()
@@ -328,6 +339,7 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 		end
 
 		-- bail out if we're beyond the frame capacity
+		if not messageLine:GetBottom() then break end
 		if messageLine:GetBottom() > self:GetTop() then break end
 
 		local messageInfo = self:GetHistoryEntryAtIndex(index + i)
@@ -367,14 +379,23 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 	end
 
 	for i = numVisibleLines + 1, #self.visibleLines do
-		E:StopFading(self.visibleLines[i], 0)
-		self.visibleLines[i]:Hide()
+		if i > maxMessages then
+			self:ReleaseMessageLine(self.visibleLines[i])
+			self.visibleLines[i] = nil
+		else
+			E:StopFading(self.visibleLines[i], 0)
+			self.visibleLines[i]:Hide()
+		end
 	end
 
 	self:SetFirstMessageIndex(index)
 end
 
 function object_proto:Refresh(delta, refreshFading, tryToFadeIn)
+	if self:GetNumHistoryElements() == 0 then
+		return self:SetFirstMessageIndex(0)
+	end
+
 	delta = delta or 0
 
 	self:ScrollTo(Clamp(self:GetFirstMessageIndex() + delta, 0, self:GetNumHistoryElements() - 1), refreshFading, tryToFadeIn)
@@ -594,6 +615,7 @@ do
 			local frame = Mixin(CreateFrame("ScrollFrame", "LSGlassFrame" .. (#frames + 1), UIParent, "LSGlassHyperlinkPropagator"), object_proto)
 			frame:EnableMouse(false)
 			frame:SetClipsChildren(true)
+			frame:Hide()
 
 			frame.visibleLines = {}
 			frame.incomingMessages = {}
@@ -603,6 +625,7 @@ do
 			frame:SetScrollChild(scrollChild)
 			frame.ScrollChild = scrollChild
 
+			frame:SetScript("OnShow", frame.OnShow)
 			frame:SetScript("OnMouseWheel", frame.OnMouseWheel)
 
 			local scrollDownButon = Mixin(CreateFrame("Button", nil, frame), scroll_down_button_proto)
