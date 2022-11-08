@@ -108,7 +108,7 @@ function E:OnEnable()
 
 	-- ? consider moving it elsewhere
 	local updater = CreateFrame("Frame", "LSGlassUpdater", UIParent)
-	updater:SetScript("OnUpdate", function (_, elapsed)
+	updater:SetScript("OnUpdate", function (self, elapsed)
 		self.elapsed = (self.elapsed or 0) + elapsed
 		if self.elapsed >= 0.01 then
 			for frame in next, chatFrames do
