@@ -8,7 +8,7 @@ TBD.
 
 ## Options
 
-TBD.
+Use **`/LSGLASS`** or **`/LSG`** to open the in-game config.
 
 ## Feedback and Feature Requests
 
