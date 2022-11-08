@@ -2,7 +2,7 @@
 
 Smooth as glass.
 
-![Imgur](https://i.imgur.com/xHTBf10.gif)
+![Imgur](https://i.imgur.com/8lj13ch.gif)
 
 ## Download
 
