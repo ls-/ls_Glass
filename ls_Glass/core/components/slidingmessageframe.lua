@@ -106,7 +106,7 @@ do
 		frame:ProcessIncoming(messages, true)
 
 		E:FadeOut(self, 0, 0.1, function()
-			self:SetText(L["JUMP_TO_PRESESNT"], true)
+			self:SetText(L["JUMP_TO_PRESENT"], true)
 			self:Hide()
 		end)
 	end
@@ -642,7 +642,7 @@ do
 			text:SetJustifyV("MIDDLE")
 			scrollDownButon.Text = text
 
-			scrollDownButon:SetText(L["JUMP_TO_PRESESNT"])
+			scrollDownButon:SetText(L["JUMP_TO_PRESENT"])
 			scrollDownButon:SetTextColor(C.db.global.colors.lanzones:GetRGB())
 
 			t_insert(frames, frame)
