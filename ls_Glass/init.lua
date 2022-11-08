@@ -379,28 +379,20 @@ function E:OnInitialize()
 						name = L["DOWNLOADS"],
 						inline = true,
 						args = {
-							wowi = {
-								order = 1,
-								type = "execute",
-								name = L["WOWINTERFACE"],
-								func = function()
-									-- E:ShowLinkCopyPopup("")
-								end,
-							},
 							cf = {
-								order = 2,
+								order = 1,
 								type = "execute",
 								name = L["CURSEFORGE"],
 								func = function()
-									-- E:ShowLinkCopyPopup("")
+									E:ShowLinkCopyPopup("https://www.curseforge.com/wow/addons/ls-glass")
 								end,
 							},
 							wago = {
-								order = 3,
+								order = 2,
 								type = "execute",
 								name = L["WAGO"],
 								func = function()
-									-- E:ShowLinkCopyPopup("")
+									E:ShowLinkCopyPopup("https://addons.wago.io/addons/ls-glass")
 								end,
 							},
 						},
