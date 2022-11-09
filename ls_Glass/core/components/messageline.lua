@@ -70,7 +70,7 @@ function E:UpdateMessageLinesBackgrounds()
 			messageLine:UpdateGradient()
 		end
 
-		for messageLine in pool:EnumerateInactive() do
+		for _, messageLine in pool:EnumerateInactive() do
 			messageLine:UpdateGradient()
 		end
 	end
@@ -82,7 +82,7 @@ function E:UpdateMessageLinesHeights()
 			messageLine:SetHeight(messageLine.Text:GetStringHeight() + 4)
 		end
 
-		for messageLine in pool:EnumerateInactive() do
+		for _, messageLine in pool:EnumerateInactive() do
 			messageLine:SetHeight(messageLine.Text:GetStringHeight() + 4)
 		end
 	end
