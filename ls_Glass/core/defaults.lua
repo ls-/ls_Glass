@@ -16,21 +16,19 @@ D.global = {
 }
 
 D.profile = {
-	width = 448,
-	height = 256,
 	font = LibStub("LibSharedMedia-3.0"):GetDefault("font"), -- "Friz Quadrata TT"
 	chat = {
 		alpha = 0.4,
 		tooltips = true,
+		slide_in_duration = 0.3,
 		font = {
 			size = 12,
 			shadow = true,
 			outline = false,
-			indented_word_wrap = true,
 		},
-		slide_in_duration = 0.3,
 		fade = {
 			-- enabled = true, -- * hardcoded
+			persistent = false, -- messages can fade in, but don't fade out
 			in_duration = 0.6,
 			out_delay = 10,
 			out_duration = 0.6,

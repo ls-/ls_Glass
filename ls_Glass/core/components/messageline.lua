@@ -3,6 +3,8 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
 -- Lua
 local _G = getfenv(0)
+local next = _G.next
+local t_insert = _G.table.insert
 
 -- Mine
 local message_line_proto = {}
@@ -50,10 +52,38 @@ local function resetMessageLine(messageLine, parent)
 	E:StopFading(messageLine, 0)
 end
 
+local pools = {}
+
 function E:CreateMessageLinePool(parent)
-	return CreateObjectPool(function()
+	return CreateObjectPool(function(pool)
+		t_insert(pools, pool)
+
 		return createMessageLine(parent)
 	end, function(_, messageLine)
 		resetMessageLine(messageLine, parent)
 	end)
+end
+
+function E:UpdateMessageLinesBackgrounds()
+	for _, pool in next, pools do
+		for messageLine in pool:EnumerateActive() do
+			messageLine:UpdateGradient()
+		end
+
+		for _, messageLine in pool:EnumerateInactive() do
+			messageLine:UpdateGradient()
+		end
+	end
+end
+
+function E:UpdateMessageLinesHeights()
+	for _, pool in next, pools do
+		for messageLine in pool:EnumerateActive() do
+			messageLine:SetHeight(messageLine.Text:GetStringHeight() + 4)
+		end
+
+		for _, messageLine in pool:EnumerateInactive() do
+			messageLine:SetHeight(messageLine.Text:GetStringHeight() + 4)
+		end
+	end
 end

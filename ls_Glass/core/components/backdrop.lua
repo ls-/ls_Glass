@@ -3,8 +3,12 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
 -- Lua
 local _G = getfenv(0)
+local next = _G.next
+local t_insert = _G.table.insert
 
 -- Mine
+local backdrops = {}
+
 function E:CreateBackdrop(parent, xOffset, yOffset)
 	local backdrop = CreateFrame("Frame", nil, parent, "BackdropTemplate")
 	backdrop:SetFrameLevel(parent:GetFrameLevel() - 1)
@@ -28,5 +32,14 @@ function E:CreateBackdrop(parent, xOffset, yOffset)
 	backdrop:SetBackdropColor(0, 0, 0, C.db.profile.dock.alpha)
 	backdrop:SetBackdropBorderColor(0, 0, 0, C.db.profile.dock.alpha)
 
+	t_insert(backdrops, backdrop)
+
 	return backdrop
+end
+
+function E:UpdateBackdrops()
+	for _, backdrop in next, backdrops do
+		backdrop:SetBackdropColor(0, 0, 0, C.db.profile.dock.alpha)
+		backdrop:SetBackdropBorderColor(0, 0, 0, C.db.profile.dock.alpha)
+	end
 end

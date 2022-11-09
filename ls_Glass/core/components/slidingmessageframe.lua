@@ -14,50 +14,66 @@ local t_wipe = _G.table.wipe
 -- Mine
 local LibEasing = LibStub("LibEasing-1.0")
 
+do
+	local map = {}
+
+	function E:GetSlidingFrameForChatFrame(chatFrame)
+		return map[chatFrame]
+	end
+
+	function E:SetSlidingFrameForChatFrame(chatFrame, slidingFrame)
+		map[chatFrame] = slidingFrame
+	end
+end
+
 ----------------
 -- BLIZZ CHAT --
 ----------------
 
 local function chatFrame_OnSizeChanged(self, width, height)
-	if self.SlidingMessageFrame then
-		-- TODO: Get height, width, etc from here instead of config
+	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
+	if slidingFrame then
 		width, height = E:Round(width), E:Round(height)
 
-		self.SlidingMessageFrame:SetSize(width, height)
-		self.SlidingMessageFrame.ScrollChild:SetSize(width, height)
+		slidingFrame:SetSize(width, height)
+		slidingFrame.ScrollChild:SetSize(width, height)
 
-		t_wipe(self.SlidingMessageFrame.visibleLines)
-		self.SlidingMessageFrame:ReleaseAllMessageLines()
-		self.SlidingMessageFrame:ScrollTo(0)
+		t_wipe(slidingFrame.visibleLines)
 
-		self.SlidingMessageFrame.ScrollDownButon:Hide()
+		if slidingFrame:GetNumActiveMessageLines() > 0 then
+			slidingFrame:ReleaseAllMessageLines()
+		end
+
+		slidingFrame:SetFirstMessageIndex(0)
+
+		slidingFrame.ScrollDownButon:Hide()
 	end
 end
 
 local function chatFrame_ShowHook(self)
 	self.FontStringContainer:Hide()
 
-	if self.SlidingMessageFrame then
+	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
+	if slidingFrame then
 		-- FCF indiscriminately calls :Show() when adding new tabs, I don't need to do
 		-- anything when that happens
-		if not self.SlidingMessageFrame:IsShown() then
-			self.SlidingMessageFrame:Show()
-			self.SlidingMessageFrame:ScrollTo(0, true)
-
-			self.SlidingMessageFrame.ScrollDownButon:Hide()
+		if not slidingFrame:IsShown() then
+			slidingFrame:Show()
 		end
 	end
 end
 
 local function chatFrame_HideHook(self)
-	if self.SlidingMessageFrame then
-		self.SlidingMessageFrame:Hide()
+	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
+	if slidingFrame then
+		slidingFrame:Hide()
 	end
 end
 
 local function chatFrame_AddMessageHook(self, ...)
-	if self.SlidingMessageFrame then
-		self.SlidingMessageFrame:AddMessage(self,...)
+	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
+	if slidingFrame then
+		slidingFrame:AddMessage(self,...)
 	end
 end
 
@@ -90,7 +106,7 @@ do
 		frame:ProcessIncoming(messages, true)
 
 		E:FadeOut(self, 0, 0.1, function()
-			self:SetText(L["JUMP_TO_PRESESNT"], true)
+			self:SetText(L["JUMP_TO_PRESENT"], true)
 			self:Hide()
 		end)
 	end
@@ -161,12 +177,13 @@ function object_proto:CaptureChatFrame(chatFrame)
 	self.ChatFrame = chatFrame
 	self.ChatTab = _G[chatFrame:GetName() .. "Tab"]
 	self.EditBox = _G[chatFrame:GetName() .. "EditBox"]
+	self.ButtonFrame = chatFrame.buttonFrame
 	self.historyBuffer = chatFrame.historyBuffer
 	self:SetParent(chatFrame)
 
-	chatFrame.SlidingMessageFrame = self
+	E:SetSlidingFrameForChatFrame(chatFrame, self)
 
-	-- TODO: Comment me out!
+	-- ! Comment me out!
 	-- if not chatFrame.bg1 then
 	-- 	chatFrame.bg1 = chatFrame:CreateTexture(nil, "BACKGROUND")
 	-- 	chatFrame.bg1:SetColorTexture(0, 0.6, 0.3, 0.3)
@@ -183,9 +200,9 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 	chatFrame:SetClampedToScreen(false)
 	chatFrame:SetClampRectInsets(0, 0, 0, 0)
+	chatFrame:SetResizeBounds(CHAT_FRAME_MIN_WIDTH, CHAT_FRAME_NORMAL_MIN_HEIGHT)
 	chatFrame:EnableMouse(false)
 
-	E:ForceHide(chatFrame.buttonFrame)
 	E:ForceHide(chatFrame.ScrollBar)
 	E:ForceHide(chatFrame.ScrollToBottomButton)
 
@@ -201,10 +218,9 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 	self:SetPoint("TOPLEFT", chatFrame)
 	self:SetSize(width, height)
+	self:SetShown(chatFrame:IsShown())
 
 	self.ScrollChild:SetSize(width, height)
-
-	self:SetShown(chatFrame:IsShown())
 
 	-- it's safer to hide the string container than the chat frame itself
 	chatFrame.FontStringContainer:Hide()
@@ -227,17 +243,41 @@ end
 
 function object_proto:ReleaseChatFrame()
 	if self.ChatFrame then
-		self.ChatFrame.SlidingMessageFrame = nil
+		E:SetSlidingFrameForChatFrame(self.ChatFrame, nil)
 
 		self.ChatFrame = nil
 		self.ChatTab = nil
 		self.EditBox = nil
+		self.ButtonFrame = nil
 		self.historyBuffer = nil
 		t_wipe(self.visibleLines)
+		t_wipe(self.incomingMessages)
+
+		LibEasing:StopEasing(self:GetScrollingHandler())
+		self:SetScrollingHandler(nil)
+
 		self:ReleaseAllMessageLines()
 		self:SetParent(UIParent)
 		self:Hide()
 	end
+end
+
+function object_proto:OnShow()
+	LibEasing:StopEasing(self:GetScrollingHandler())
+	self:SetScrollingHandler(nil)
+
+	self:SetVerticalScroll(0)
+	self:ScrollTo(self:GetFirstMessageIndex(), true)
+
+	self:SetFirstMessageIndex(0)
+	self:ProcessIncoming({t_removemulti(self.incomingMessages, 1, #self.incomingMessages)}, true)
+
+	self.ScrollDownButon:Hide()
+end
+
+function object_proto:OnHide()
+	LibEasing:StopEasing(self:GetScrollingHandler())
+	self:SetScrollingHandler(nil)
 end
 
 function object_proto:GetNumHistoryElements()
@@ -270,6 +310,14 @@ function object_proto:ReleaseAllMessageLines()
 	end
 end
 
+function object_proto:GetNumActiveMessageLines()
+	if self.messageFramePool then
+		return self.messageFramePool:GetNumActive()
+	end
+
+	return 0
+end
+
 function object_proto:ReleaseMessageLine(messageLine)
 	if self.messageFramePool and messageLine then
 		self.messageFramePool:Release(messageLine)
@@ -300,6 +348,7 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 		end
 
 		-- bail out if we're beyond the frame capacity
+		if not messageLine:GetBottom() then break end
 		if messageLine:GetBottom() > self:GetTop() then break end
 
 		local messageInfo = self:GetHistoryEntryAtIndex(index + i)
@@ -310,7 +359,7 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 			if refreshFading then
 				if tryToFadeIn then
 					E:FadeIn(messageLine, C.db.profile.chat.fade.in_duration, function()
-						if not self.isMouseOver then
+						if not self.isMouseOver and not C.db.profile.chat.fade.persistent then
 							E:FadeOut(messageLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
 								messageLine:Hide()
 							end)
@@ -319,7 +368,7 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 				else
 					messageLine:SetAlpha(1)
 
-					if not self.isMouseOver then
+					if not self.isMouseOver and not C.db.profile.chat.fade.persistent then
 						E:FadeOut(messageLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
 							messageLine:Hide()
 						end)
@@ -339,14 +388,25 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 	end
 
 	for i = numVisibleLines + 1, #self.visibleLines do
-		self:ReleaseMessageLine(self.visibleLines[i])
-		self.visibleLines[i] = nil
+		if i > maxMessages then
+			self:ReleaseMessageLine(self.visibleLines[i])
+			self.visibleLines[i] = nil
+		else
+			E:StopFading(self.visibleLines[i], 0)
+			self.visibleLines[i]:Hide()
+		end
 	end
 
 	self:SetFirstMessageIndex(index)
 end
 
 function object_proto:Refresh(delta, refreshFading, tryToFadeIn)
+	if not self:IsShown() then return end
+
+	if self:GetNumHistoryElements() == 0 then
+		return self:SetFirstMessageIndex(0)
+	end
+
 	delta = delta or 0
 
 	self:ScrollTo(Clamp(self:GetFirstMessageIndex() + delta, 0, self:GetNumHistoryElements() - 1), refreshFading, tryToFadeIn)
@@ -421,7 +481,7 @@ function object_proto:OnFrame()
 					E:FadeIn(visibleLine, C.db.profile.chat.fade.in_duration, function()
 						if self.isMouseOver then
 							E:StopFading(visibleLine, 1)
-						else
+						elseif not C.db.profile.chat.fade.persistent then
 							E:FadeOut(visibleLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
 								visibleLine:Hide()
 							end)
@@ -435,7 +495,7 @@ function object_proto:OnFrame()
 				E:FadeIn(self.ScrollDownButon, C.db.profile.chat.fade.in_duration, function()
 					if self.isMouseOver then
 						E:StopFading(self.ScrollDownButon, 1)
-					else
+					elseif not C.db.profile.chat.fade.persistent then
 						E:FadeOut(self.ScrollDownButon, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
 							self.ScrollDownButon:Hide()
 						end)
@@ -444,87 +504,55 @@ function object_proto:OnFrame()
 			end
 
 			if C.db.profile.dock.fade.enabled then
-				-- these use custom values for fading in/out because Blizz fade chat as well,
+				-- these use custom values for fading in/out because Blizz fade chat as well
 				-- so I'm trying not to interfere with that
+				-- ! DO NOT SHOW/HIDE the tab, it'll taint EVERYTHING, just adjust its alpha
 				if not self.ChatFrame.isDocked then
-					self.ChatTab:Show()
 					E:FadeIn(self.ChatTab, 0.1, function()
 						if self.isMouseOver then
 							E:StopFading(self.ChatTab, 1)
 						else
-							E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration, function()
-								self.ChatTab:Hide()
-							end)
+							E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration)
 						end
 					end)
 				end
 
-				-- IM style chat frame have their own edit boxes
-				-- don't hide them, hiding them resets a bunch of stuff
-				if GetCVar("chatStyle") == "im" then
-					E:FadeIn(self.EditBox.Fader, 0.1, function()
-						if self.isMouseOver then
-							E:StopFading(self.EditBox.Fader, 1)
-						else
-							E:FadeOut(self.EditBox.Fader, 4, C.db.profile.dock.fade.out_duration)
-						end
-					end)
-				else
-					ChatFrame1EditBox.Fader:Show()
-					E:FadeIn(ChatFrame1EditBox.Fader, 0.1, function()
-						if self.isMouseOver then
-							E:StopFading(ChatFrame1EditBox.Fader, 1)
-						else
-							E:FadeOut(ChatFrame1EditBox.Fader, 4, C.db.profile.dock.fade.out_duration)
-						end
-					end)
-				end
+				E:FadeIn(self.ButtonFrame, 0.1, function()
+					if self.isMouseOver then
+						E:StopFading(self.ButtonFrame, 1)
+					else
+						E:FadeOut(self.ButtonFrame, 4, C.db.profile.dock.fade.out_duration)
+					end
+				end)
 			end
 		else
-			for _, visibleLine in next, self.visibleLines do
-				if visibleLine:IsShown() and not E:IsFading(visibleLine) then
-					E:FadeOut(visibleLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-						visibleLine:Hide()
-					end)
+			if not C.db.profile.chat.fade.persistent then
+				for _, visibleLine in next, self.visibleLines do
+					if visibleLine:IsShown() and not E:IsFading(visibleLine) then
+						E:FadeOut(visibleLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
+							visibleLine:Hide()
+						end)
+					end
 				end
+
+				E:FadeOut(self.ScrollDownButon, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
+					self.ScrollDownButon:Hide()
+				end)
 			end
 
-			E:FadeOut(self.ScrollDownButon, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-				self.ScrollDownButon:Hide()
-			end)
-
 			if C.db.profile.dock.fade.enabled then
-				-- these use custom values for fading in/out because Blizz fade chat as well,
+				-- these use custom values for fading in/out because Blizz fade chat as well
 				-- so I'm trying not to interfere with that
+				-- ! DO NOT SHOW/HIDE the tab, it'll taint EVERYTHING, just adjust its alpha
 				if not self.ChatFrame.isDocked then
-					if not self.ChatTab.isDragging then
-						E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration, function()
-							self.ChatTab:Hide()
-						end)
+					if not self.isDragging then
+						E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration)
 					else
 						E:StopFading(self.ChatTab, 1)
 					end
 				end
 
-				-- IM style chat frame have their own edit boxes
-				-- don't hide them, hiding them resets a bunch of stuff
-				if GetCVar("chatStyle") == "im" then
-					if not self.EditBox:HasFocus() and self.EditBox:GetText() == "" then
-						E:FadeOut(self.EditBox.Fader, 4, C.db.profile.dock.fade.out_duration)
-					else
-						E:FadeIn(self.EditBox.Fader, 0.1, function()
-							E:StopFading(self.EditBox.Fader, 1)
-						end)
-					end
-				else
-					if not ChatFrame1EditBox:HasFocus() and ChatFrame1EditBox:GetText() == "" then
-						E:FadeOut(ChatFrame1EditBox.Fader, 4, C.db.profile.dock.fade.out_duration)
-					else
-						E:FadeIn(ChatFrame1EditBox.Fader, 0.1, function()
-							E:StopFading(ChatFrame1EditBox.Fader, 1)
-						end)
-					end
-				end
+				E:FadeOut(self.ButtonFrame, 4, C.db.profile.dock.fade.out_duration)
 			end
 		end
 	end
@@ -551,7 +579,7 @@ function object_proto:ProcessIncoming(incoming, doNotFade)
 		if not doNotFade then
 			messageLine:SetAlpha(0)
 			E:FadeIn(messageLine, C.db.profile.chat.fade.in_duration, function()
-				if not self.isMouseOver then
+				if not self.isMouseOver and not C.db.profile.chat.fade.persistent then
 					E:FadeOut(messageLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
 						messageLine:Hide()
 					end)
@@ -591,13 +619,14 @@ function object_proto:Release()
 end
 
 do
-	local index = 0
+	local frames = {}
+
 	local slidingMessageFramePool = CreateObjectPool(
 		function(pool)
-			index = index + 1
-			local frame = Mixin(CreateFrame("ScrollFrame", "LSGlassFrame" .. index, UIParent, "LSGlassHyperlinkPropagator"), object_proto)
+			local frame = Mixin(CreateFrame("ScrollFrame", "LSGlassFrame" .. (#frames + 1), UIParent, "LSGlassHyperlinkPropagator"), object_proto)
 			frame:EnableMouse(false)
 			frame:SetClipsChildren(true)
+			frame:Hide()
 
 			frame.visibleLines = {}
 			frame.incomingMessages = {}
@@ -607,6 +636,8 @@ do
 			frame:SetScrollChild(scrollChild)
 			frame.ScrollChild = scrollChild
 
+			frame:SetScript("OnHide", frame.OnHide)
+			frame:SetScript("OnShow", frame.OnShow)
 			frame:SetScript("OnMouseWheel", frame.OnMouseWheel)
 
 			local scrollDownButon = Mixin(CreateFrame("Button", nil, frame), scroll_down_button_proto)
@@ -616,16 +647,17 @@ do
 			scrollDownButon:Hide()
 			frame.ScrollDownButon = scrollDownButon
 
-			local text = scrollDownButon:CreateFontString(nil, "ARTWORK", "GameFontNormal") -- TODO: Fix me!
-			-- local text = scrollDownButon:CreateFontString(nil, "ARTWORK", "GlassMessageFont")
+			local text = scrollDownButon:CreateFontString(nil, "ARTWORK", "LSGlassMessageFont")
 			text:SetPoint("TOPLEFT", 2, 0)
 			text:SetPoint("BOTTOMRIGHT", -2, 0)
 			text:SetJustifyH("RIGHT")
 			text:SetJustifyV("MIDDLE")
 			scrollDownButon.Text = text
 
-			scrollDownButon:SetText(L["JUMP_TO_PRESESNT"])
+			scrollDownButon:SetText(L["JUMP_TO_PRESENT"])
 			scrollDownButon:SetTextColor(C.db.global.colors.lanzones:GetRGB())
+
+			t_insert(frames, frame)
 
 			return frame
 		end,
@@ -644,6 +676,43 @@ do
 			frame:CaptureChatFrame(chatFrame)
 
 			return frame
+		end
+	end
+
+	function E:ResetSlidingFrameDockFading()
+		for i, frame in next, frames do
+			if frame:IsShown() then
+				frame.isMouseOver = nil
+
+				E:StopFading(frame.ChatTab, 1)
+				E:StopFading(frame.ButtonFrame, 1)
+
+				-- ? I don't like this... Should I attach to the first frame?
+				if i == 1 then
+					LSGlassUpdater.isMouseOver = nil
+
+					E:StopFading(GeneralDockManager, 1)
+				end
+			end
+		end
+	end
+
+	function E:ResetSlidingFrameChatFading()
+		for _, frame in next, frames do
+			if frame:IsShown() then
+				frame.isMouseOver = nil
+
+				for _, visibleLine in next, frame.visibleLines do
+					if visibleLine:IsShown() then
+						E:StopFading(visibleLine, 1)
+					end
+				end
+
+				if frame:GetFirstMessageIndex() ~= 0 then
+					frame.ScrollDownButon:Show()
+					E:StopFading(frame.ScrollDownButon, 1)
+				end
+			end
 		end
 	end
 end

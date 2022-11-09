@@ -2,13 +2,16 @@
 
 Smooth as glass.
 
+![Imgur](https://i.imgur.com/8lj13ch.gif)
+
 ## Download
 
-TBD.
+- [Curse](https://www.curseforge.com/wow/addons/ls-glass)
+- [Wago](https://addons.wago.io/addons/ls-glass)
 
 ## Options
 
-TBD.
+Use **`/LSGLASS`** or **`/LSG`** to open the in-game config.
 
 ## Feedback and Feature Requests
 
@@ -16,7 +19,7 @@ If you found a bug or want to share an idea on how to improve my addon, either u
 
 ## Localisation
 
-TBD.
+Feel free to add and/or review translations on [Curse](https://www.curseforge.com/wow/addons/ls-glass/localization), alternatively, you may create a PR on [project's GitHub page](https://github.com/ls-/ls_Glass/pulls).
 
 ## FAQ
 

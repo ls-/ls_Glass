@@ -15,21 +15,26 @@ local function chatTab_SetPoint(self, _, anchor, _, _, _, shouldIgnore)
 end
 
 local function chatTab_OnDragStart(self)
-	self.isDragging = true
-end
-
-local function chatTab_OnDragStop(self)
-	self.isDragging = false
-
-	local frame = _G["ChatFrame" .. self:GetID()]
-	if frame and frame.SlidingMessageFrame and not frame.SlidingMessageFrame.isMouseOver then
-		frame.SlidingMessageFrame.isMouseOver = nil
+	local frame = E:GetSlidingFrameForChatFrame(_G["ChatFrame" .. self:GetID()])
+	if frame then
+		frame.isDragging = true
 	end
 end
 
-local function chatTabText_SetPoint(self, p, anchor, rP, x, _, shouldIgnore)
+local function chatTab_OnDragStop(self)
+	local frame = E:GetSlidingFrameForChatFrame(_G["ChatFrame" .. self:GetID()])
+	if frame then
+		if frame.isMouseOver then
+			frame.isMouseOver = nil
+		end
+
+		frame.isDragging = nil
+	end
+end
+
+local function chatTabText_SetPoint(self, p, anchor, rP, x, y, shouldIgnore)
 	if not shouldIgnore then
-		self:SetPoint(p, anchor, rP, x, p == "CENTER" and 0 or -6, true)
+		self:SetPoint(p, anchor, rP, p == "LEFT" and 8 or x, p == "CENTER" and 0 or y, true)
 	end
 end
 
@@ -117,6 +122,10 @@ function E:HandleChatTab(frame)
 	frame.HighlightMiddle:SetTexCoord(0, 1, 0, 0.5)
 	frame.HighlightMiddle:SetSize(8, 8)
 
+	if frame.conversationIcon then
+		frame.conversationIcon:SetPoint("RIGHT", frame.Text, "LEFT", 0, 0)
+	end
+
 	-- reset the tab
 	frame:SetPoint(frame:GetPoint(1))
 
@@ -124,7 +133,7 @@ function E:HandleChatTab(frame)
 		frame.Text:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 	end
 
-	-- It can be "CENTER" or "LEFT", so just use the index
+	-- it can be "CENTER" or "LEFT", so just use the index
 	frame.Text:SetPoint(frame.Text:GetPoint(1))
 end
 
@@ -145,10 +154,12 @@ local MINI_TAB_TEXTURES = {
 }
 
 function E:HandleMinimizedTab(frame)
-	if not frame then return end
-
 	if not handledMiniTabs[frame] then
 		frame.Backdrop = E:CreateBackdrop(frame)
+
+		E:HandleMaximizeButton(_G[frame:GetName() .. "MaximizeButton"])
+
+		hooksecurefunc(frame.Text, "SetTextColor", chatTabText_SetTextColor)
 
 		handledMiniTabs[frame] = true
 	end
@@ -182,23 +193,10 @@ function E:HandleMinimizedTab(frame)
 	frame.HighlightMiddle:SetTexCoord(0, 1, 0, 0.5)
 	frame.HighlightMiddle:SetSize(8, 8)
 
-	local maximizeButton = _G[frame:GetName() .. "MaximizeButton"]
-	maximizeButton:SetNormalTexture(0)
-	maximizeButton:SetPushedTexture(0)
+	-- reset the tab
+	if not frame.selectedColorTable then
+		frame.Text:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+	end
 
-	local normalTexture = maximizeButton:GetNormalTexture()
-	normalTexture:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\icons")
-	normalTexture:SetTexCoord(0.5, 1, 0, 0.5)
-	normalTexture:ClearAllPoints()
-	normalTexture:SetPoint("TOPLEFT", 2, -2)
-	normalTexture:SetPoint("BOTTOMRIGHT", -2, 2)
-	normalTexture:SetVertexColor(C.db.global.colors.lanzones:GetRGB())
-
-	local psuhedTexture = maximizeButton:GetPushedTexture()
-	psuhedTexture:SetTexture("Interface\\AddOns\\ls_Glass\\assets\\icons")
-	psuhedTexture:SetTexCoord(0.5, 1, 0, 0.5)
-	psuhedTexture:ClearAllPoints()
-	psuhedTexture:SetPoint("TOPLEFT", 3, -3)
-	psuhedTexture:SetPoint("BOTTOMRIGHT", -1, 1)
-	psuhedTexture:SetVertexColor(C.db.global.colors.lanzones:GetRGB())
+	frame.conversationIcon:SetPoint("RIGHT", frame.Text, "LEFT", 0, 0)
 end

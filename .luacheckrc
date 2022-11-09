@@ -35,26 +35,36 @@ read_globals = {
 	-- FrameXML
 	"BattlePetTooltip",
 	"BattlePetToolTip_ShowLink",
+	"CHAT_FRAME_MIN_WIDTH",
+	"CHAT_FRAME_NORMAL_MIN_HEIGHT",
 	"ChatFrame1",
 	"ChatFrame1EditBox",
 	"ChatFrame2",
+	"ChatFrameChannelButton",
+	"ChatFrameMenuButton",
 	"Clamp",
 	"ColorMixin",
 	"CreateObjectPool",
 	"DEFAULT_TAB_SELECTED_COLOR_TABLE",
 	"GameTooltip",
 	"GeneralDockManager",
+	"HideUIPanel",
+	"LinkUtil",
 	"Mixin",
 	"NORMAL_FONT_COLOR",
 	"NUM_CHAT_WINDOWS",
+	"Settings",
+	"SettingsPanel",
+	"SlashCmdList",
 	"UIParent",
 
 	-- Namespace
-	"LinkUtil",
 
 	-- API
 	"CreateFont",
 	"CreateFrame",
 	"GetAddOnMetadata",
 	"GetCVar",
+	"GetLocale",
+	"InCombatLockdown",
 }
