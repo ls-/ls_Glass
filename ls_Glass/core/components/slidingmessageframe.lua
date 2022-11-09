@@ -40,8 +40,16 @@ local function chatFrame_OnSizeChanged(self, width, height)
 
 		t_wipe(slidingFrame.visibleLines)
 
-		if slidingFrame:GetNumActiveMessageLines() > 0 then
-			slidingFrame:ReleaseAllMessageLines()
+		-- TODO: Refactor it later...
+		if slidingFrame.messageFramePool then
+			if slidingFrame:GetNumActiveMessageLines() > 0 then
+				slidingFrame:ReleaseAllMessageLines()
+			end
+
+			for _, messageLine in slidingFrame.messageFramePool:EnumerateInactive() do
+				messageLine:SetWidth(width)
+				messageLine:SetGradientBackgroundSize(E:Round(width * 0.1), E:Round(width * 0.4))
+			end
 		end
 
 		slidingFrame:SetFirstMessageIndex(0)
@@ -86,24 +94,7 @@ local scroll_down_button_proto = {}
 do
 	function scroll_down_button_proto:OnClick()
 		local frame = self:GetParent()
-		local num = m_min(frame:GetNumHistoryElements(), frame:GetMaxMessages(), frame:GetFirstMessageIndex())
-
-		frame:ScrollTo(num, true)
-
-		if num == frame:GetFirstMessageIndex() then
-			num = num + 1
-		end
-
-		local messages = {}
-		for i = num - 1, 1, -1 do
-			local messageInfo = frame:GetHistoryEntryAtIndex(i)
-			if messageInfo then
-				t_insert(messages, {messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b})
-			end
-		end
-
-		frame:SetFirstMessageIndex(0)
-		frame:ProcessIncoming(messages, true)
+		frame:FastForward()
 
 		E:FadeOut(self, 0, 0.1, function()
 			self:SetText(L["JUMP_TO_PRESENT"], true)
@@ -200,7 +191,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 	chatFrame:SetClampedToScreen(false)
 	chatFrame:SetClampRectInsets(0, 0, 0, 0)
-	chatFrame:SetResizeBounds(CHAT_FRAME_MIN_WIDTH, CHAT_FRAME_NORMAL_MIN_HEIGHT)
+	chatFrame:SetResizeBounds(176, 64)
 	chatFrame:EnableMouse(false)
 
 	E:ForceHide(chatFrame.ScrollBar)
@@ -265,12 +256,7 @@ end
 function object_proto:OnShow()
 	LibEasing:StopEasing(self:GetScrollingHandler())
 	self:SetScrollingHandler(nil)
-
-	self:SetVerticalScroll(0)
-	self:ScrollTo(self:GetFirstMessageIndex(), true)
-
-	self:SetFirstMessageIndex(0)
-	self:ProcessIncoming({t_removemulti(self.incomingMessages, 1, #self.incomingMessages)}, true)
+	self:FastForward()
 
 	self.ScrollDownButon:Hide()
 end
@@ -278,6 +264,9 @@ end
 function object_proto:OnHide()
 	LibEasing:StopEasing(self:GetScrollingHandler())
 	self:SetScrollingHandler(nil)
+
+	t_wipe(self.visibleLines)
+	self:ReleaseAllMessageLines()
 end
 
 function object_proto:GetNumHistoryElements()
@@ -325,7 +314,7 @@ function object_proto:ReleaseMessageLine(messageLine)
 end
 
 function object_proto:GetMaxMessages()
-	return m_ceil(self.ChatFrame:GetHeight() / (C.db.profile.chat.font.size + 4))
+	return m_ceil(self.ChatFrame:GetHeight() / (C.db.profile.chat.font.size + C.db.profile.chat.y_padding * 2))
 end
 
 function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
@@ -348,7 +337,6 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 		end
 
 		-- bail out if we're beyond the frame capacity
-		if not messageLine:GetBottom() then break end
 		if messageLine:GetBottom() > self:GetTop() then break end
 
 		local messageInfo = self:GetHistoryEntryAtIndex(index + i)
@@ -398,6 +386,33 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 	end
 
 	self:SetFirstMessageIndex(index)
+end
+
+function object_proto:FastForward()
+	if self:GetNumHistoryElements() > 0 then
+		t_wipe(self.incomingMessages)
+
+		local num = m_min(self:GetNumHistoryElements(), self:GetMaxMessages(), self:GetFirstMessageIndex())
+
+		self:SetVerticalScroll(0)
+		self:ScrollTo(num, true)
+
+		if num == 0 then return end
+		if num == self:GetFirstMessageIndex() then
+			num = num + 1
+		end
+
+		local messages = {}
+		for i = num - 1, 1, -1 do
+			local messageInfo = self:GetHistoryEntryAtIndex(i)
+			if messageInfo then
+				t_insert(messages, {messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b})
+			end
+		end
+
+		self:ProcessIncoming(messages, true)
+		self:SetFirstMessageIndex(0)
+	end
 end
 
 function object_proto:Refresh(delta, refreshFading, tryToFadeIn)
@@ -461,6 +476,10 @@ function object_proto:AddMessage(_, ...)
 
 			t_insert(self.incomingMessages, {...})
 		end
+	else
+		-- the frame might be hidden due to a bunch of factors, just bump the index of
+		-- the first message, OnShow will take care of the rest
+		self:SetFirstMessageIndex(self:GetFirstMessageIndex() + 1)
 	end
 end
 
@@ -609,7 +628,7 @@ function object_proto:ProcessIncoming(incoming, doNotFade)
 		function()
 			self:SetVerticalScroll(0)
 			self:Refresh(0, doNotFade)
-			self:SetScrollingHandler()
+			self:SetScrollingHandler(nil)
 		end
 	))
 end
@@ -680,21 +699,19 @@ do
 	end
 
 	function E:ResetSlidingFrameDockFading()
-		for i, frame in next, frames do
+		for _, frame in next, frames do
 			if frame:IsShown() then
 				frame.isMouseOver = nil
 
 				E:StopFading(frame.ChatTab, 1)
 				E:StopFading(frame.ButtonFrame, 1)
-
-				-- ? I don't like this... Should I attach to the first frame?
-				if i == 1 then
-					LSGlassUpdater.isMouseOver = nil
-
-					E:StopFading(GeneralDockManager, 1)
-				end
 			end
 		end
+
+		-- ? I don't like this... Should I attach to the first frame?
+		LSGlassUpdater.isMouseOver = nil
+
+		E:StopFading(GeneralDockManager, 1)
 	end
 
 	function E:ResetSlidingFrameChatFading()
