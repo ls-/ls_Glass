@@ -209,7 +209,6 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 	self:SetPoint("TOPLEFT", chatFrame)
 	self:SetSize(width, height)
-	self:SetShown(chatFrame:IsShown())
 
 	self.ScrollChild:SetSize(width, height)
 
@@ -230,6 +229,8 @@ function object_proto:CaptureChatFrame(chatFrame)
 	for i = 1, chatFrame:GetNumMessages() do
 		self:AddMessage(chatFrame, chatFrame:GetMessageInfo(i))
 	end
+
+	self:SetShown(chatFrame:IsShown())
 end
 
 function object_proto:ReleaseChatFrame()
@@ -393,11 +394,11 @@ function object_proto:FastForward()
 		t_wipe(self.incomingMessages)
 
 		local num = m_min(self:GetNumHistoryElements(), self:GetMaxMessages(), self:GetFirstMessageIndex())
-		if num == 0 then return end
 
 		self:SetVerticalScroll(0)
-		self:ScrollTo(num)
+		self:ScrollTo(num, true)
 
+		if num == 0 then return end
 		if num == self:GetFirstMessageIndex() then
 			num = num + 1
 		end
@@ -410,7 +411,7 @@ function object_proto:FastForward()
 			end
 		end
 
-		self:ProcessIncoming(messages, false)
+		self:ProcessIncoming(messages, true)
 		self:SetFirstMessageIndex(0)
 	end
 end
