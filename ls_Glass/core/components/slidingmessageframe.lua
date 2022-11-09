@@ -686,15 +686,13 @@ do
 
 				E:StopFading(frame.ChatTab, 1)
 				E:StopFading(frame.ButtonFrame, 1)
-
-				-- ? I don't like this... Should I attach to the first frame?
-				if i == 1 then
-					LSGlassUpdater.isMouseOver = nil
-
-					E:StopFading(GeneralDockManager, 1)
-				end
 			end
 		end
+
+		-- ? I don't like this... Should I attach to the first frame?
+		LSGlassUpdater.isMouseOver = nil
+
+		E:StopFading(GeneralDockManager, 1)
 	end
 
 	function E:ResetSlidingFrameChatFading()
