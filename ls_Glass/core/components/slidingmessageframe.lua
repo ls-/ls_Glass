@@ -393,11 +393,11 @@ function object_proto:FastForward()
 		t_wipe(self.incomingMessages)
 
 		local num = m_min(self:GetNumHistoryElements(), self:GetMaxMessages(), self:GetFirstMessageIndex())
-		if num == 0 then return end
 
 		self:SetVerticalScroll(0)
 		self:ScrollTo(num, true)
 
+		if num == 0 then return end
 		if num == self:GetFirstMessageIndex() then
 			num = num + 1
 		end
