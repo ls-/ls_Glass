@@ -86,24 +86,7 @@ local scroll_down_button_proto = {}
 do
 	function scroll_down_button_proto:OnClick()
 		local frame = self:GetParent()
-		local num = m_min(frame:GetNumHistoryElements(), frame:GetMaxMessages(), frame:GetFirstMessageIndex())
-
-		frame:ScrollTo(num, true)
-
-		if num == frame:GetFirstMessageIndex() then
-			num = num + 1
-		end
-
-		local messages = {}
-		for i = num - 1, 1, -1 do
-			local messageInfo = frame:GetHistoryEntryAtIndex(i)
-			if messageInfo then
-				t_insert(messages, {messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b})
-			end
-		end
-
-		frame:SetFirstMessageIndex(0)
-		frame:ProcessIncoming(messages, true)
+		frame:FastForward()
 
 		E:FadeOut(self, 0, 0.1, function()
 			self:SetText(L["JUMP_TO_PRESENT"], true)
@@ -265,12 +248,7 @@ end
 function object_proto:OnShow()
 	LibEasing:StopEasing(self:GetScrollingHandler())
 	self:SetScrollingHandler(nil)
-
-	self:SetVerticalScroll(0)
-	self:ScrollTo(self:GetFirstMessageIndex(), true)
-
-	self:SetFirstMessageIndex(0)
-	self:ProcessIncoming({t_removemulti(self.incomingMessages, 1, #self.incomingMessages)}, true)
+	self:FastForward()
 
 	self.ScrollDownButon:Hide()
 end
@@ -278,6 +256,9 @@ end
 function object_proto:OnHide()
 	LibEasing:StopEasing(self:GetScrollingHandler())
 	self:SetScrollingHandler(nil)
+
+	t_wipe(self.visibleLines)
+	self:ReleaseAllMessageLines()
 end
 
 function object_proto:GetNumHistoryElements()
@@ -348,7 +329,6 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 		end
 
 		-- bail out if we're beyond the frame capacity
-		if not messageLine:GetBottom() then break end
 		if messageLine:GetBottom() > self:GetTop() then break end
 
 		local messageInfo = self:GetHistoryEntryAtIndex(index + i)
@@ -398,6 +378,33 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 	end
 
 	self:SetFirstMessageIndex(index)
+end
+
+function object_proto:FastForward()
+	if self:GetNumHistoryElements() > 0 then
+		t_wipe(self.incomingMessages)
+
+		local num = m_min(self:GetNumHistoryElements(), self:GetMaxMessages(), self:GetFirstMessageIndex())
+		if num == 0 then return end
+
+		self:SetVerticalScroll(0)
+		self:ScrollTo(num, true)
+
+		if num == self:GetFirstMessageIndex() then
+			num = num + 1
+		end
+
+		local messages = {}
+		for i = num - 1, 1, -1 do
+			local messageInfo = self:GetHistoryEntryAtIndex(i)
+			if messageInfo then
+				t_insert(messages, {messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b})
+			end
+		end
+
+		self:ProcessIncoming(messages, true)
+		self:SetFirstMessageIndex(0)
+	end
 end
 
 function object_proto:Refresh(delta, refreshFading, tryToFadeIn)
@@ -461,6 +468,10 @@ function object_proto:AddMessage(_, ...)
 
 			t_insert(self.incomingMessages, {...})
 		end
+	else
+		-- the frame might be hidden due to a bunch of factors, just bump the index of
+		-- the first message, OnShow will take care of the rest
+		self:SetFirstMessageIndex(self:GetFirstMessageIndex() + 1)
 	end
 end
 
@@ -609,7 +620,7 @@ function object_proto:ProcessIncoming(incoming, doNotFade)
 		function()
 			self:SetVerticalScroll(0)
 			self:Refresh(0, doNotFade)
-			self:SetScrollingHandler()
+			self:SetScrollingHandler(nil)
 		end
 	))
 end
