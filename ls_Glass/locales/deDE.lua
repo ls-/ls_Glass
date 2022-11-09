@@ -1,4 +1,4 @@
-﻿-- Contributors:
+﻿-- Contributors: terijaki@GitHub
 
 local _, ns = ...
 local L = ns.L
