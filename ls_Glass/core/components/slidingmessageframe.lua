@@ -315,7 +315,7 @@ function object_proto:ReleaseMessageLine(messageLine)
 end
 
 function object_proto:GetMaxMessages()
-	return m_ceil(self.ChatFrame:GetHeight() / (C.db.profile.chat.font.size + C.db.profile.chat.y_padding * 2))
+	return m_ceil(self:GetHeight() / (C.db.profile.chat.font.size + C.db.profile.chat.y_padding * 2))
 end
 
 function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
@@ -390,6 +390,8 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 end
 
 function object_proto:FastForward()
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+
 	if self:GetNumHistoryElements() > 0 then
 		t_wipe(self.incomingMessages)
 
@@ -417,7 +419,7 @@ function object_proto:FastForward()
 end
 
 function object_proto:Refresh(delta, refreshFading, tryToFadeIn)
-	if not self:IsShown() then return end
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
 
 	if self:GetNumHistoryElements() == 0 then
 		return self:SetFirstMessageIndex(0)
@@ -485,7 +487,7 @@ function object_proto:AddMessage(_, ...)
 end
 
 function object_proto:OnFrame()
-	if not self:IsShown() or self:GetScrollingHandler() then return end
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 or self:GetScrollingHandler() then return end
 
 	if #self.incomingMessages > 0 then
 		self:ProcessIncoming({t_removemulti(self.incomingMessages, 1, #self.incomingMessages)}, false)
