@@ -1,6 +1,6 @@
 # LS: Glass
 
-Smooth as glass.
+Replacement for the default chat. Smooth as glass!
 
 ![Imgur](https://i.imgur.com/8lj13ch.gif)
 
@@ -23,8 +23,11 @@ Feel free to add and/or review translations on [Curse](https://www.curseforge.co
 
 ## FAQ
 
-**Q:** How is this addon related to Glass by mixxorz?  
-**A:** Originally, the goal was to take over that addon and maintain it. However, after reviewing the original code to figure out what I needed to do to update it for the Dragonflight expansion I decided to start from scratch. But it's fair to say that the addon is inspired by Glass, hence its name.
+**`Q:`** How is this addon related to Glass by mixxorz?  
+**`A:`** Originally, the goal was to take over that addon and maintain it. However, after reviewing the original code to figure out what I needed to do to update it for the Dragonflight expansion I decided to start from scratch. But it's fair to say that the addon is inspired by Glass, hence its name.
+  
+**`Q:`** How do I move and/or resize the chat frame?
+**`A:`** Use "Edit Mode". There's a tiny triangle in the bottom right corner of the "Chat Frame" mover that's used for resizing. Hopefully, Blizz will change it to something more noticeable in the future.
 
 ## License
 
