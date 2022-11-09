@@ -28,6 +28,14 @@ function E:OnInitialize()
 	self.VER.string = GetAddOnMetadata(addonName, "Version")
 	self.VER.number = tonumber(self.VER.string:gsub("%D", ""), nil)
 
+	if LS_GLASS_GLOBAL_CONFIG then
+		if LS_GLASS_GLOBAL_CONFIG.profiles then
+			for profile, data in next, LS_GLASS_GLOBAL_CONFIG.profiles do
+				self:Modernize(data, profile, "profile")
+			end
+		end
+	end
+
 	C.db = LibStub("AceDB-3.0"):New("LS_GLASS_GLOBAL_CONFIG", D, true)
 	C.db:RegisterCallback("OnProfileChanged", updateCallback)
 	C.db:RegisterCallback("OnProfileCopied", updateCallback)
@@ -110,7 +118,7 @@ function E:OnInitialize()
 								order = 2,
 								type = "range",
 								name = L["X_PADDING"],
-								min = 0, max = 20, step = 1,
+								min = 1, max = 20, step = 1,
 								set = function(_, value)
 									if C.db.profile.chat.x_padding ~= value then
 										C.db.profile.chat.x_padding = value
@@ -123,7 +131,7 @@ function E:OnInitialize()
 								order = 3,
 								type = "range",
 								name = L["Y_PADDING"],
-								min = 0, max = 10, step = 1,
+								min = 1, max = 10, step = 1,
 								set = function(_, value)
 									if C.db.profile.chat.y_padding ~= value then
 										C.db.profile.chat.y_padding = value

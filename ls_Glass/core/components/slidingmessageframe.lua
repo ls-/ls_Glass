@@ -209,7 +209,6 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 	self:SetPoint("TOPLEFT", chatFrame)
 	self:SetSize(width, height)
-	self:SetShown(chatFrame:IsShown())
 
 	self.ScrollChild:SetSize(width, height)
 
@@ -230,6 +229,8 @@ function object_proto:CaptureChatFrame(chatFrame)
 	for i = 1, chatFrame:GetNumMessages() do
 		self:AddMessage(chatFrame, chatFrame:GetMessageInfo(i))
 	end
+
+	self:SetShown(chatFrame:IsShown())
 end
 
 function object_proto:ReleaseChatFrame()
@@ -314,7 +315,7 @@ function object_proto:ReleaseMessageLine(messageLine)
 end
 
 function object_proto:GetMaxMessages()
-	return m_ceil(self.ChatFrame:GetHeight() / (C.db.profile.chat.font.size + C.db.profile.chat.y_padding * 2))
+	return m_ceil(self:GetHeight() / (C.db.profile.chat.font.size + C.db.profile.chat.y_padding * 2))
 end
 
 function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
@@ -389,15 +390,17 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 end
 
 function object_proto:FastForward()
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+
 	if self:GetNumHistoryElements() > 0 then
 		t_wipe(self.incomingMessages)
 
 		local num = m_min(self:GetNumHistoryElements(), self:GetMaxMessages(), self:GetFirstMessageIndex())
-		if num == 0 then return end
 
 		self:SetVerticalScroll(0)
-		self:ScrollTo(num)
+		self:ScrollTo(num, true)
 
+		if num == 0 then return end
 		if num == self:GetFirstMessageIndex() then
 			num = num + 1
 		end
@@ -410,13 +413,13 @@ function object_proto:FastForward()
 			end
 		end
 
-		self:ProcessIncoming(messages, false)
+		self:ProcessIncoming(messages, true)
 		self:SetFirstMessageIndex(0)
 	end
 end
 
 function object_proto:Refresh(delta, refreshFading, tryToFadeIn)
-	if not self:IsShown() then return end
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
 
 	if self:GetNumHistoryElements() == 0 then
 		return self:SetFirstMessageIndex(0)
@@ -484,7 +487,7 @@ function object_proto:AddMessage(_, ...)
 end
 
 function object_proto:OnFrame()
-	if not self:IsShown() or self:GetScrollingHandler() then return end
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 or self:GetScrollingHandler() then return end
 
 	if #self.incomingMessages > 0 then
 		self:ProcessIncoming({t_removemulti(self.incomingMessages, 1, #self.incomingMessages)}, false)
