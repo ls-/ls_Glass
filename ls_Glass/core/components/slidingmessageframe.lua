@@ -252,6 +252,10 @@ function object_proto:ReleaseChatFrame()
 		self.historyBuffer = nil
 		t_wipe(self.visibleLines)
 		t_wipe(self.incomingMessages)
+
+		LibEasing:StopEasing(self:GetScrollingHandler())
+		self:SetScrollingHandler(nil)
+
 		self:ReleaseAllMessageLines()
 		self:SetParent(UIParent)
 		self:Hide()
@@ -269,6 +273,11 @@ function object_proto:OnShow()
 	self:ProcessIncoming({t_removemulti(self.incomingMessages, 1, #self.incomingMessages)}, true)
 
 	self.ScrollDownButon:Hide()
+end
+
+function object_proto:OnHide()
+	LibEasing:StopEasing(self:GetScrollingHandler())
+	self:SetScrollingHandler(nil)
 end
 
 function object_proto:GetNumHistoryElements()
@@ -392,6 +401,8 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 end
 
 function object_proto:Refresh(delta, refreshFading, tryToFadeIn)
+	if not self:IsShown() then return end
+
 	if self:GetNumHistoryElements() == 0 then
 		return self:SetFirstMessageIndex(0)
 	end
@@ -625,6 +636,7 @@ do
 			frame:SetScrollChild(scrollChild)
 			frame.ScrollChild = scrollChild
 
+			frame:SetScript("OnHide", frame.OnHide)
 			frame:SetScript("OnShow", frame.OnShow)
 			frame:SetScript("OnMouseWheel", frame.OnMouseWheel)
 
