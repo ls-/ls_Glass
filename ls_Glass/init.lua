@@ -106,14 +106,40 @@ function E:OnInitialize()
 									end
 								end,
 							},
-							slide_in_duration = {
+							x_padding = {
 								order = 2,
+								type = "range",
+								name = L["X_PADDING"],
+								min = 0, max = 20, step = 1,
+								set = function(_, value)
+									if C.db.profile.chat.x_padding ~= value then
+										C.db.profile.chat.x_padding = value
+
+										E:UpdateMessageLinesHorizPadding()
+									end
+								end,
+							},
+							y_padding = {
+								order = 3,
+								type = "range",
+								name = L["Y_PADDING"],
+								min = 0, max = 10, step = 1,
+								set = function(_, value)
+									if C.db.profile.chat.y_padding ~= value then
+										C.db.profile.chat.y_padding = value
+
+										E:UpdateMessageLinesHeights()
+									end
+								end,
+							},
+							slide_in_duration = {
+								order = 4,
 								type = "range",
 								name = L["SLIDE_IN_DURATION"],
 								min = 0, max = 1, step = 0.05,
 							},
 							tooltips = {
-								order = 3,
+								order = 5,
 								type = "toggle",
 								name = L["MOUSEOVER_TOOLTIPS"],
 							},

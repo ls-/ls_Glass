@@ -15,7 +15,7 @@ do
 		self.Text:SetText(text)
 		self.Text:SetTextColor(r or 1, g or 1, b or 1, a)
 
-		self:SetHeight(self.Text:GetStringHeight() + 4)
+		self:SetHeight(self.Text:GetStringHeight() + C.db.profile.chat.y_padding * 2)
 	end
 
 	function message_line_proto:UpdateGradient()
@@ -30,15 +30,15 @@ local function createMessageLine(parent)
 	local width = parent:GetWidth()
 
 	local frame = Mixin(CreateFrame("Frame", nil, parent, "LSGlassHyperlinkPropagator"), message_line_proto)
-	frame:SetSize(width, C.db.profile.chat.font.size + 4)
+	frame:SetSize(width, C.db.profile.chat.font.size + C.db.profile.chat.y_padding * 2)
 	frame:SetAlpha(0)
 	frame:Hide()
 
 	E:CreateGradientBackground(frame, E:Round(width * 0.1), E:Round(width * 0.5), 0, 0, 0, C.db.profile.chat.alpha)
 
 	frame.Text = frame:CreateFontString(nil, "ARTWORK", "LSGlassMessageFont")
-	frame.Text:SetPoint("LEFT", 15, 0)
-	frame.Text:SetPoint("RIGHT", -15, 0)
+	frame.Text:SetPoint("LEFT", C.db.profile.chat.x_padding, 0)
+	frame.Text:SetPoint("RIGHT", -C.db.profile.chat.x_padding, 0)
 
 	return frame
 end
@@ -47,7 +47,7 @@ local function resetMessageLine(messageLine, parent)
 	messageLine.Text:SetText("")
 	messageLine:ClearAllPoints()
 	messageLine:Hide()
-	messageLine:SetSize(parent:GetWidth(), C.db.profile.chat.font.size + 4)
+	messageLine:SetSize(parent:GetWidth(), C.db.profile.chat.font.size + C.db.profile.chat.y_padding * 2)
 	messageLine:UpdateGradient()
 	E:StopFading(messageLine, 0)
 end
@@ -79,11 +79,25 @@ end
 function E:UpdateMessageLinesHeights()
 	for _, pool in next, pools do
 		for messageLine in pool:EnumerateActive() do
-			messageLine:SetHeight(messageLine.Text:GetStringHeight() + 4)
+			messageLine:SetHeight(messageLine.Text:GetStringHeight() + C.db.profile.chat.y_padding * 2)
 		end
 
 		for _, messageLine in pool:EnumerateInactive() do
-			messageLine:SetHeight(messageLine.Text:GetStringHeight() + 4)
+			messageLine:SetHeight(messageLine.Text:GetStringHeight() + C.db.profile.chat.y_padding * 2)
+		end
+	end
+end
+
+function E:UpdateMessageLinesHorizPadding()
+	for _, pool in next, pools do
+		for messageLine in pool:EnumerateActive() do
+			messageLine.Text:SetPoint("LEFT", C.db.profile.chat.x_padding, 0)
+			messageLine.Text:SetPoint("RIGHT", -C.db.profile.chat.x_padding, 0)
+		end
+
+		for _, messageLine in pool:EnumerateInactive() do
+			messageLine.Text:SetPoint("LEFT", C.db.profile.chat.x_padding, 0)
+			messageLine.Text:SetPoint("RIGHT", -C.db.profile.chat.x_padding, 0)
 		end
 	end
 end
