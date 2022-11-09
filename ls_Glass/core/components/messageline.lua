@@ -43,25 +43,27 @@ local function createMessageLine(parent)
 	return frame
 end
 
-local function resetMessageLine(messageLine, parent)
+local function resetMessageLine(messageLine)
 	messageLine.Text:SetText("")
 	messageLine:ClearAllPoints()
 	messageLine:Hide()
-	messageLine:SetSize(parent:GetWidth(), C.db.profile.chat.font.size + C.db.profile.chat.y_padding * 2)
-	messageLine:UpdateGradient()
 	E:StopFading(messageLine, 0)
 end
 
 local pools = {}
 
 function E:CreateMessageLinePool(parent)
-	return CreateObjectPool(function(pool)
-		t_insert(pools, pool)
-
+	local pool = CreateObjectPool(function()
 		return createMessageLine(parent)
 	end, function(_, messageLine)
-		resetMessageLine(messageLine, parent)
+		resetMessageLine(messageLine)
 	end)
+
+	pool.parent = parent
+
+	t_insert(pools, pool)
+
+	return pool
 end
 
 function E:UpdateMessageLinesBackgrounds()

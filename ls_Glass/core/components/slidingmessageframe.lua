@@ -40,8 +40,16 @@ local function chatFrame_OnSizeChanged(self, width, height)
 
 		t_wipe(slidingFrame.visibleLines)
 
-		if slidingFrame:GetNumActiveMessageLines() > 0 then
-			slidingFrame:ReleaseAllMessageLines()
+		-- TODO: Refactor it later...
+		if slidingFrame.messageFramePool then
+			if slidingFrame:GetNumActiveMessageLines() > 0 then
+				slidingFrame:ReleaseAllMessageLines()
+			end
+
+			for _, messageLine in slidingFrame.messageFramePool:EnumerateInactive() do
+				messageLine:SetWidth(width)
+				messageLine:SetGradientBackgroundSize(E:Round(width * 0.1), E:Round(width * 0.4))
+			end
 		end
 
 		slidingFrame:SetFirstMessageIndex(0)
