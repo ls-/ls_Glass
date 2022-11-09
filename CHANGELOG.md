@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Version 100000.03
+
+- Fixed more issues related to fasting forward. Those pesky line#340 errors.
+- Added German translation. Translated by terijaki@GitHub.
+
 ## Version 100000.02
 
 - Added horizontal and vertical padding options for messages.
