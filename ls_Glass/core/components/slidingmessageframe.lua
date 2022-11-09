@@ -699,7 +699,7 @@ do
 	end
 
 	function E:ResetSlidingFrameDockFading()
-		for i, frame in next, frames do
+		for _, frame in next, frames do
 			if frame:IsShown() then
 				frame.isMouseOver = nil
 
