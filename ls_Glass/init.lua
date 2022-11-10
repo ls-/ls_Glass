@@ -43,8 +43,6 @@ function E:OnInitialize()
 	C.db:RegisterCallback("OnProfileShutdown", shutdownCallback)
 	C.db:RegisterCallback("OnDatabaseShutdown", shutdownCallback)
 
-	E:CreateFonts()
-
 	C.options = {
 		type = "group",
 		name = "|cffffffff" .. L["LS_GLASS"] .. "|r",
@@ -515,6 +513,8 @@ local tempChatFrames = {}
 local expectedChatFrames = {}
 
 function E:OnEnable()
+	E:CreateFonts()
+
 	E:HandleDock(GeneralDockManager)
 
 	-- TODO: Move these somewhere better
@@ -565,11 +565,15 @@ function E:OnEnable()
 			expectedChatFrames[chatType] = {}
 		end
 
-		expectedChatFrames[chatType][chatTarget] = chatFrame
+		if chatTarget then
+			expectedChatFrames[chatType][chatTarget] = chatFrame
+		else
+			expectedChatFrames[chatType] = chatFrame
+		end
 	end)
 
 	hooksecurefunc("FCF_OpenTemporaryWindow", function(chatType, chatTarget)
-		local chatFrame = expectedChatFrames[chatType] and expectedChatFrames[chatType][chatTarget]
+		local chatFrame = chatTarget and (expectedChatFrames[chatType] and expectedChatFrames[chatType][chatTarget]) or expectedChatFrames[chatType]
 		if chatFrame then
 			local frame = E:HandleChatFrame(chatFrame)
 			if frame then

@@ -15,6 +15,16 @@ function E:CreateFonts()
 		C.db.profile.chat.font.outline and "OUTLINE" or ""
 	)
 
+	local mFont = messageFont:GetFont()
+	if not mFont then
+		-- a corrupt, missing, or misplaced font was supplied, reset it
+		messageFont:SetFont(
+			LSM:Fetch("font"),
+			C.db.profile.chat.font.size,
+			C.db.profile.chat.font.outline and "OUTLINE" or ""
+		)
+	end
+
 	messageFont:SetShadowColor(0, 0, 0, 1)
 
 	if C.db.profile.chat.font.shadow then
@@ -29,10 +39,19 @@ function E:CreateFonts()
 
 	local editBoxFont = CreateFont("LSGlassEditBoxFont")
 	editBoxFont:SetFont(
-		LSM:Fetch("font", C.db.profile.font), -- ? Add eparate font?
+		LSM:Fetch("font", C.db.profile.font), -- ? Add a separate font?
 		C.db.profile.dock.font.size,
 		C.db.profile.dock.font.outline and "OUTLINE" or ""
 	)
+
+	local ebFont = editBoxFont:GetFont()
+	if not ebFont then
+		editBoxFont:SetFont(
+			LSM:Fetch("font"),
+			C.db.profile.dock.font.size,
+			C.db.profile.dock.font.outline and "OUTLINE" or ""
+		)
+	end
 
 	editBoxFont:SetShadowColor(0, 0, 0, 1)
 
@@ -53,6 +72,15 @@ function E:UpdateMessageFont()
 		C.db.profile.chat.font.outline and "OUTLINE" or ""
 	)
 
+	local font = LSGlassMessageFont:GetFont()
+	if not font then
+		LSGlassMessageFont:SetFont(
+			LSM:Fetch("font"),
+			C.db.profile.chat.font.size,
+			C.db.profile.chat.font.outline and "OUTLINE" or ""
+		)
+	end
+
 	if C.db.profile.chat.font.shadow then
 		LSGlassMessageFont:SetShadowOffset(1, -1)
 	else
@@ -66,6 +94,15 @@ function E:UpdateEditBoxFont()
 		C.db.profile.dock.font.size,
 		C.db.profile.dock.font.outline and "OUTLINE" or ""
 	)
+
+	local font = LSGlassEditBoxFont:GetFont()
+	if not font then
+		LSGlassEditBoxFont:SetFont(
+			LSM:Fetch("font"),
+			C.db.profile.dock.font.size,
+			C.db.profile.dock.font.outline and "OUTLINE" or ""
+		)
+	end
 
 	if C.db.profile.dock.font.shadow then
 		LSGlassEditBoxFont:SetShadowOffset(1, -1)
