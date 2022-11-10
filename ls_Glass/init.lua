@@ -43,8 +43,6 @@ function E:OnInitialize()
 	C.db:RegisterCallback("OnProfileShutdown", shutdownCallback)
 	C.db:RegisterCallback("OnDatabaseShutdown", shutdownCallback)
 
-	E:CreateFonts()
-
 	C.options = {
 		type = "group",
 		name = "|cffffffff" .. L["LS_GLASS"] .. "|r",
@@ -515,6 +513,8 @@ local tempChatFrames = {}
 local expectedChatFrames = {}
 
 function E:OnEnable()
+	E:CreateFonts()
+
 	E:HandleDock(GeneralDockManager)
 
 	-- TODO: Move these somewhere better
