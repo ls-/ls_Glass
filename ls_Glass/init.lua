@@ -565,11 +565,15 @@ function E:OnEnable()
 			expectedChatFrames[chatType] = {}
 		end
 
-		expectedChatFrames[chatType][chatTarget] = chatFrame
+		if chatTarget then
+			expectedChatFrames[chatType][chatTarget] = chatFrame
+		else
+			expectedChatFrames[chatType] = chatFrame
+		end
 	end)
 
 	hooksecurefunc("FCF_OpenTemporaryWindow", function(chatType, chatTarget)
-		local chatFrame = expectedChatFrames[chatType] and expectedChatFrames[chatType][chatTarget]
+		local chatFrame = chatTarget and (expectedChatFrames[chatType] and expectedChatFrames[chatType][chatTarget]) or expectedChatFrames[chatType]
 		if chatFrame then
 			local frame = E:HandleChatFrame(chatFrame)
 			if frame then
