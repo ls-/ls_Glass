@@ -1,4 +1,4 @@
-﻿-- Contributors: terijaki@GitHub
+﻿-- Contributors: terijaki@GitHub, Solence1@Curse
 
 local _, ns = ...
 local L = ns.L
@@ -31,3 +31,5 @@ L["SIZE"] = "Größe"
 L["SLIDE_IN_DURATION"] = "Einschubzeit"
 L["SUPPORT"] = "Support"
 L["UNREAD_MESSAGES"] = "|TInterface\\CHATFRAME\\UI-ChatWhisperIcon:0:|t ungelesene Nachrichten"
+L["X_PADDING"] = "Horizontaler Abstand"
+L["Y_PADDING"] = "Vertikaler Abstand"
