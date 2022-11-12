@@ -23,6 +23,7 @@ D.profile = {
 		slide_in_duration = 0.3,
 		x_padding = 14,
 		y_padding = 2,
+		messageline_gradient = true,
 		font = {
 			size = 12,
 			shadow = true,

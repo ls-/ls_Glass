@@ -149,6 +149,11 @@ function E:OnInitialize()
 								type = "toggle",
 								name = L["MOUSEOVER_TOOLTIPS"],
 							},
+							messageline_gradient = {
+								order = 6,
+								type = "toggle",
+								name = L["MESSAGELINE_GRADIENT"]
+							},
 							spacer1 = {
 								order = 9,
 								type = "description",

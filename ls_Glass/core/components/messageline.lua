@@ -21,7 +21,12 @@ do
 	function message_line_proto:UpdateGradient()
 		local width = self:GetWidth()
 
-		self:SetGradientBackgroundSize(E:Round(width * 0.1), E:Round(width * 0.4))
+		if C.db.profile.chat.messageline_gradient then
+			self:SetGradientBackgroundSize(E:Round(width * 0.1), E:Round(width * 0.4))
+		else
+			self:SetGradientBackgroundSize(width, width)
+		end
+
 		self:SetGradientBackgroundColor(0, 0, 0, C.db.profile.chat.alpha)
 	end
 end
@@ -34,7 +39,11 @@ local function createMessageLine(parent)
 	frame:SetAlpha(0)
 	frame:Hide()
 
-	E:CreateGradientBackground(frame, E:Round(width * 0.1), E:Round(width * 0.5), 0, 0, 0, C.db.profile.chat.alpha)
+	if C.db.profile.chat.messageline_gradient then
+		E:CreateGradientBackground(frame, E:Round(width * 0.1), E:Round(width * 0.5), 0, 0, 0, C.db.profile.chat.alpha)
+	else
+		E:CreateGradientBackground(frame, width, width, 0, 0, 0, C.db.profile.chat.alpha)
+	end
 
 	frame.Text = frame:CreateFontString(nil, "ARTWORK", "LSGlassMessageFont")
 	frame.Text:SetPoint("LEFT", C.db.profile.chat.x_padding, 0)
