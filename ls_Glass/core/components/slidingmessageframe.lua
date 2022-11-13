@@ -319,9 +319,11 @@ function object_proto:GetMaxNumVisibleLines()
 end
 
 function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
-	local numVisibleLines = 0
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
 
 	local maxNumVisibleLines = self:GetMaxNumVisibleLines()
+	local numVisibleLines = 0
+
 	for i = 1, maxNumVisibleLines do
 		local messageLine = self.visibleLines[i]
 		if not messageLine then
@@ -418,23 +420,11 @@ function object_proto:FastForward()
 	end
 end
 
-function object_proto:Refresh(delta, refreshFading, tryToFadeIn)
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
-
+function object_proto:OnMouseWheel(delta)
 	if self:GetNumHistoryElements() == 0 then
 		return self:SetFirstMessageIndex(0)
 	end
 
-	delta = delta or 0
-
-	self:ScrollTo(Clamp(self:GetFirstMessageIndex() + delta, 0, self:GetNumHistoryElements() - 1), refreshFading, tryToFadeIn)
-
-	if delta == 0 then
-		self:SetFirstMessageIndex(0)
-	end
-end
-
-function object_proto:OnMouseWheel(delta)
 	local scrollingHandler = self:GetScrollingHandler()
 	if scrollingHandler then
 		LibEasing:StopEasing(scrollingHandler)
@@ -442,7 +432,7 @@ function object_proto:OnMouseWheel(delta)
 		self:SetVerticalScroll(0)
 	end
 
-	self:Refresh(delta, true, true)
+	self:ScrollTo(Clamp(self:GetFirstMessageIndex() + delta, 0, self:GetNumHistoryElements() - 1), true, true)
 
 	if self:GetFirstMessageIndex() ~= 0 then
 		self.ScrollDownButon:Show()
@@ -630,7 +620,8 @@ function object_proto:ProcessIncoming(incoming, doNotFade)
 		LibEasing.OutCubic,
 		function()
 			self:SetVerticalScroll(0)
-			self:Refresh(0, doNotFade)
+			self:ScrollTo(self:GetFirstMessageIndex(), doNotFade)
+			self:SetFirstMessageIndex(0)
 			self:SetScrollingHandler(nil)
 		end
 	))
