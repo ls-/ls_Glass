@@ -438,7 +438,7 @@ function object_proto:OnMouseWheel(delta)
 	local scrollingHandler = self:GetScrollingHandler()
 	if scrollingHandler then
 		LibEasing:StopEasing(scrollingHandler)
-
+		self:SetScrollingHandler(nil)
 		self:SetVerticalScroll(0)
 	end
 
