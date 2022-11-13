@@ -286,20 +286,6 @@ function object_proto:GetFirstMessageIndex()
 	return self.firstMessageIndex
 end
 
-function object_proto:AcquireMessageLine()
-	if not self.messageFramePool then
-		self.messageFramePool = E:CreateMessageLinePool(self.ScrollChild)
-	end
-
-	return self.messageFramePool:Acquire()
-end
-
-function object_proto:ReleaseAllMessageLines()
-	if self.messageFramePool then
-		self.messageFramePool:ReleaseAll()
-	end
-end
-
 function object_proto:GetNumActiveMessageLines()
 	if self.messageFramePool then
 		return self.messageFramePool:GetNumActive()
@@ -308,21 +294,35 @@ function object_proto:GetNumActiveMessageLines()
 	return 0
 end
 
+function object_proto:AcquireMessageLine()
+	if not self.messageFramePool then
+		self.messageFramePool = E:CreateMessageLinePool(self.ScrollChild)
+	end
+
+	return self.messageFramePool:Acquire()
+end
+
 function object_proto:ReleaseMessageLine(messageLine)
 	if self.messageFramePool and messageLine then
 		self.messageFramePool:Release(messageLine)
 	end
 end
 
-function object_proto:GetMaxMessages()
+function object_proto:ReleaseAllMessageLines()
+	if self.messageFramePool then
+		self.messageFramePool:ReleaseAll()
+	end
+end
+
+function object_proto:GetMaxNumVisibleLines()
 	return m_ceil(self:GetHeight() / (C.db.profile.chat.font.size + C.db.profile.chat.y_padding * 2))
 end
 
 function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 	local numVisibleLines = 0
 
-	local maxMessages = self:GetMaxMessages()
-	for i = 1, maxMessages do
+	local maxNumVisibleLines = self:GetMaxNumVisibleLines()
+	for i = 1, maxNumVisibleLines do
 		local messageLine = self.visibleLines[i]
 		if not messageLine then
 			messageLine = self:AcquireMessageLine()
@@ -377,7 +377,7 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 	end
 
 	for i = numVisibleLines + 1, #self.visibleLines do
-		if i > maxMessages then
+		if i > maxNumVisibleLines then
 			self:ReleaseMessageLine(self.visibleLines[i])
 			self.visibleLines[i] = nil
 		else
@@ -395,7 +395,7 @@ function object_proto:FastForward()
 	if self:GetNumHistoryElements() > 0 then
 		t_wipe(self.incomingMessages)
 
-		local num = m_min(self:GetNumHistoryElements(), self:GetMaxMessages(), self:GetFirstMessageIndex())
+		local num = m_min(self:GetNumHistoryElements(), self:GetMaxNumVisibleLines(), self:GetFirstMessageIndex())
 
 		self:SetVerticalScroll(0)
 		self:ScrollTo(num, true)
