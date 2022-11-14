@@ -47,6 +47,7 @@ local function resetMessageLine(messageLine)
 	messageLine.Text:SetText("")
 	messageLine:ClearAllPoints()
 	messageLine:Hide()
+	messageLine:UpdateGradient()
 	E:StopFading(messageLine, 0)
 end
 

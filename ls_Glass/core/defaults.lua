@@ -38,6 +38,10 @@ D.profile = {
 	},
 	dock = { -- and edit boxes
 		alpha = 0.8,
+		edit = {
+			position = "bottom", -- "top"
+			offset = 2,
+		},
 		font = {
 			size = 12,
 			shadow = true,

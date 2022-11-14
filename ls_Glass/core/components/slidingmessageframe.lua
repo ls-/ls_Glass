@@ -78,55 +78,13 @@ local function chatFrame_HideHook(self)
 	end
 end
 
-local function chatFrame_AddMessageHook(self, ...)
+local function chatFrame_AddMessageHook(self)
 	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
 	if slidingFrame then
-		slidingFrame:AddMessage(self,...)
-	end
-end
-
-------------------------
--- SCROLL DOWN BUTTON --
-------------------------
-
-local scroll_down_button_proto = {}
-
-do
-	function scroll_down_button_proto:OnClick()
-		local frame = self:GetParent()
-		frame:FastForward()
-
-		E:FadeOut(self, 0, 0.1, function()
-			self:SetText(L["JUMP_TO_PRESENT"], true)
-			self:Hide()
-		end)
-	end
-
-	function scroll_down_button_proto:SetText(text, isInstant)
-		if text ~= self.textString then
-			self.textString = text
-
-			if isInstant then
-				self.Text:SetText(text)
-
-				self:SetWidth(self.Text:GetUnboundedStringWidth() + 26)
-				self:SetHeight(self.Text:GetStringHeight() + 4)
-			else
-				E:StopFading(self.Text, 1)
-				E:FadeOut(self.Text, 0, 0.1, function()
-					self.Text:SetText(text)
-
-					self:SetWidth(self.Text:GetUnboundedStringWidth() + 26)
-					self:SetHeight(self.Text:GetStringHeight() + 4)
-
-					E:FadeIn(self.Text, 0.1)
-				end)
-			end
-		end
-	end
-
-	function scroll_down_button_proto:SetTextColor(r, g, b)
-		self.Text:SetTextColor(r, g, b)
+		-- pull the data from history to account for any text processing done by other
+		-- addons
+		local data = slidingFrame:GetHistoryEntryAtIndex(1)
+		slidingFrame:AddMessage(self, data.message, data.r, data.g, data.b)
 	end
 end
 
@@ -220,6 +178,8 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 		hooksecurefunc(chatFrame, "Show", chatFrame_ShowHook)
 		hooksecurefunc(chatFrame, "Hide", chatFrame_HideHook)
+
+		-- it's more convenient than hooking chatFrame.historyBuffer:PushFront()
 		hooksecurefunc(chatFrame, "AddMessage", chatFrame_AddMessageHook)
 
 		hookedChatFrames[chatFrame] = true
@@ -286,20 +246,6 @@ function object_proto:GetFirstMessageIndex()
 	return self.firstMessageIndex
 end
 
-function object_proto:AcquireMessageLine()
-	if not self.messageFramePool then
-		self.messageFramePool = E:CreateMessageLinePool(self.ScrollChild)
-	end
-
-	return self.messageFramePool:Acquire()
-end
-
-function object_proto:ReleaseAllMessageLines()
-	if self.messageFramePool then
-		self.messageFramePool:ReleaseAll()
-	end
-end
-
 function object_proto:GetNumActiveMessageLines()
 	if self.messageFramePool then
 		return self.messageFramePool:GetNumActive()
@@ -308,21 +254,37 @@ function object_proto:GetNumActiveMessageLines()
 	return 0
 end
 
+function object_proto:AcquireMessageLine()
+	if not self.messageFramePool then
+		self.messageFramePool = E:CreateMessageLinePool(self.ScrollChild)
+	end
+
+	return self.messageFramePool:Acquire()
+end
+
 function object_proto:ReleaseMessageLine(messageLine)
 	if self.messageFramePool and messageLine then
 		self.messageFramePool:Release(messageLine)
 	end
 end
 
-function object_proto:GetMaxMessages()
+function object_proto:ReleaseAllMessageLines()
+	if self.messageFramePool then
+		self.messageFramePool:ReleaseAll()
+	end
+end
+
+function object_proto:GetMaxNumVisibleLines()
 	return m_ceil(self:GetHeight() / (C.db.profile.chat.font.size + C.db.profile.chat.y_padding * 2))
 end
 
 function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+
+	local maxNumVisibleLines = self:GetMaxNumVisibleLines()
 	local numVisibleLines = 0
 
-	local maxMessages = self:GetMaxMessages()
-	for i = 1, maxMessages do
+	for i = 1, maxNumVisibleLines do
 		local messageLine = self.visibleLines[i]
 		if not messageLine then
 			messageLine = self:AcquireMessageLine()
@@ -342,7 +304,7 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 
 		local messageInfo = self:GetHistoryEntryAtIndex(index + i)
 		if messageInfo then
-			messageLine:SetText(E:ProcessText(messageInfo.message), messageInfo.r, messageInfo.g, messageInfo.b)
+			messageLine:SetText(messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b)
 			messageLine:Show()
 
 			if refreshFading then
@@ -377,7 +339,7 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 	end
 
 	for i = numVisibleLines + 1, #self.visibleLines do
-		if i > maxMessages then
+		if i > maxNumVisibleLines then
 			self:ReleaseMessageLine(self.visibleLines[i])
 			self.visibleLines[i] = nil
 		else
@@ -395,7 +357,7 @@ function object_proto:FastForward()
 	if self:GetNumHistoryElements() > 0 then
 		t_wipe(self.incomingMessages)
 
-		local num = m_min(self:GetNumHistoryElements(), self:GetMaxMessages(), self:GetFirstMessageIndex())
+		local num = m_min(self:GetNumHistoryElements(), self:GetMaxNumVisibleLines(), self:GetFirstMessageIndex())
 
 		self:SetVerticalScroll(0)
 		self:ScrollTo(num, true)
@@ -418,31 +380,19 @@ function object_proto:FastForward()
 	end
 end
 
-function object_proto:Refresh(delta, refreshFading, tryToFadeIn)
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
-
+function object_proto:OnMouseWheel(delta)
 	if self:GetNumHistoryElements() == 0 then
 		return self:SetFirstMessageIndex(0)
 	end
 
-	delta = delta or 0
-
-	self:ScrollTo(Clamp(self:GetFirstMessageIndex() + delta, 0, self:GetNumHistoryElements() - 1), refreshFading, tryToFadeIn)
-
-	if delta == 0 then
-		self:SetFirstMessageIndex(0)
-	end
-end
-
-function object_proto:OnMouseWheel(delta)
 	local scrollingHandler = self:GetScrollingHandler()
 	if scrollingHandler then
 		LibEasing:StopEasing(scrollingHandler)
-
+		self:SetScrollingHandler(nil)
 		self:SetVerticalScroll(0)
 	end
 
-	self:Refresh(delta, true, true)
+	self:ScrollTo(Clamp(self:GetFirstMessageIndex() + delta, 0, self:GetNumHistoryElements() - 1), true, true)
 
 	if self:GetFirstMessageIndex() ~= 0 then
 		self.ScrollDownButon:Show()
@@ -465,8 +415,8 @@ end
 function object_proto:AddMessage(_, ...)
 	if self:IsShown() then
 		if not self:GetScrollingHandler() and self:GetFirstMessageIndex() > 0 then
-			-- it means we're scrolling up, just show "Unread Messages"
-			self.ScrollDownButon:SetText(L["UNREAD_MESSAGES"])
+			-- it means we're scrolling up, just show the message icon
+			self.ScrollDownButon:SetState(2)
 
 			self:SetFirstMessageIndex(self:GetFirstMessageIndex() + 1)
 		else
@@ -595,7 +545,7 @@ function object_proto:ProcessIncoming(incoming, doNotFade)
 			messageLine:SetPoint("TOPLEFT", self.ScrollChild, "BOTTOMLEFT", 0, 0)
 		end
 
-		messageLine:SetText(E:ProcessText(incoming[i][1]), incoming[i][2], incoming[i][3], incoming[i][4])
+		messageLine:SetText(incoming[i][1], incoming[i][2], incoming[i][3], incoming[i][4])
 		messageLine:Show()
 
 		if not doNotFade then
@@ -630,7 +580,8 @@ function object_proto:ProcessIncoming(incoming, doNotFade)
 		LibEasing.OutCubic,
 		function()
 			self:SetVerticalScroll(0)
-			self:Refresh(0, doNotFade)
+			self:ScrollTo(self:GetFirstMessageIndex(), doNotFade)
+			self:SetFirstMessageIndex(0)
 			self:SetScrollingHandler(nil)
 		end
 	))
@@ -662,22 +613,7 @@ do
 			frame:SetScript("OnShow", frame.OnShow)
 			frame:SetScript("OnMouseWheel", frame.OnMouseWheel)
 
-			local scrollDownButon = Mixin(CreateFrame("Button", nil, frame), scroll_down_button_proto)
-			scrollDownButon:SetPoint("BOTTOMRIGHT", -2, 4)
-			scrollDownButon:SetScript("OnClick", scrollDownButon.OnClick)
-			scrollDownButon:SetAlpha(0)
-			scrollDownButon:Hide()
-			frame.ScrollDownButon = scrollDownButon
-
-			local text = scrollDownButon:CreateFontString(nil, "ARTWORK", "LSGlassMessageFont")
-			text:SetPoint("TOPLEFT", 2, 0)
-			text:SetPoint("BOTTOMRIGHT", -2, 0)
-			text:SetJustifyH("RIGHT")
-			text:SetJustifyV("MIDDLE")
-			scrollDownButon.Text = text
-
-			scrollDownButon:SetText(L["JUMP_TO_PRESENT"])
-			scrollDownButon:SetTextColor(C.db.global.colors.lanzones:GetRGB())
+			frame.ScrollDownButon = E:CreateScrollDownButton(frame)
 
 			t_insert(frames, frame)
 
