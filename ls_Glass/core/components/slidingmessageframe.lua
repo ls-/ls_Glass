@@ -88,51 +88,6 @@ local function chatFrame_AddMessageHook(self)
 	end
 end
 
-------------------------
--- SCROLL DOWN BUTTON --
-------------------------
-
-local scroll_down_button_proto = {}
-
-do
-	function scroll_down_button_proto:OnClick()
-		local frame = self:GetParent()
-		frame:FastForward()
-
-		E:FadeOut(self, 0, 0.1, function()
-			self:SetText(L["JUMP_TO_PRESENT"], true)
-			self:Hide()
-		end)
-	end
-
-	function scroll_down_button_proto:SetText(text, isInstant)
-		if text ~= self.textString then
-			self.textString = text
-
-			if isInstant then
-				self.Text:SetText(text)
-
-				self:SetWidth(self.Text:GetUnboundedStringWidth() + 26)
-				self:SetHeight(self.Text:GetStringHeight() + 4)
-			else
-				E:StopFading(self.Text, 1)
-				E:FadeOut(self.Text, 0, 0.1, function()
-					self.Text:SetText(text)
-
-					self:SetWidth(self.Text:GetUnboundedStringWidth() + 26)
-					self:SetHeight(self.Text:GetStringHeight() + 4)
-
-					E:FadeIn(self.Text, 0.1)
-				end)
-			end
-		end
-	end
-
-	function scroll_down_button_proto:SetTextColor(r, g, b)
-		self.Text:SetTextColor(r, g, b)
-	end
-end
-
 ---------------------------
 -- SLIDING MESSAGE FRAME --
 ---------------------------
@@ -460,8 +415,8 @@ end
 function object_proto:AddMessage(_, ...)
 	if self:IsShown() then
 		if not self:GetScrollingHandler() and self:GetFirstMessageIndex() > 0 then
-			-- it means we're scrolling up, just show "Unread Messages"
-			self.ScrollDownButon:SetText(L["UNREAD_MESSAGES"])
+			-- it means we're scrolling up, just show the message icon
+			self.ScrollDownButon:SetState(2)
 
 			self:SetFirstMessageIndex(self:GetFirstMessageIndex() + 1)
 		else
@@ -658,22 +613,7 @@ do
 			frame:SetScript("OnShow", frame.OnShow)
 			frame:SetScript("OnMouseWheel", frame.OnMouseWheel)
 
-			local scrollDownButon = Mixin(CreateFrame("Button", nil, frame), scroll_down_button_proto)
-			scrollDownButon:SetPoint("BOTTOMRIGHT", -2, 4)
-			scrollDownButon:SetScript("OnClick", scrollDownButon.OnClick)
-			scrollDownButon:SetAlpha(0)
-			scrollDownButon:Hide()
-			frame.ScrollDownButon = scrollDownButon
-
-			local text = scrollDownButon:CreateFontString(nil, "ARTWORK", "LSGlassMessageFont")
-			text:SetPoint("TOPLEFT", 2, 0)
-			text:SetPoint("BOTTOMRIGHT", -2, 0)
-			text:SetJustifyH("RIGHT")
-			text:SetJustifyV("MIDDLE")
-			scrollDownButon.Text = text
-
-			scrollDownButon:SetText(L["JUMP_TO_PRESENT"])
-			scrollDownButon:SetTextColor(C.db.global.colors.lanzones:GetRGB())
+			frame.ScrollDownButon = E:CreateScrollDownButton(frame)
 
 			t_insert(frames, frame)
 
