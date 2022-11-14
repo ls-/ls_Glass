@@ -48,7 +48,7 @@ end
 
 function E:CreateScrollDownButton(parent)
 	local button = Mixin(CreateFrame("Button", nil, parent), button_proto)
-	button:SetSize(32, 32)
+	button:SetSize(24, 24)
 	button:SetPoint("BOTTOMRIGHT", -4, 4)
 	button:SetScript("OnClick", button.OnClick)
 	button:SetAlpha(0)
