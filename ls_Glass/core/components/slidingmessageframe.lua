@@ -78,10 +78,13 @@ local function chatFrame_HideHook(self)
 	end
 end
 
-local function chatFrame_AddMessageHook(self, ...)
+local function chatFrame_AddMessageHook(self)
 	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
 	if slidingFrame then
-		slidingFrame:AddMessage(self,...)
+		-- pull the data from history to account for any text processing done by other
+		-- addons
+		local data = slidingFrame:GetHistoryEntryAtIndex(1)
+		slidingFrame:AddMessage(self, data.message, data.r, data.g, data.b)
 	end
 end
 
@@ -220,6 +223,8 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 		hooksecurefunc(chatFrame, "Show", chatFrame_ShowHook)
 		hooksecurefunc(chatFrame, "Hide", chatFrame_HideHook)
+
+		-- it's more convenient than hooking chatFrame.historyBuffer:PushFront()
 		hooksecurefunc(chatFrame, "AddMessage", chatFrame_AddMessageHook)
 
 		hookedChatFrames[chatFrame] = true
@@ -344,7 +349,7 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 
 		local messageInfo = self:GetHistoryEntryAtIndex(index + i)
 		if messageInfo then
-			messageLine:SetText(E:ProcessText(messageInfo.message), messageInfo.r, messageInfo.g, messageInfo.b)
+			messageLine:SetText(messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b)
 			messageLine:Show()
 
 			if refreshFading then
@@ -585,7 +590,7 @@ function object_proto:ProcessIncoming(incoming, doNotFade)
 			messageLine:SetPoint("TOPLEFT", self.ScrollChild, "BOTTOMLEFT", 0, 0)
 		end
 
-		messageLine:SetText(E:ProcessText(incoming[i][1]), incoming[i][2], incoming[i][3], incoming[i][4])
+		messageLine:SetText(incoming[i][1], incoming[i][2], incoming[i][3], incoming[i][4])
 		messageLine:Show()
 
 		if not doNotFade then
