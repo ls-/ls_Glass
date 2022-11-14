@@ -45,3 +45,8 @@ L["SLIDE_IN_DURATION"] = "Slide In Duration"
 L["SUPPORT"] = "Support"
 L["X_PADDING"] = "Horizontal Padding"
 L["Y_PADDING"] = "Vertical Padding"
+
+L["EDITBOX_POSITION"] = "Edit Box Position"
+L["OFFSET"] = "Offset"
+L["TOP"] = "Top"
+L["BOTTOM"] = "Bottom"

@@ -15,6 +15,7 @@ local function updateCallback()
 	E:UpdateMessageLinesBackgrounds()
 	E:UpdateBackdrops()
 	E:UpdateEditBoxFont()
+	E:UpdateEditBoxes()
 	E:ResetSlidingFrameDockFading()
 	E:ResetSlidingFrameChatFading()
 end
@@ -274,6 +275,41 @@ function E:OnInitialize()
 										C.db.profile.dock.alpha = value
 
 										E:UpdateBackdrops()
+									end
+								end,
+							},
+							edit_position = {
+								order = 2,
+								type = "select",
+								name = L["EDITBOX_POSITION"],
+								values = {
+									["bottom"] = L["BOTTOM"],
+									["top"] = L["TOP"],
+								},
+								get = function()
+									return C.db.profile.dock.edit.position
+								end,
+								set = function(_, value)
+									if C.db.profile.dock.edit.position ~= value then
+										C.db.profile.dock.edit.position = value
+
+										E:UpdateEditBoxes()
+									end
+								end,
+							},
+							edit_offset = {
+								order = 3,
+								type = "range",
+								name = L["OFFSET"],
+								min = 2, max = 32, step = 1,
+								get = function()
+									return C.db.profile.dock.edit.offset
+								end,
+								set = function(_, value)
+									if C.db.profile.dock.edit.offset ~= value then
+										C.db.profile.dock.edit.offset = value
+
+										E:UpdateEditBoxes()
 									end
 								end,
 							},
