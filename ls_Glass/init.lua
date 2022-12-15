@@ -560,7 +560,7 @@ function E:OnEnable()
 			if linkType == "battlepet" then
 				GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)
 				BattlePetToolTip_ShowLink(text)
-			else
+			elseif linkType ~= "trade" then
 				GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)
 
 				local isOK = pcall(GameTooltip.SetHyperlink, GameTooltip, link)
