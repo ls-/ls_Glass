@@ -301,7 +301,7 @@ function E:OnInitialize()
 								order = 3,
 								type = "range",
 								name = L["OFFSET"],
-								min = 2, max = 32, step = 1,
+								min = 0, max = 64, step = 1,
 								get = function()
 									return C.db.profile.dock.edit.offset
 								end,
