@@ -236,7 +236,7 @@ function E:OnInitialize()
 										disabled = function()
 											return C.db.profile.chat.fade.persistent
 										end,
-										min = 0, max = 20, step = 1,
+										min = 0, max = 120, step = 1,
 									},
 									out_duration = {
 										order = 12,
