@@ -1,6 +1,6 @@
 std = "none"
 max_line_length = false
-max_comment_line_length = 80
+max_comment_line_length = 120
 self = false
 
 exclude_files = {
@@ -9,7 +9,7 @@ exclude_files = {
 }
 
 ignore = {
-	"111/LS.*", -- Setting an undefined global variable starting with SLASH_
+	"111/LS.*", -- Setting an undefined global variable starting with LS
 	"111/SLASH_.*", -- Setting an undefined global variable starting with SLASH_
 	"112/LS.*", -- Mutating an undefined global variable starting with LS
 	"113/LS.*", -- Accessing an undefined global variable starting with LS
@@ -29,42 +29,30 @@ globals = {
 }
 
 read_globals = {
-	-- AddOns
-	"LibStub",
-
-	-- FrameXML
 	"BattlePetTooltip",
 	"BattlePetToolTip_ShowLink",
-	"CHAT_FRAME_MIN_WIDTH",
-	"CHAT_FRAME_NORMAL_MIN_HEIGHT",
 	"ChatFrame1",
-	"ChatFrame1EditBox",
 	"ChatFrame2",
 	"ChatFrameChannelButton",
 	"ChatFrameMenuButton",
 	"Clamp",
 	"ColorMixin",
+	"CreateFont",
+	"CreateFrame",
 	"CreateObjectPool",
 	"DEFAULT_TAB_SELECTED_COLOR_TABLE",
 	"GameTooltip",
 	"GeneralDockManager",
+	"GetAddOnMetadata",
+	"GetLocale",
 	"HideUIPanel",
+	"InCombatLockdown",
+	"LibStub",
 	"LinkUtil",
 	"Mixin",
 	"NORMAL_FONT_COLOR",
 	"NUM_CHAT_WINDOWS",
 	"Settings",
 	"SettingsPanel",
-	"SlashCmdList",
 	"UIParent",
-
-	-- Namespace
-
-	-- API
-	"CreateFont",
-	"CreateFrame",
-	"GetAddOnMetadata",
-	"GetCVar",
-	"GetLocale",
-	"InCombatLockdown",
 }

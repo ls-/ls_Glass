@@ -236,7 +236,7 @@ function E:OnInitialize()
 										disabled = function()
 											return C.db.profile.chat.fade.persistent
 										end,
-										min = 0, max = 20, step = 1,
+										min = 0, max = 120, step = 1,
 									},
 									out_duration = {
 										order = 12,
@@ -301,7 +301,7 @@ function E:OnInitialize()
 								order = 3,
 								type = "range",
 								name = L["OFFSET"],
-								min = 2, max = 32, step = 1,
+								min = 0, max = 64, step = 1,
 								get = function()
 									return C.db.profile.dock.edit.offset
 								end,
@@ -560,7 +560,7 @@ function E:OnEnable()
 			if linkType == "battlepet" then
 				GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)
 				BattlePetToolTip_ShowLink(text)
-			else
+			elseif linkType ~= "trade" then
 				GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)
 
 				local isOK = pcall(GameTooltip.SetHyperlink, GameTooltip, link)

@@ -32,11 +32,11 @@ function E:HandleEditBox(frame)
 	frame:ClearAllPoints()
 
 	if C.db.profile.dock.edit.position == "top" then
-		frame:SetPoint("BOTTOMLEFT", frame.chatFrame, "TOPLEFT", 0, C.db.profile.dock.edit.offset)
-		frame:SetPoint("BOTTOMRIGHT", frame.chatFrame, "TOPRIGHT", 0, C.db.profile.dock.edit.offset)
+		frame:SetPoint("TOPLEFT", frame.chatFrame, "TOPLEFT", 0, C.db.profile.dock.edit.offset)
+		frame:SetPoint("TOPRIGHT", frame.chatFrame, "TOPRIGHT", 0, C.db.profile.dock.edit.offset)
 	else
-		frame:SetPoint("TOPLEFT", frame.chatFrame, "BOTTOMLEFT", 0, -C.db.profile.dock.edit.offset)
-		frame:SetPoint("TOPRIGHT", frame.chatFrame, "BOTTOMRIGHT", 0, -C.db.profile.dock.edit.offset)
+		frame:SetPoint("BOTTOMLEFT", frame.chatFrame, "BOTTOMLEFT", 0, -C.db.profile.dock.edit.offset)
+		frame:SetPoint("BOTTOMRIGHT", frame.chatFrame, "BOTTOMRIGHT", 0, -C.db.profile.dock.edit.offset)
 	end
 
 	frame:SetFontObject("LSGlassEditBoxFont")
@@ -51,11 +51,11 @@ function E:UpdateEditBoxes()
 		editBox:ClearAllPoints()
 
 		if C.db.profile.dock.edit.position == "top" then
-			editBox:SetPoint("BOTTOMLEFT", editBox.chatFrame, "TOPLEFT", 0, C.db.profile.dock.edit.offset)
-			editBox:SetPoint("BOTTOMRIGHT", editBox.chatFrame, "TOPRIGHT", 0, C.db.profile.dock.edit.offset)
+			editBox:SetPoint("TOPLEFT", editBox.chatFrame, "TOPLEFT", 0, C.db.profile.dock.edit.offset)
+			editBox:SetPoint("TOPRIGHT", editBox.chatFrame, "TOPRIGHT", 0, C.db.profile.dock.edit.offset)
 		else
-			editBox:SetPoint("TOPLEFT", editBox.chatFrame, "BOTTOMLEFT", 0, -C.db.profile.dock.edit.offset)
-			editBox:SetPoint("TOPRIGHT", editBox.chatFrame, "BOTTOMRIGHT", 0, -C.db.profile.dock.edit.offset)
+			editBox:SetPoint("BOTTOMLEFT", editBox.chatFrame, "BOTTOMLEFT", 0, -C.db.profile.dock.edit.offset)
+			editBox:SetPoint("BOTTOMRIGHT", editBox.chatFrame, "BOTTOMRIGHT", 0, -C.db.profile.dock.edit.offset)
 		end
 	end
 end
