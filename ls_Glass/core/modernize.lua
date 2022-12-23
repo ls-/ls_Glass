@@ -24,5 +24,15 @@ function E:Modernize(data, name, key)
 
 			data.version = 10000003
 		end
+
+		if data.version < 10000201 then
+			if data.dock then
+				if data.dock.edit then
+					data.dock.edit.offset = nil
+				end
+			end
+
+			data.version = 10000201
+		end
 	end
 end

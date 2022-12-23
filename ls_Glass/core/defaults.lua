@@ -40,7 +40,7 @@ D.profile = {
 		alpha = 0.8,
 		edit = {
 			position = "bottom", -- "top"
-			offset = 4,
+			offset = 32,
 		},
 		font = {
 			size = 12,
