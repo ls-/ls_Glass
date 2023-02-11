@@ -54,7 +54,7 @@ local function chatFrame_OnSizeChanged(self, width, height)
 
 		slidingFrame:SetFirstMessageIndex(0)
 
-		slidingFrame.ScrollDownButon:Hide()
+		slidingFrame.ScrollToBottomButton:Hide()
 	end
 end
 
@@ -219,7 +219,7 @@ function object_proto:OnShow()
 	self:SetScrollingHandler(nil)
 	self:FastForward()
 
-	self.ScrollDownButon:Hide()
+	self.ScrollToBottomButton:Hide()
 end
 
 function object_proto:OnHide()
@@ -395,11 +395,11 @@ function object_proto:OnMouseWheel(delta)
 	self:ScrollTo(Clamp(self:GetFirstMessageIndex() + delta, 0, self:GetNumHistoryElements() - 1), true, true)
 
 	if self:GetFirstMessageIndex() ~= 0 then
-		self.ScrollDownButon:Show()
-		E:FadeIn(self.ScrollDownButon, 0.1)
+		self.ScrollToBottomButton:Show()
+		E:FadeIn(self.ScrollToBottomButton, 0.1)
 	else
-		E:FadeOut(self.ScrollDownButon, 0, 0.1, function()
-			self.ScrollDownButon:Hide()
+		E:FadeOut(self.ScrollToBottomButton, 0, 0.1, function()
+			self.ScrollToBottomButton:Hide()
 		end)
 	end
 end
@@ -416,7 +416,7 @@ function object_proto:AddMessage(_, ...)
 	if self:IsShown() then
 		if not self:GetScrollingHandler() and self:GetFirstMessageIndex() > 0 then
 			-- it means we're scrolling up, just show the message icon
-			self.ScrollDownButon:SetState(2)
+			self.ScrollToBottomButton:SetState(2)
 
 			self:SetFirstMessageIndex(self:GetFirstMessageIndex() + 1)
 		else
@@ -463,13 +463,13 @@ function object_proto:OnFrame()
 			end
 
 			if self:GetFirstMessageIndex() ~= 0 then
-				self.ScrollDownButon:Show()
-				E:FadeIn(self.ScrollDownButon, C.db.profile.chat.fade.in_duration, function()
+				self.ScrollToBottomButton:Show()
+				E:FadeIn(self.ScrollToBottomButton, C.db.profile.chat.fade.in_duration, function()
 					if self.isMouseOver then
-						E:StopFading(self.ScrollDownButon, 1)
+						E:StopFading(self.ScrollToBottomButton, 1)
 					elseif not C.db.profile.chat.fade.persistent then
-						E:FadeOut(self.ScrollDownButon, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-							self.ScrollDownButon:Hide()
+						E:FadeOut(self.ScrollToBottomButton, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
+							self.ScrollToBottomButton:Hide()
 						end)
 					end
 				end)
@@ -496,6 +496,24 @@ function object_proto:OnFrame()
 						E:FadeOut(self.ButtonFrame, 4, C.db.profile.dock.fade.out_duration)
 					end
 				end)
+
+				if C.db.profile.chat.buttons.up_and_down then
+					E:FadeIn(self.ScrollDownButton, 0.1, function()
+						if self.isMouseOver then
+							E:StopFading(self.ScrollDownButton, 1)
+						else
+							E:FadeOut(self.ScrollDownButton, 4, C.db.profile.dock.fade.out_duration)
+						end
+					end)
+
+					E:FadeIn(self.ScrollUpButton, 0.1, function()
+						if self.isMouseOver then
+							E:StopFading(self.ScrollUpButton, 1)
+						else
+							E:FadeOut(self.ScrollUpButton, 4, C.db.profile.dock.fade.out_duration)
+						end
+					end)
+				end
 			end
 		else
 			if not C.db.profile.chat.fade.persistent then
@@ -507,8 +525,8 @@ function object_proto:OnFrame()
 					end
 				end
 
-				E:FadeOut(self.ScrollDownButon, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-					self.ScrollDownButon:Hide()
+				E:FadeOut(self.ScrollToBottomButton, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
+					self.ScrollToBottomButton:Hide()
 				end)
 			end
 
@@ -525,6 +543,11 @@ function object_proto:OnFrame()
 				end
 
 				E:FadeOut(self.ButtonFrame, 4, C.db.profile.dock.fade.out_duration)
+
+				if C.db.profile.chat.buttons.up_and_down then
+					E:FadeOut(self.ScrollDownButton, 4, C.db.profile.dock.fade.out_duration)
+					E:FadeOut(self.ScrollUpButton, 4, C.db.profile.dock.fade.out_duration)
+				end
 			end
 		end
 	end
@@ -613,7 +636,19 @@ do
 			frame:SetScript("OnShow", frame.OnShow)
 			frame:SetScript("OnMouseWheel", frame.OnMouseWheel)
 
-			frame.ScrollDownButon = E:CreateScrollDownButton(frame)
+			local scrollToBottomButton = E:CreateScrollToBottomButton(frame)
+			scrollToBottomButton:SetPoint("BOTTOMRIGHT", -4, 4)
+			frame.ScrollToBottomButton = scrollToBottomButton
+
+			local scrollDownButton = E:CreateScrollButton(frame, 3)
+			scrollDownButton:SetPoint("BOTTOMRIGHT", scrollToBottomButton, "TOPRIGHT", 0, 2)
+			scrollDownButton:SetShown(C.db.profile.chat.buttons.up_and_down)
+			frame.ScrollDownButton = scrollDownButton
+
+			local scrollUpButton = E:CreateScrollButton(frame, 4)
+			scrollUpButton:SetPoint("BOTTOMRIGHT", scrollDownButton, "TOPRIGHT", 0, 2)
+			scrollUpButton:SetShown(C.db.profile.chat.buttons.up_and_down)
+			frame.ScrollUpButton = scrollUpButton
 
 			t_insert(frames, frame)
 
@@ -665,10 +700,17 @@ do
 				end
 
 				if frame:GetFirstMessageIndex() ~= 0 then
-					frame.ScrollDownButon:Show()
-					E:StopFading(frame.ScrollDownButon, 1)
+					frame.ScrollToBottomButton:Show()
+					E:StopFading(frame.ScrollToBottomButton, 1)
 				end
 			end
+		end
+	end
+
+	function E:ToggleScrollButtons()
+		for _, frame in next, frames do
+			frame.ScrollDownButton:SetShown(C.db.profile.chat.buttons.up_and_down)
+			frame.ScrollUpButton:SetShown(C.db.profile.chat.buttons.up_and_down)
 		end
 	end
 end

@@ -150,6 +150,19 @@ function E:OnInitialize()
 								type = "toggle",
 								name = L["MOUSEOVER_TOOLTIPS"],
 							},
+							up_and_down = {
+								order = 5,
+								type = "toggle",
+								name = L["SCROLL_BUTTONS"],
+								get = function()
+									return C.db.profile.chat.buttons.up_and_down
+								end,
+								set = function(_, value)
+									C.db.profile.chat.buttons.up_and_down = value
+
+									E:ToggleScrollButtons()
+								end,
+							},
 							spacer1 = {
 								order = 9,
 								type = "description",

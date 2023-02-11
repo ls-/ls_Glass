@@ -35,6 +35,9 @@ D.profile = {
 			out_delay = 10,
 			out_duration = 0.6,
 		},
+		buttons = {
+			up_and_down = false,
+		},
 	},
 	dock = { -- and edit boxes
 		alpha = 0.8,
