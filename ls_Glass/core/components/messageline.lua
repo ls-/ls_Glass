@@ -10,6 +10,10 @@ local t_insert = _G.table.insert
 local message_line_proto = {}
 
 do
+	function message_line_proto:GetText()
+		return self.Text:GetText() or ""
+	end
+
 	function message_line_proto:SetText(text, r, g, b, a)
 		self.Text:SetHeight(128)
 		self.Text:SetText(text)

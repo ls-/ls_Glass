@@ -344,6 +344,7 @@ function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
 			self.visibleLines[i] = nil
 		else
 			E:StopFading(self.visibleLines[i], 0)
+			self.visibleLines[i]:SetText("", 1, 1, 1)
 			self.visibleLines[i]:Hide()
 		end
 	end
@@ -450,16 +451,31 @@ function object_proto:OnFrame()
 
 		if isMouseOver then
 			for _, visibleLine in next, self.visibleLines do
-				if visibleLine:IsShown() and visibleLine:GetAlpha() ~= 0 then
-					E:FadeIn(visibleLine, C.db.profile.chat.fade.in_duration, function()
-						if self.isMouseOver then
-							E:StopFading(visibleLine, 1)
-						elseif not C.db.profile.chat.fade.persistent then
-							E:FadeOut(visibleLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-								visibleLine:Hide()
-							end)
-						end
-					end)
+				if visibleLine:IsShown() then
+					if visibleLine:GetAlpha() ~= 0 then
+						E:FadeIn(visibleLine, C.db.profile.chat.fade.in_duration, function()
+							if self.isMouseOver then
+								E:StopFading(visibleLine, 1)
+							elseif not C.db.profile.chat.fade.persistent then
+								E:FadeOut(visibleLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
+									visibleLine:Hide()
+								end)
+							end
+						end)
+					end
+				else
+					if C.db.profile.chat.fade.mouseover and visibleLine:GetText() ~= "" then
+						visibleLine:Show()
+						E:FadeIn(visibleLine, C.db.profile.chat.fade.in_duration, function()
+							if self.isMouseOver then
+								E:StopFading(visibleLine, 1)
+							elseif not C.db.profile.chat.fade.persistent then
+								E:FadeOut(visibleLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
+									visibleLine:Hide()
+								end)
+							end
+						end)
+					end
 				end
 			end
 

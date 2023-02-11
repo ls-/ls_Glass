@@ -236,6 +236,11 @@ function E:OnInitialize()
 										type = "toggle",
 										name = L["PERSISTENT"],
 									},
+									mouseover = {
+										order = 2,
+										type = "toggle",
+										name = L["MOUSEOVER"],
+									},
 									in_duration = {
 										order = 10,
 										type = "range",
