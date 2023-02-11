@@ -35,6 +35,7 @@ function button_proto:SetState(state, isInstant)
 end
 
 local function setUpBaseButton(button, state)
+	button:SetFlattensRenderLayers(true)
 	button:SetSize(24, 24)
 	button:Hide()
 

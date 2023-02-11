@@ -646,6 +646,7 @@ do
 			frame.pool = pool
 
 			local scrollChild = CreateFrame("Frame", nil, frame, "LSGlassHyperlinkPropagator")
+			frame:SetFrameLevel(frame:GetFrameLevel() + 1)
 			frame:SetScrollChild(scrollChild)
 			frame.ScrollChild = scrollChild
 
@@ -655,16 +656,19 @@ do
 
 			local scrollToBottomButton = E:CreateScrollToBottomButton(frame)
 			scrollToBottomButton:SetPoint("BOTTOMRIGHT", -4, 4)
+			scrollToBottomButton:SetFrameLevel(frame:GetFrameLevel() + 2)
 			frame.ScrollToBottomButton = scrollToBottomButton
 
 			local scrollDownButton = E:CreateScrollButton(frame, 3)
 			scrollDownButton:SetPoint("BOTTOMRIGHT", scrollToBottomButton, "TOPRIGHT", 0, 2)
 			scrollDownButton:SetShown(C.db.profile.chat.buttons.up_and_down)
+			scrollDownButton:SetFrameLevel(frame:GetFrameLevel() + 2)
 			frame.ScrollDownButton = scrollDownButton
 
 			local scrollUpButton = E:CreateScrollButton(frame, 4)
 			scrollUpButton:SetPoint("BOTTOMRIGHT", scrollDownButton, "TOPRIGHT", 0, 2)
 			scrollUpButton:SetShown(C.db.profile.chat.buttons.up_and_down)
+			scrollUpButton:SetFrameLevel(frame:GetFrameLevel() + 2)
 			frame.ScrollUpButton = scrollUpButton
 
 			t_insert(frames, frame)

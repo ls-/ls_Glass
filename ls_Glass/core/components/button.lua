@@ -17,6 +17,7 @@ local function handleButton(frame, ...)
 		handledbuttons[frame] = true
 	end
 
+	frame:SetFlattensRenderLayers(true)
 	frame:SetSize(20, 20)
 	frame:SetNormalTexture(0)
 	frame:SetPushedTexture(0)
