@@ -399,6 +399,7 @@ function object_proto:OnMouseWheel(delta)
 		E:FadeIn(self.ScrollToBottomButton, 0.1)
 	else
 		E:FadeOut(self.ScrollToBottomButton, 0, 0.1, function()
+			self.ScrollToBottomButton:SetState(1, true)
 			self.ScrollToBottomButton:Hide()
 		end)
 	end
