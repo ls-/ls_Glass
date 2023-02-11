@@ -7,6 +7,6 @@
 	<Script file="gradientbackground.lua"/>
 	<Script file="messageline.lua"/>
 	<Script file="slidingmessageframe.lua"/>
-	<Script file="scrolldown.lua"/>
+	<Script file="scrollbutton.lua"/>
 	<Script file="tab.lua"/>
 </Ui>

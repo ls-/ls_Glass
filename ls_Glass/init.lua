@@ -150,6 +150,19 @@ function E:OnInitialize()
 								type = "toggle",
 								name = L["MOUSEOVER_TOOLTIPS"],
 							},
+							up_and_down = {
+								order = 5,
+								type = "toggle",
+								name = L["SCROLL_BUTTONS"],
+								get = function()
+									return C.db.profile.chat.buttons.up_and_down
+								end,
+								set = function(_, value)
+									C.db.profile.chat.buttons.up_and_down = value
+
+									E:ToggleScrollButtons()
+								end,
+							},
 							spacer1 = {
 								order = 9,
 								type = "description",
@@ -222,6 +235,11 @@ function E:OnInitialize()
 										order = 1,
 										type = "toggle",
 										name = L["PERSISTENT"],
+									},
+									mouseover = {
+										order = 2,
+										type = "toggle",
+										name = L["MOUSEOVER"],
 									},
 									in_duration = {
 										order = 10,
@@ -637,6 +655,26 @@ function E:OnEnable()
 		end
 	end)
 
+	local alertingTabs = {}
+
+	hooksecurefunc("FCFTab_UpdateAlpha", function(chatFrame)
+		local tab = _G[chatFrame:GetName() .. "Tab"]
+		if tab then
+			alertingTabs[tab] = tab.alerting and true or nil
+
+			local isAlerting = false
+			for _, v in next, alertingTabs do
+				isAlerting = isAlerting or v
+			end
+
+			if isAlerting then
+				E:FadeIn(GeneralDockManager, 0.1)
+			end
+
+			LSGlassUpdater.isAlerting = isAlerting
+		end
+	end)
+
 	-- ? consider moving it elsewhere
 	local updater = CreateFrame("Frame", "LSGlassUpdater", UIParent)
 	updater:SetScript("OnUpdate", function (self, elapsed)
@@ -662,11 +700,11 @@ function E:OnEnable()
 						E:FadeIn(GeneralDockManager, 0.1, function()
 							if self.isMouseOver then
 								E:StopFading(GeneralDockManager, 1)
-							else
+							elseif not self.isAlerting then
 								E:FadeOut(GeneralDockManager, 4, C.db.profile.dock.fade.out_duration)
 							end
 						end)
-					else
+					elseif not self.isAlerting then
 						E:FadeOut(GeneralDockManager, 4, C.db.profile.dock.fade.out_duration)
 					end
 				end

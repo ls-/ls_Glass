@@ -47,6 +47,7 @@ read_globals = {
 	"GetLocale",
 	"HideUIPanel",
 	"InCombatLockdown",
+	"IsControlKeyDown",
 	"LibStub",
 	"LinkUtil",
 	"Mixin",

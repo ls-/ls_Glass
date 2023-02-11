@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Version 100005.01
+
+- Added 10.0.5 support.
+- Added optional buttons for scrolling up and down. It's an accessibility feature meant for users
+  who can't use the mouse wheel. Holding the Ctrl key will slow the scrolling rate by two times.
+- Added an option to fade in chat messages on mouseover.
+
 ## Version 100002.01
 
 - Added 10.0.2 support.
