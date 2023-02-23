@@ -15,7 +15,6 @@ do
 	end
 
 	function message_line_proto:SetText(text, r, g, b, a)
-		self.Text:SetHeight(128)
 		self.Text:SetText(text)
 		self.Text:SetTextColor(r or 1, g or 1, b or 1, a)
 
