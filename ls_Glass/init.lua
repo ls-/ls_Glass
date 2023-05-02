@@ -26,7 +26,7 @@ end
 
 function E:OnInitialize()
 	self.VER = {}
-	self.VER.string = GetAddOnMetadata(addonName, "Version")
+	self.VER.string = C_AddOns.GetAddOnMetadata(addonName, "Version")
 	self.VER.number = tonumber(self.VER.string:gsub("%D", ""), nil)
 
 	if LS_GLASS_GLOBAL_CONFIG then

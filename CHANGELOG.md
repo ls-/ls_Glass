@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Version 100100.01
+
+- Added 10.1.0 support.
+
 ## Version 100005.01
 
 - Added 10.0.5 support.
