@@ -31,6 +31,7 @@ globals = {
 read_globals = {
 	"BattlePetTooltip",
 	"BattlePetToolTip_ShowLink",
+	"C_AddOns",
 	"ChatFrame1",
 	"ChatFrame2",
 	"ChatFrameChannelButton",
@@ -43,7 +44,6 @@ read_globals = {
 	"DEFAULT_TAB_SELECTED_COLOR_TABLE",
 	"GameTooltip",
 	"GeneralDockManager",
-	"GetAddOnMetadata",
 	"GetLocale",
 	"HideUIPanel",
 	"InCombatLockdown",
