@@ -18,7 +18,7 @@ L["WOWINTERFACE"] = "WoWInterface"
 
 L["ENABLE"] = _G.ENABLE
 L["GENERAL"] = _G.GENERAL_LABEL
-L["INFO"] = "|cff1a9fc0" .. _G.INFO .. "|r"
+L["INFO"] = "|cffe0bc5b" .. _G.INFO .. "|r"
 L["OKAY"] = _G.OKAY
 
 -- Require translation
