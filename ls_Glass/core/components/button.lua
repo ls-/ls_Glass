@@ -62,11 +62,11 @@ local function handleButton(frame, ...)
 	highlightMiddle:SetSize(8, 8)
 end
 
-function E:HandleMinimizeButton(frame)
+function E:HandleMinimizeButton(frame, tab)
 	handleButton(frame, 0.25, 0.5, 0, 0.5)
 
 	frame:ClearAllPoints()
-	frame:SetPoint("BOTTOMLEFT", _G[frame:GetParent():GetParent():GetName() .. "Tab"], "BOTTOMRIGHT", 1, 0)
+	frame:SetPoint("BOTTOMLEFT", tab, "BOTTOMRIGHT", 1, 0)
 end
 
 function E:HandleMaximizeButton(frame)
