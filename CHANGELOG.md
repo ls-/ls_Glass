@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## Version 100105.01
+
+- Added 10.1.5 support.
+
+### Known Issues
+
+I'm still in the process of rewriting the addon, so for the time being I'm not fixing any bugs. It takes time because
+real life keeps getting in the way.
+
 ## Version 100100.02
 
 - Fixed an issue where due to some other addon interference temporary tabs, for instance, whisper tabs would get broken.
