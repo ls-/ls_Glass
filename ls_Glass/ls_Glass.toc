@@ -1,6 +1,6 @@
-## Interface: 100100
+## Interface: 100105
 ## Author: lightspark
-## Version: 100100.02
+## Version: 100105.01
 
 ## Title: LS: |cffe0bc5bGlass|r
 ## Notes: Smooth as glass.
