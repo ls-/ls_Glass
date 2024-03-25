@@ -631,6 +631,7 @@ function E:OnEnable()
 			expectedChatFrames[chatType] = {}
 		end
 
+		-- the PET_BATTLE_COMBAT_LOG chatType doesn't have chatTarget
 		if chatTarget then
 			expectedChatFrames[chatType][chatTarget] = chatFrame
 		else
