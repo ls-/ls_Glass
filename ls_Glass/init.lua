@@ -81,6 +81,8 @@ function E:OnInitialize()
 
 							E:UpdateMessageFont()
 							E:UpdateEditBoxFont()
+							E:UpdateMessageLinesHeights()
+							E:UpdateMessageLinesPadding()
 						end
 					},
 					spacer2 = {
