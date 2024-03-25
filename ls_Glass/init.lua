@@ -130,7 +130,7 @@ function E:OnInitialize()
 								order = 3,
 								type = "range",
 								name = L["Y_PADDING"],
-								min = 1, max = 10, step = 1,
+								min = 0, max = 10, step = 1,
 								set = function(_, value)
 									if C.db.profile.chat.y_padding ~= value then
 										C.db.profile.chat.y_padding = value
