@@ -9,6 +9,8 @@ local LSM = LibStub("LibSharedMedia-3.0")
 
 function E:CreateFonts()
 	local messageFont = CreateFont("LSGlassMessageFont")
+	messageFont:CopyFontObject(ChatFontNormal)
+
 	messageFont:SetFont(
 		LSM:Fetch("font", C.db.profile.font),
 		C.db.profile.chat.font.size,
@@ -38,6 +40,8 @@ function E:CreateFonts()
 	messageFont:SetIndentedWordWrap(true)
 
 	local editBoxFont = CreateFont("LSGlassEditBoxFont")
+	editBoxFont:CopyFontObject(GameFontNormalSmall)
+
 	editBoxFont:SetFont(
 		LSM:Fetch("font", C.db.profile.font), -- ? Add a separate font?
 		C.db.profile.dock.font.size,
