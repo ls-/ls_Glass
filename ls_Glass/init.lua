@@ -122,7 +122,7 @@ function E:OnInitialize()
 									if C.db.profile.chat.x_padding ~= value then
 										C.db.profile.chat.x_padding = value
 
-										E:UpdateMessageLinesHorizPadding()
+										E:UpdateMessageLinesPadding()
 									end
 								end,
 							},
@@ -136,6 +136,7 @@ function E:OnInitialize()
 										C.db.profile.chat.y_padding = value
 
 										E:UpdateMessageLinesHeights()
+										E:UpdateMessageLinesPadding()
 									end
 								end,
 							},

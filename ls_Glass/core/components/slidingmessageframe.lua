@@ -47,7 +47,7 @@ local function chatFrame_OnSizeChanged(self, width, height)
 			end
 
 			for _, messageLine in slidingFrame.messageFramePool:EnumerateInactive() do
-				messageLine:SetWidth(width)
+				messageLine:SetWidth(width - C.db.profile.chat.x_padding * 2)
 				messageLine:SetGradientBackgroundSize(E:Round(width * 0.1), E:Round(width * 0.4))
 			end
 		end
