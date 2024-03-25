@@ -547,6 +547,18 @@ function E:OnInitialize()
 
 	Settings.RegisterAddOnCategory(Settings.RegisterCanvasLayoutCategory(panel, L["LS_GLASS"]))
 
+	AddonCompartmentFrame:RegisterAddon({
+		text = L["LS_GLASS"],
+		icon = "Interface\\AddOns\\ls_Glass\\assets\\logo-32",
+		notCheckable = true,
+		registerForAnyClick = true,
+		func = function()
+			if not InCombatLockdown() then
+				LibStub("AceConfigDialog-3.0"):Open(addonName)
+			end
+		end,
+	})
+
 	SLASH_LSGLASS1 = "/lsglass"
 	SLASH_LSGLASS2 = "/lsg"
 	SlashCmdList["LSGLASS"] = function(msg)
