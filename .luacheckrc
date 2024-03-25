@@ -1,6 +1,6 @@
 std = "none"
 max_line_length = false
-max_comment_line_length = 120
+max_comment_line_length = 100
 self = false
 
 exclude_files = {
@@ -26,9 +26,13 @@ globals = {
 	-- Lua
 	"getfenv",
 	"print",
+
+	-- FrameXML
+	"SlashCmdList",
 }
 
 read_globals = {
+	"AddonCompartmentFrame",
 	"BattlePetTooltip",
 	"BattlePetToolTip_ShowLink",
 	"C_AddOns",
