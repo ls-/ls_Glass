@@ -1,6 +1,6 @@
 std = "none"
 max_line_length = false
-max_comment_line_length = 120
+max_comment_line_length = 100
 self = false
 
 exclude_files = {
@@ -26,12 +26,17 @@ globals = {
 	-- Lua
 	"getfenv",
 	"print",
+
+	-- FrameXML
+	"SlashCmdList",
 }
 
 read_globals = {
+	"AddonCompartmentFrame",
 	"BattlePetTooltip",
 	"BattlePetToolTip_ShowLink",
 	"C_AddOns",
+	"ChatFontNormal",
 	"ChatFrame1",
 	"ChatFrame2",
 	"ChatFrameChannelButton",
@@ -42,6 +47,7 @@ read_globals = {
 	"CreateFrame",
 	"CreateObjectPool",
 	"DEFAULT_TAB_SELECTED_COLOR_TABLE",
+	"GameFontNormalSmall",
 	"GameTooltip",
 	"GeneralDockManager",
 	"GetLocale",

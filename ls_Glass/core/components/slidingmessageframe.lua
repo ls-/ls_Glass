@@ -47,7 +47,7 @@ local function chatFrame_OnSizeChanged(self, width, height)
 			end
 
 			for _, messageLine in slidingFrame.messageFramePool:EnumerateInactive() do
-				messageLine:SetWidth(width)
+				messageLine:SetWidth(width - C.db.profile.chat.x_padding * 2)
 				messageLine:SetGradientBackgroundSize(E:Round(width * 0.1), E:Round(width * 0.4))
 			end
 		end
@@ -58,15 +58,17 @@ local function chatFrame_OnSizeChanged(self, width, height)
 	end
 end
 
-local function chatFrame_ShowHook(self)
-	self.FontStringContainer:Hide()
+local function chatFrame_SetShownHook(self, isShown)
+	if isShown then
+		self.FontStringContainer:Hide()
 
-	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
-	if slidingFrame then
-		-- FCF indiscriminately calls :Show() when adding new tabs, I don't need to do
-		-- anything when that happens
-		if not slidingFrame:IsShown() then
-			slidingFrame:Show()
+		local slidingFrame = E:GetSlidingFrameForChatFrame(self)
+		if slidingFrame then
+			-- FCF indiscriminately calls :SetShown(true) when adding new tabs, I don't need to do
+			-- anything when that happens
+			if not slidingFrame:IsShown() then
+				slidingFrame:Show()
+			end
 		end
 	end
 end
@@ -176,7 +178,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 	if not hookedChatFrames[chatFrame] then
 		chatFrame:HookScript("OnSizeChanged", chatFrame_OnSizeChanged)
 
-		hooksecurefunc(chatFrame, "Show", chatFrame_ShowHook)
+		hooksecurefunc(chatFrame, "SetShown", chatFrame_SetShownHook)
 		hooksecurefunc(chatFrame, "Hide", chatFrame_HideHook)
 
 		-- it's more convenient than hooking chatFrame.historyBuffer:PushFront()

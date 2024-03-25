@@ -81,6 +81,8 @@ function E:OnInitialize()
 
 							E:UpdateMessageFont()
 							E:UpdateEditBoxFont()
+							E:UpdateMessageLinesHeights()
+							E:UpdateMessageLinesPadding()
 						end
 					},
 					spacer2 = {
@@ -122,7 +124,7 @@ function E:OnInitialize()
 									if C.db.profile.chat.x_padding ~= value then
 										C.db.profile.chat.x_padding = value
 
-										E:UpdateMessageLinesHorizPadding()
+										E:UpdateMessageLinesPadding()
 									end
 								end,
 							},
@@ -130,12 +132,13 @@ function E:OnInitialize()
 								order = 3,
 								type = "range",
 								name = L["Y_PADDING"],
-								min = 1, max = 10, step = 1,
+								min = 0, max = 10, step = 1,
 								set = function(_, value)
 									if C.db.profile.chat.y_padding ~= value then
 										C.db.profile.chat.y_padding = value
 
 										E:UpdateMessageLinesHeights()
+										E:UpdateMessageLinesPadding()
 									end
 								end,
 							},
@@ -547,6 +550,18 @@ function E:OnInitialize()
 
 	Settings.RegisterAddOnCategory(Settings.RegisterCanvasLayoutCategory(panel, L["LS_GLASS"]))
 
+	AddonCompartmentFrame:RegisterAddon({
+		text = L["LS_GLASS"],
+		icon = "Interface\\AddOns\\ls_Glass\\assets\\logo-32",
+		notCheckable = true,
+		registerForAnyClick = true,
+		func = function()
+			if not InCombatLockdown() then
+				LibStub("AceConfigDialog-3.0"):Open(addonName)
+			end
+		end,
+	})
+
 	SLASH_LSGLASS1 = "/lsglass"
 	SLASH_LSGLASS2 = "/lsg"
 	SlashCmdList["LSGLASS"] = function(msg)
@@ -619,6 +634,7 @@ function E:OnEnable()
 			expectedChatFrames[chatType] = {}
 		end
 
+		-- the PET_BATTLE_COMBAT_LOG chatType doesn't have chatTarget
 		if chatTarget then
 			expectedChatFrames[chatType][chatTarget] = chatFrame
 		else
