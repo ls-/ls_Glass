@@ -18,8 +18,6 @@ do
 		self.Text:SetText(text)
 		self.Text:SetTextColor(r or 1, g or 1, b or 1, a)
 
-		self:SetHeight(self.Text:GetStringHeight() + C.db.profile.chat.y_padding * 2)
-
 		-- realistically, it should be height == 0, but given how this API works, it could be
 		-- 0.00000001 for all I know, it happens when nil or "" messages are being rendered
 		local height = self.Text:GetStringHeight()
