@@ -18,8 +18,6 @@ do
 		self.Text:SetText(text)
 		self.Text:SetTextColor(r or 1, g or 1, b or 1, a)
 
-		self:SetHeight(self.Text:GetStringHeight() + C.db.profile.chat.y_padding * 2)
-
 		-- realistically, it should be height == 0, but given how this API works, it could be
 		-- 0.00000001 for all I know, it happens when nil or "" messages are being rendered
 		local height = self.Text:GetStringHeight()
@@ -49,7 +47,7 @@ local function createMessageLine(parent)
 	E:CreateGradientBackground(frame, E:Round(width * 0.1), E:Round(width * 0.5), 0, 0, 0, C.db.profile.chat.alpha)
 
 	frame.Text = frame:CreateFontString(nil, "ARTWORK", "LSGlassMessageFont")
-	frame.Text:SetPoint("LEFT", C.db.profile.chat.x_padding, -C.db.profile.chat.y_padding)
+	frame.Text:SetPoint("TOPLEFT", C.db.profile.chat.x_padding, -C.db.profile.chat.y_padding)
 	frame.Text:SetWidth(width - C.db.profile.chat.x_padding * 2)
 	frame.Text:SetIndentedWordWrap(true)
 	frame.Text:SetNonSpaceWrap(true)
@@ -118,11 +116,11 @@ end
 function E:UpdateMessageLinesPadding()
 	for _, pool in next, pools do
 		for messageLine in pool:EnumerateActive() do
-			messageLine.Text:SetPoint("LEFT", C.db.profile.chat.x_padding, -C.db.profile.chat.y_padding)
+			messageLine.Text:SetPoint("TOPLEFT", C.db.profile.chat.x_padding, -C.db.profile.chat.y_padding)
 		end
 
 		for _, messageLine in pool:EnumerateInactive() do
-			messageLine.Text:SetPoint("LEFT", C.db.profile.chat.x_padding, -C.db.profile.chat.y_padding)
+			messageLine.Text:SetPoint("TOPLEFT", C.db.profile.chat.x_padding, -C.db.profile.chat.y_padding)
 		end
 	end
 end
