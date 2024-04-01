@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Version 100206.02
+
+- Fixed an issue where vertical padding wouldn't apply correctly.
+
 ## Version 100206.01
 
 - Added 10.2.6 support.
