@@ -47,7 +47,7 @@ local function createMessageLine(parent)
 	E:CreateGradientBackground(frame, E:Round(width * 0.1), E:Round(width * 0.5), 0, 0, 0, C.db.profile.chat.alpha)
 
 	frame.Text = frame:CreateFontString(nil, "ARTWORK", "LSGlassMessageFont")
-	frame.Text:SetPoint("LEFT", C.db.profile.chat.x_padding, -C.db.profile.chat.y_padding)
+	frame.Text:SetPoint("TOPLEFT", C.db.profile.chat.x_padding, -C.db.profile.chat.y_padding)
 	frame.Text:SetWidth(width - C.db.profile.chat.x_padding * 2)
 	frame.Text:SetIndentedWordWrap(true)
 	frame.Text:SetNonSpaceWrap(true)
@@ -116,11 +116,11 @@ end
 function E:UpdateMessageLinesPadding()
 	for _, pool in next, pools do
 		for messageLine in pool:EnumerateActive() do
-			messageLine.Text:SetPoint("LEFT", C.db.profile.chat.x_padding, -C.db.profile.chat.y_padding)
+			messageLine.Text:SetPoint("TOPLEFT", C.db.profile.chat.x_padding, -C.db.profile.chat.y_padding)
 		end
 
 		for _, messageLine in pool:EnumerateInactive() do
-			messageLine.Text:SetPoint("LEFT", C.db.profile.chat.x_padding, -C.db.profile.chat.y_padding)
+			messageLine.Text:SetPoint("TOPLEFT", C.db.profile.chat.x_padding, -C.db.profile.chat.y_padding)
 		end
 	end
 end
