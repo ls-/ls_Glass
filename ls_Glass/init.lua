@@ -190,8 +190,10 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 			E:HandleMinimizeButton(_G["ChatFrame" .. i .. "ButtonFrameMinimizeButton"], _G["ChatFrame" .. i .. "Tab"])
 
 			if i == 1 then
+				E:HandleQuickJoinToastButton(QuickJoinToastButton)
 				E:HandleChannelButton(ChatFrameChannelButton)
 				E:HandleMenuButton(ChatFrameMenuButton)
+				E:HandleTTSButton(TextToSpeechButton)
 			end
 		end
 

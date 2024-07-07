@@ -36,6 +36,7 @@ read_globals = {
 	"BattlePetTooltip",
 	"BattlePetToolTip_ShowLink",
 	"C_AddOns",
+	"ChatAlertFrame",
 	"ChatFontNormal",
 	"ChatFrame1",
 	"ChatFrame2",
@@ -60,7 +61,9 @@ read_globals = {
 	"Mixin",
 	"NORMAL_FONT_COLOR",
 	"NUM_CHAT_WINDOWS",
+	"QuickJoinToastButton",
 	"Settings",
 	"SettingsPanel",
+	"TextToSpeechButton",
 	"UIParent",
 }
