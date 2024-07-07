@@ -4,21 +4,9 @@
 ## Title: LS: |cffe0bc5bGlass|r
 ## Notes: Smooth as glass.
 ## IconTexture: Interface\AddOns\ls_Glass\assets\logo-64
-
 ## SavedVariables: LS_GLASS_GLOBAL_CONFIG
 
-embeds\LibStub\LibStub.lua
-embeds\CallbackHandler-1.0\CallbackHandler-1.0.xml
-embeds\AceAddon-3.0\AceAddon-3.0.xml
-embeds\AceDB-3.0\AceDB-3.0.xml
-embeds\AceDBOptions-3.0\AceDBOptions-3.0.xml
-embeds\AceEvent-3.0\AceEvent-3.0.xml
-embeds\AceGUI-3.0\AceGUI-3.0.xml
-embeds\AceConfig-3.0\AceConfig-3.0.xml
-embeds\LibSharedMedia-3.0\lib.xml
-embeds\AceGUI-3.0-SharedMediaWidgets\widget.xml
-embeds\LibEasing\LibEasing.lua
-
+embeds\_embeds.xml
 locales\_locales.xml
 
 core\_core.xml
