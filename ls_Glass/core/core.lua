@@ -3,15 +3,17 @@ local L = ns.L
 
 -- Lua
 local _G = getfenv(0)
+local error = _G.error
 local ipairs = _G.ipairs
 local m_floor = _G.math.floor
 local next= _G.next
 local pcall = _G.pcall
 local s_format = _G.string.format
 local t_insert = _G.table.insert
+local type = _G.type
 
 -- Mine
-local E, C, D = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceEvent-3.0"), {}, {}
+local E, C, D = {}, {}, {}
 ns.E, ns.C, ns.D = E, C, D
 
 _G[addonName] = {
@@ -63,6 +65,54 @@ do
 
 		for _, listener in ipairs(listeners[messageType]) do
 			listener(payload)
+		end
+	end
+end
+
+do
+	local oneTimeEvents = {ADDON_LOADED = false, PLAYER_LOGIN = false}
+	local registeredEvents = {}
+
+	local dispatcher = CreateFrame("Frame", "LSGEventFrame")
+	dispatcher:SetScript("OnEvent", function(_, event, ...)
+		for func in next, registeredEvents[event] do
+			func(...)
+		end
+
+		if oneTimeEvents[event] == false then
+			oneTimeEvents[event] = true
+		end
+	end)
+
+	function E:RegisterEvent(event, func)
+		if oneTimeEvents[event] then
+			error(s_format("Failed to register for '%s' event, already fired!", event), 3)
+		end
+
+		if not func or type(func) ~= "function" then
+			error(s_format("Failed to register for '%s' event, no handler!", event), 3)
+		end
+
+		if not registeredEvents[event] then
+			registeredEvents[event] = {}
+
+			dispatcher:RegisterEvent(event)
+		end
+
+		registeredEvents[event][func] = true
+	end
+
+	function E:UnregisterEvent(event, func)
+		local funcs = registeredEvents[event]
+
+		if funcs and funcs[func] then
+			funcs[func] = nil
+
+			if not next(funcs) then
+				registeredEvents[event] = nil
+
+				dispatcher:UnregisterEvent(event)
+			end
 		end
 	end
 end
@@ -120,8 +170,9 @@ do
 		return v
 	end
 
-	local function lerp(v1, v2, perc)
-		return clamp(v1 + (v2 - v1) * perc)
+	local function outCubic(t, b, c, d)
+		t = t / d - 1
+		return clamp(c * (t ^ 3 + 1) + b)
 	end
 
 	local FADE_IN = 1
@@ -138,7 +189,8 @@ do
 			if data.fadeTimer > 0 then
 				data.initAlpha = data.initAlpha or object:GetAlpha()
 
-				object:SetAlpha(lerp(data.initAlpha, data.finalAlpha, data.fadeTimer / data.duration))
+				object:SetAlpha(outCubic(data.fadeTimer, data.initAlpha, data.finalAlpha - data.initAlpha, data.duration))
+				-- object:SetAlpha(lerp(data.initAlpha, data.finalAlpha, data.fadeTimer / data.duration))
 
 				if data.fadeTimer >= data.duration then
 					remove(object)

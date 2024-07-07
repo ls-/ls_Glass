@@ -138,7 +138,7 @@ do
 
 	function scroll_button_proto:OnUpdate(elapsed)
 		self.elapsed = (self.elapsed or 0) + elapsed
-		if self.elapsed > (IsControlKeyDown() and 0.128 or 0.064) then
+		if self.elapsed > 0.275 then -- SCROLL_DURATION + POST_SCROLL_DELAY
 			self.elapsed = 0
 
 			self:OnMouseDown()

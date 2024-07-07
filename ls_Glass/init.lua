@@ -9,30 +9,32 @@ local pcall = _G.pcall
 local tonumber = _G.tonumber
 
 -- Mine
+E.VER = {}
+E.VER.string = C_AddOns.GetAddOnMetadata(addonName, "Version")
+E.VER.number = tonumber(E.VER.string:gsub("%D", ""), nil)
+
 local function updateCallback()
-	E:UpdateMessageFont()
-	E:UpdateMessageLinesHeights()
-	E:UpdateMessageLinesBackgrounds()
-	E:UpdateBackdrops()
-	E:UpdateEditBoxFont()
-	E:UpdateEditBoxes()
-	E:ResetSlidingFrameDockFading()
-	E:ResetSlidingFrameChatFading()
+	-- E:UpdateMessageFont()
+	-- E:UpdateMessageLinesHeights()
+	-- E:UpdateMessageLinesBackgrounds()
+	-- E:UpdateBackdrops()
+	-- E:UpdateEditBoxFont()
+	-- E:UpdateEditBoxes()
+	-- E:ResetSlidingFrameDockFading()
+	-- E:ResetSlidingFrameChatFading()
 end
 
 local function shutdownCallback()
 	C.db.profile.version = E.VER.number
 end
 
-function E:OnInitialize()
-	self.VER = {}
-	self.VER.string = C_AddOns.GetAddOnMetadata(addonName, "Version")
-	self.VER.number = tonumber(self.VER.string:gsub("%D", ""), nil)
+E:RegisterEvent("ADDON_LOADED", function(arg1)
+	if arg1 ~= addonName then return end
 
 	if LS_GLASS_GLOBAL_CONFIG then
 		if LS_GLASS_GLOBAL_CONFIG.profiles then
 			for profile, data in next, LS_GLASS_GLOBAL_CONFIG.profiles do
-				self:Modernize(data, profile, "profile")
+				E:Modernize(data, profile, "profile")
 			end
 		end
 	end
@@ -48,372 +50,7 @@ function E:OnInitialize()
 		type = "group",
 		name = "|cffffffff" .. L["LS_GLASS"] .. "|r",
 		args = {
-			general = {
-				order = 10,
-				type = "group",
-				name = L["GENERAL"],
-				args = {
-					warning = {
-						order = 1,
-						type = "description",
-						name = L["CONFIG_WARNING"],
-						fontSize = "medium",
-						image = "Interface\\OPTIONSFRAME\\UI-OptionsFrame-NewFeatureIcon",
-						imageWidth = 16,
-						imageHeight = 16,
-					},
-					spacer1 = {
-						order = 2,
-						type = "description",
-						name = " ",
-					},
-					font = {
-						order = 3,
-						type = "select",
-						name = L["FONT"],
-						dialogControl = "LSM30_Font",
-						values = LibStub("LibSharedMedia-3.0"):HashTable("font"),
-						get = function()
-							return LibStub("LibSharedMedia-3.0"):IsValid("font", C.db.profile.font) and C.db.profile.font or LibStub("LibSharedMedia-3.0"):GetDefault("font")
-						end,
-						set = function(_, value)
-							C.db.profile.font = value
-
-							E:UpdateMessageFont()
-							E:UpdateEditBoxFont()
-							E:UpdateMessageLinesHeights()
-							E:UpdateMessageLinesPadding()
-						end
-					},
-					spacer2 = {
-						order = 9,
-						type = "description",
-						name = " ",
-					},
-					chat = {
-						order = 10,
-						type = "group",
-						guiInline = true,
-						name = L["MESSAGES"],
-						get = function(info)
-							return C.db.profile.chat[info[#info]]
-						end,
-						set = function(info, value)
-							C.db.profile.chat[info[#info]] = value
-						end,
-						args = {
-							alpha = {
-								order = 1,
-								type = "range",
-								name = L["BACKGROUND_ALPHA"],
-								min = 0, max = 1, step = 0.01, bigStep = 0.1,
-								set = function(_, value)
-									if C.db.profile.chat.alpha ~= value then
-										C.db.profile.chat.alpha = value
-
-										E:UpdateMessageLinesBackgrounds()
-									end
-								end,
-							},
-							x_padding = {
-								order = 2,
-								type = "range",
-								name = L["X_PADDING"],
-								min = 1, max = 20, step = 1,
-								set = function(_, value)
-									if C.db.profile.chat.x_padding ~= value then
-										C.db.profile.chat.x_padding = value
-
-										E:UpdateMessageLinesPadding()
-									end
-								end,
-							},
-							y_padding = {
-								order = 3,
-								type = "range",
-								name = L["Y_PADDING"],
-								min = 0, max = 10, step = 1,
-								set = function(_, value)
-									if C.db.profile.chat.y_padding ~= value then
-										C.db.profile.chat.y_padding = value
-
-										E:UpdateMessageLinesHeights()
-										E:UpdateMessageLinesPadding()
-									end
-								end,
-							},
-							slide_in_duration = {
-								order = 4,
-								type = "range",
-								name = L["SLIDE_IN_DURATION"],
-								min = 0, max = 1, step = 0.05,
-							},
-							tooltips = {
-								order = 5,
-								type = "toggle",
-								name = L["MOUSEOVER_TOOLTIPS"],
-							},
-							up_and_down = {
-								order = 5,
-								type = "toggle",
-								name = L["SCROLL_BUTTONS"],
-								get = function()
-									return C.db.profile.chat.buttons.up_and_down
-								end,
-								set = function(_, value)
-									C.db.profile.chat.buttons.up_and_down = value
-
-									E:ToggleScrollButtons()
-								end,
-							},
-							spacer1 = {
-								order = 9,
-								type = "description",
-								name = " ",
-							},
-							font = {
-								order = 10,
-								type = "group",
-								guiInline = true,
-								name = L["FONT"],
-								get = function(info)
-									return C.db.profile.chat.font[info[#info]]
-								end,
-								set = function(info, value)
-									if C.db.profile.chat.font[info[#info]]~= value then
-										C.db.profile.chat.font[info[#info]]= value
-
-										E:UpdateMessageFont()
-									end
-								end,
-								args = {
-									size = {
-										order = 1,
-										type = "range",
-										name = L["SIZE"],
-										min = 10, max = 20, step = 1,
-										set = function(_, value)
-											if C.db.profile.chat.font.size ~= value then
-												C.db.profile.chat.font.size = value
-
-												E:UpdateMessageFont()
-												E:UpdateMessageLinesHeights()
-											end
-										end,
-									},
-									outline = {
-										order = 2,
-										type = "toggle",
-										name = L["OUTLINE"],
-									},
-									shadow = {
-										order = 3,
-										type = "toggle",
-										name = L["SHADOW"],
-									},
-								},
-							},
-							spacer2 = {
-								order = 19,
-								type = "description",
-								name = " ",
-							},
-							fade = {
-								order = 20,
-								type = "group",
-								guiInline = true,
-								name = L["FADING"],
-								get = function(info)
-									return C.db.profile.chat.fade[info[#info]]
-								end,
-								set = function(info, value)
-									if C.db.profile.chat.fade[info[#info]]~= value then
-										C.db.profile.chat.fade[info[#info]]= value
-
-										E:ResetSlidingFrameChatFading()
-									end
-								end,
-								args = {
-									persistent = {
-										order = 1,
-										type = "toggle",
-										name = L["PERSISTENT"],
-									},
-									mouseover = {
-										order = 2,
-										type = "toggle",
-										name = L["MOUSEOVER"],
-									},
-									in_duration = {
-										order = 10,
-										type = "range",
-										name = L["FADE_IN_DURATION"],
-										min = 0, max = 1, step = 0.05,
-									},
-									out_delay = {
-										order = 11,
-										type = "range",
-										name = L["FADE_OUT_DELAY"],
-										disabled = function()
-											return C.db.profile.chat.fade.persistent
-										end,
-										min = 0, max = 120, step = 1,
-									},
-									out_duration = {
-										order = 12,
-										type = "range",
-										name = L["FADE_OUT_DURATION"],
-										disabled = function()
-											return C.db.profile.chat.fade.persistent
-										end,
-										min = 0.1, max = 1, step = 0.05,
-									},
-								},
-							},
-						},
-					},
-					spacer3 = {
-						order = 19,
-						type = "description",
-						name = " ",
-					},
-					dock = {
-						order = 20,
-						type = "group",
-						guiInline = true,
-						name = L["DOCK_AND_EDITBOX"],
-						get = function(info)
-							return C.db.profile.dock[info[#info]]
-						end,
-						args = {
-							alpha = {
-								order = 1,
-								type = "range",
-								name = L["BACKGROUND_ALPHA"],
-								min = 0, max = 1, step = 0.01, bigStep = 0.1,
-								set = function(_, value)
-									if C.db.profile.dock.alpha ~= value then
-										C.db.profile.dock.alpha = value
-
-										E:UpdateBackdrops()
-									end
-								end,
-							},
-							edit_position = {
-								order = 2,
-								type = "select",
-								name = L["EDITBOX_POSITION"],
-								values = {
-									["bottom"] = L["BOTTOM"],
-									["top"] = L["TOP"],
-								},
-								get = function()
-									return C.db.profile.dock.edit.position
-								end,
-								set = function(_, value)
-									if C.db.profile.dock.edit.position ~= value then
-										C.db.profile.dock.edit.position = value
-
-										E:UpdateEditBoxes()
-									end
-								end,
-							},
-							edit_offset = {
-								order = 3,
-								type = "range",
-								name = L["OFFSET"],
-								min = 0, max = 64, step = 1,
-								get = function()
-									return C.db.profile.dock.edit.offset
-								end,
-								set = function(_, value)
-									if C.db.profile.dock.edit.offset ~= value then
-										C.db.profile.dock.edit.offset = value
-
-										E:UpdateEditBoxes()
-									end
-								end,
-							},
-							spacer1 = {
-								order = 9,
-								type = "description",
-								name = " ",
-							},
-							font = {
-								order = 10,
-								type = "group",
-								guiInline = true,
-								name = L["FONT_EDITBOX"],
-								get = function(info)
-									return C.db.profile.dock.font[info[#info]]
-								end,
-								set = function(info, value)
-									if C.db.profile.dock.font[info[#info]]~= value then
-										C.db.profile.dock.font[info[#info]]= value
-
-										E:UpdateEditBoxFont()
-									end
-								end,
-								args = {
-									size = {
-										order = 1,
-										type = "range",
-										name = L["SIZE"],
-										min = 10, max = 20, step = 1,
-									},
-									outline = {
-										order = 2,
-										type = "toggle",
-										name = L["OUTLINE"],
-									},
-									shadow = {
-										order = 3,
-										type = "toggle",
-										name = L["SHADOW"],
-									},
-								},
-							},
-							spacer2 = {
-								order = 19,
-								type = "description",
-								name = " ",
-							},
-							fade = {
-								order = 20,
-								type = "group",
-								guiInline = true,
-								name = L["FADING"],
-								get = function(info)
-									return C.db.profile.dock.fade[info[#info]]
-								end,
-								set = function(info, value)
-									if C.db.profile.dock.fade[info[#info]]~= value then
-										C.db.profile.dock.fade[info[#info]]= value
-
-										E:ResetSlidingFrameDockFading()
-									end
-								end,
-								args = {
-									enabled = {
-										order = 1,
-										type = "toggle",
-										name = L["ENABLE"],
-									},
-									out_duration = {
-										order = 12,
-										type = "range",
-										name = L["FADE_OUT_DURATION"],
-										disabled = function()
-											return not C.db.profile.dock.fade.enabled
-										end,
-										min = 0.1, max = 1, step = 0.05,
-									},
-								},
-							},
-						},
-					},
-				},
-			},
+			-- general = {},
 			about = {
 				order = 110,
 				type = "group",
@@ -526,207 +163,198 @@ function E:OnInitialize()
 		},
 	}
 
+	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, C.options)
+	LibStub("AceConfigDialog-3.0"):SetDefaultSize(addonName, 1024, 768)
+
 	C.options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(C.db, true)
 	C.options.args.profiles.order = 100
 	C.options.args.profiles.desc = nil
 
-	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, C.options)
-	LibStub("AceConfigDialog-3.0"):SetDefaultSize(addonName, 1024, 768)
+	E:RegisterEvent("PLAYER_LOGIN", function()
+		E:CreateFonts()
+		E:HandleDock(GeneralDockManager)
 
-	local panel = CreateFrame("Frame", "LSGConfigPanel")
-	panel:Hide()
+		local chatFrames = {}
+		local tempChatFrames = {}
+		local expectedChatFrames = {}
 
-	local button = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
-	button:SetText(L["OPEN_CONFIG"])
-	button:SetWidth(button:GetTextWidth() + 18)
-	button:SetPoint("TOPLEFT", 16, -16)
-	button:SetScript("OnClick", function()
-		if not InCombatLockdown() then
-			HideUIPanel(SettingsPanel)
-
-			LibStub("AceConfigDialog-3.0"):Open(addonName)
-		end
-	end)
-
-	Settings.RegisterAddOnCategory(Settings.RegisterCanvasLayoutCategory(panel, L["LS_GLASS"]))
-
-	AddonCompartmentFrame:RegisterAddon({
-		text = L["LS_GLASS"],
-		icon = "Interface\\AddOns\\ls_Glass\\assets\\logo-32",
-		notCheckable = true,
-		registerForAnyClick = true,
-		func = function()
-			if not InCombatLockdown() then
-				LibStub("AceConfigDialog-3.0"):Open(addonName)
+		-- static chat frames
+		for i = 1, NUM_CHAT_WINDOWS do
+			local frame = E:HandleChatFrame(_G["ChatFrame" .. i], i)
+			if frame then
+				chatFrames[frame] = true
 			end
-		end,
-	})
 
-	SLASH_LSGLASS1 = "/lsglass"
-	SLASH_LSGLASS2 = "/lsg"
-	SlashCmdList["LSGLASS"] = function(msg)
-		if msg == "" then
-			if not InCombatLockdown() then
-				LibStub("AceConfigDialog-3.0"):Open(addonName)
+			E:HandleChatTab(_G["ChatFrame" .. i .. "Tab"])
+			E:HandleEditBox(_G["ChatFrame" .. i .. "EditBox"])
+			E:HandleMinimizeButton(_G["ChatFrame" .. i .. "ButtonFrameMinimizeButton"], _G["ChatFrame" .. i .. "Tab"])
+
+			if i == 1 then
+				E:HandleChannelButton(ChatFrameChannelButton)
+				E:HandleMenuButton(ChatFrameMenuButton)
 			end
 		end
-	end
 
-	self:RegisterEvent("PLAYER_REGEN_DISABLED", function()
-		LibStub("AceConfigDialog-3.0"):Close(addonName)
-	end)
-end
+		-- temporary chat frames
+		hooksecurefunc("FCF_SetTemporaryWindowType", function(chatFrame, chatType, chatTarget)
+			if not expectedChatFrames[chatType] then
+				expectedChatFrames[chatType] = {}
+			end
 
-local chatFrames = {}
-local tempChatFrames = {}
-local expectedChatFrames = {}
+			-- the PET_BATTLE_COMBAT_LOG chatType doesn't have chatTarget
+			if chatTarget then
+				expectedChatFrames[chatType][chatTarget] = chatFrame
+			else
+				expectedChatFrames[chatType] = chatFrame
+			end
+		end)
 
-function E:OnEnable()
-	E:CreateFonts()
+		hooksecurefunc("FCF_OpenTemporaryWindow", function(chatType, chatTarget)
+			local chatFrame = chatTarget and (expectedChatFrames[chatType] and expectedChatFrames[chatType][chatTarget]) or expectedChatFrames[chatType]
+			if chatFrame then
+				local frame = E:HandleChatFrame(chatFrame, 1)
+				if frame then
+					E:HandleChatTab(_G[chatFrame:GetName() .. "Tab"])
+					E:HandleEditBox(_G[chatFrame:GetName() .. "EditBox"])
+					E:HandleMinimizeButton(_G[chatFrame:GetName() .. "ButtonFrameMinimizeButton"], _G[chatFrame:GetName() .. "Tab"])
 
-	E:HandleDock(GeneralDockManager)
-
-	-- TODO: Move these somewhere better
-	ChatFrame1:HookScript("OnHyperlinkEnter", function(chatFrame, link, text)
-		if C.db.profile.chat.tooltips then
-			local linkType = LinkUtil.SplitLinkData(link)
-			if linkType == "battlepet" then
-				GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)
-				BattlePetToolTip_ShowLink(text)
-			elseif linkType ~= "trade" then
-				GameTooltip:SetOwner(chatFrame, "ANCHOR_CURSOR_RIGHT", 4, 2)
-
-				local isOK = pcall(GameTooltip.SetHyperlink, GameTooltip, link)
-				if not isOK then
-					GameTooltip:Hide()
-				else
-					GameTooltip:Show()
+					tempChatFrames[frame] = true
 				end
 			end
-		end
-	end)
+		end)
 
-	ChatFrame1:HookScript("OnHyperlinkLeave", function()
-		BattlePetTooltip:Hide()
-		GameTooltip:Hide()
-	end)
+		hooksecurefunc("FCF_Close", function(chatFrame)
+			local frame = E:GetSlidingFrameForChatFrame(chatFrame)
+			if tempChatFrames[frame] then
+				frame:Release()
 
-	-- static chat frames
-	for i = 1, NUM_CHAT_WINDOWS do
-		local frame = E:HandleChatFrame(_G["ChatFrame" .. i])
-		if frame then
-			chatFrames[frame] = true
-		end
-
-		E:HandleChatTab(_G["ChatFrame" .. i .. "Tab"])
-		E:HandleEditBox(_G["ChatFrame" .. i .. "EditBox"])
-		E:HandleMinimizeButton(_G["ChatFrame" .. i .. "ButtonFrameMinimizeButton"], _G["ChatFrame" .. i .. "Tab"])
-
-		if i == 1 then
-			E:HandleChannelButton(ChatFrameChannelButton)
-			E:HandleMenuButton(ChatFrameMenuButton)
-		end
-	end
-
-	-- temporary chat frames
-	hooksecurefunc("FCF_SetTemporaryWindowType", function(chatFrame, chatType, chatTarget)
-		if not expectedChatFrames[chatType] then
-			expectedChatFrames[chatType] = {}
-		end
-
-		-- the PET_BATTLE_COMBAT_LOG chatType doesn't have chatTarget
-		if chatTarget then
-			expectedChatFrames[chatType][chatTarget] = chatFrame
-		else
-			expectedChatFrames[chatType] = chatFrame
-		end
-	end)
-
-	hooksecurefunc("FCF_OpenTemporaryWindow", function(chatType, chatTarget)
-		local chatFrame = chatTarget and (expectedChatFrames[chatType] and expectedChatFrames[chatType][chatTarget]) or expectedChatFrames[chatType]
-		if chatFrame then
-			local frame = E:HandleChatFrame(chatFrame)
-			if frame then
-				E:HandleChatTab(_G[chatFrame:GetName() .. "Tab"])
-				E:HandleEditBox(_G[chatFrame:GetName() .. "EditBox"])
-				E:HandleMinimizeButton(_G[chatFrame:GetName() .. "ButtonFrameMinimizeButton"], _G[chatFrame:GetName() .. "Tab"])
-
-				tempChatFrames[frame] = true
+				tempChatFrames[frame] = nil
 			end
-		end
-	end)
+		end)
 
-	hooksecurefunc("FCF_Close", function(chatFrame)
-		local frame = E:GetSlidingFrameForChatFrame(chatFrame)
-		if tempChatFrames[frame] then
-			frame:Release()
-
-			tempChatFrames[frame] = nil
-		end
-	end)
-
-	hooksecurefunc("FCF_MinimizeFrame", function(chatFrame)
-		if chatFrame.minFrame then
-			E:HandleMinimizedTab(chatFrame.minFrame)
-		end
-	end)
-
-	local alertingTabs = {}
-
-	hooksecurefunc("FCFTab_UpdateAlpha", function(chatFrame)
-		local tab = _G[chatFrame:GetName() .. "Tab"]
-		if tab then
-			alertingTabs[tab] = tab.alerting and true or nil
-
-			local isAlerting = false
-			for _, v in next, alertingTabs do
-				isAlerting = isAlerting or v
+		hooksecurefunc("FCF_MinimizeFrame", function(chatFrame)
+			if chatFrame.minFrame then
+				E:HandleMinimizedTab(chatFrame.minFrame)
 			end
+		end)
 
-			if isAlerting then
-				E:FadeIn(GeneralDockManager, 0.1)
+		local alertingTabs = {}
+
+		hooksecurefunc("FCFTab_UpdateAlpha", function(chatFrame)
+			local tab = _G[chatFrame:GetName() .. "Tab"]
+			if tab then
+				alertingTabs[tab] = tab.alerting and true or nil
+
+				local isAlerting = false
+				for _, v in next, alertingTabs do
+					isAlerting = isAlerting or v
+				end
+
+				if isAlerting then
+					E:FadeIn(GeneralDockManager, 0.1)
+				end
+
+				LSGlassUpdater.isAlerting = isAlerting
 			end
+		end)
 
-			LSGlassUpdater.isAlerting = isAlerting
-		end
-	end)
+		-- ? consider moving it elsewhere
+		local updater = CreateFrame("Frame", "LSGlassUpdater", UIParent)
+		updater:SetScript("OnUpdate", function (self, elapsed)
+			self.elapsed = (self.elapsed or 0) + elapsed
+			if self.elapsed >= 0.01 then
+				for frame in next, chatFrames do
+					frame:OnFrame()
+				end
 
-	-- ? consider moving it elsewhere
-	local updater = CreateFrame("Frame", "LSGlassUpdater", UIParent)
-	updater:SetScript("OnUpdate", function (self, elapsed)
-		self.elapsed = (self.elapsed or 0) + elapsed
-		if self.elapsed >= 0.01 then
-			for frame in next, chatFrames do
-				frame:OnFrame()
+				for frame in next, tempChatFrames do
+					frame:OnFrame()
+				end
+
+				if C.db.profile.dock.fade.enabled then
+					-- these use custom values for fading in/out because Blizz fade chat as well
+					-- so I'm trying not to interfere with that
+					-- ! DO NOT SHOW/HIDE gdm, it'll taint EVERYTHING, just adjust its alpha
+					local isMouseOver = ChatFrame1:IsMouseOver(26, -36, 0, 0)
+					if self.isMouseOver ~= isMouseOver then
+						self.isMouseOver = isMouseOver
+
+						if isMouseOver then
+							E:FadeIn(GeneralDockManager, 0.1, function()
+								if self.isMouseOver then
+									E:StopFading(GeneralDockManager, 1)
+								elseif not self.isAlerting then
+									E:FadeOut(GeneralDockManager, 4, C.db.profile.dock.fade.out_duration)
+								end
+							end)
+						elseif not self.isAlerting then
+							E:FadeOut(GeneralDockManager, 4, C.db.profile.dock.fade.out_duration)
+						end
+					end
+				end
+
+				self.elapsed = 0
 			end
+		end)
 
-			for frame in next, tempChatFrames do
-				frame:OnFrame()
-			end
+		-- ? consider moving it elsewhere as well
+		E:RegisterEvent("GLOBAL_MOUSE_DOWN", function(button)
+			if button == "LeftButton" and C.db.profile.chat.fade.click then
+				for frame in next, chatFrames do
+					if frame:IsShown() and frame:IsMouseOver() and not frame:IsMouseOverHyperlink() then
+						frame:FadeInMessages()
+					end
+				end
 
-			if C.db.profile.dock.fade.enabled then
-				-- these use custom values for fading in/out because Blizz fade chat as well
-				-- so I'm trying not to interfere with that
-				-- ! DO NOT SHOW/HIDE gdm, it'll taint EVERYTHING, just adjust its alpha
-				local isMouseOver = ChatFrame1:IsMouseOver(26, -36, 0, 0)
-				if self.isMouseOver ~= isMouseOver then
-					self.isMouseOver = isMouseOver
-
-					if isMouseOver then
-						E:FadeIn(GeneralDockManager, 0.1, function()
-							if self.isMouseOver then
-								E:StopFading(GeneralDockManager, 1)
-							elseif not self.isAlerting then
-								E:FadeOut(GeneralDockManager, 4, C.db.profile.dock.fade.out_duration)
-							end
-						end)
-					elseif not self.isAlerting then
-						E:FadeOut(GeneralDockManager, 4, C.db.profile.dock.fade.out_duration)
+				for frame in next, tempChatFrames do
+					if frame:IsShown() and frame:IsMouseOver() and not frame:IsMouseOverHyperlink() then
+						frame:FadeInMessages()
 					end
 				end
 			end
+		end)
 
-			self.elapsed = 0
+		local panel = CreateFrame("Frame", "LSGConfigPanel")
+		panel:Hide()
+
+		local button = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+		button:SetText(L["OPEN_CONFIG"])
+		button:SetWidth(button:GetTextWidth() + 18)
+		button:SetPoint("TOPLEFT", 16, -16)
+		button:SetScript("OnClick", function()
+			if not InCombatLockdown() then
+				HideUIPanel(SettingsPanel)
+
+				LibStub("AceConfigDialog-3.0"):Open(addonName)
+			end
+		end)
+
+		Settings.RegisterAddOnCategory(Settings.RegisterCanvasLayoutCategory(panel, L["LS_GLASS"]))
+
+		AddonCompartmentFrame:RegisterAddon({
+			text = L["LS_GLASS"],
+			icon = "Interface\\AddOns\\ls_Glass\\assets\\logo-32",
+			notCheckable = true,
+			registerForAnyClick = true,
+			func = function()
+				if not InCombatLockdown() then
+					LibStub("AceConfigDialog-3.0"):Open(addonName)
+				end
+			end,
+		})
+
+		E:RegisterEvent("PLAYER_REGEN_DISABLED", function()
+			LibStub("AceConfigDialog-3.0"):Close(addonName)
+		end)
+
+		SLASH_LSGLASS1 = "/lsglass"
+		SLASH_LSGLASS2 = "/lsg"
+		SlashCmdList["LSGLASS"] = function(msg)
+			if msg == "" then
+				if not InCombatLockdown() then
+					LibStub("AceConfigDialog-3.0"):Open(addonName)
+				end
+			end
 		end
 	end)
-end
+end)
