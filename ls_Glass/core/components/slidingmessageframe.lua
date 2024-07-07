@@ -913,7 +913,7 @@ function object_proto:OnFrame()
 		self.numIncomingMessages = 0
 	end
 
-	local isMouseOver = self:IsMouseOver(26, -36, 0, 0)
+	local isMouseOver = self:IsMouseOver(26, -36, -36, 0)
 	if isMouseOver ~= self.isMouseOver then
 		self.isMouseOver = isMouseOver
 

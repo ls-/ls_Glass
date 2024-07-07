@@ -275,7 +275,7 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 					-- these use custom values for fading in/out because Blizz fade chat as well
 					-- so I'm trying not to interfere with that
 					-- ! DO NOT SHOW/HIDE gdm, it'll taint EVERYTHING, just adjust its alpha
-					local isMouseOver = ChatFrame1:IsMouseOver(26, -36, 0, 0)
+					local isMouseOver = ChatFrame1:IsMouseOver(26, -36, -36, 0)
 					if self.isMouseOver ~= isMouseOver then
 						self.isMouseOver = isMouseOver
 
