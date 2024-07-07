@@ -106,6 +106,8 @@ local function chatFrame_StopMovingOrSizingHook(self)
 	end
 end
 
+-- FIXME: When something changes UIParent's scale, this one fires, but it never reaches
+-- RefreshIfNecessary
 local function chatFrame_OnSizeChanged(self, width, height)
 	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
 	if slidingFrame then
