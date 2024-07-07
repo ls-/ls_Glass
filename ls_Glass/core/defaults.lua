@@ -129,8 +129,7 @@ D.profile = {
 			-- enabled = true, -- * hardcoded
 			persistent = false, -- messages can fade in, but don't fade out
 			click = false,
-			-- mouseover = false, -- hidden messages will fade in on mouse over
-			out_delay = 5,
+			out_delay = 60,
 			out_duration = 0.6,
 		},
 		buttons = {
