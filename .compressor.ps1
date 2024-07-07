@@ -28,7 +28,7 @@ $foldersToInclude = @(
 	".\$name"
 )
 
-$filesToRemove = @(
+$filesToExclude = @(
 	"*.doc*"
 	"*.editorconfig",
 	"*.git*",
