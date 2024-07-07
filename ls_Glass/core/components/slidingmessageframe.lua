@@ -143,13 +143,6 @@ local function chatFrame_HideHook(self)
 	end
 end
 
-local function chatFrame_AddMessageHook(self, ...)
-	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
-	if slidingFrame then
-		slidingFrame:NewIncomingMessage(...)
-	end
-end
-
 local function chatFrame_RemoveMessagesByPredicateHook(self)
 	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
 	if slidingFrame then
@@ -318,8 +311,13 @@ function object_proto:CaptureChatFrame(chatFrame)
 		hooksecurefunc(chatFrame, "SetShown", chatFrame_SetShownHook)
 		hooksecurefunc(chatFrame, "Hide", chatFrame_HideHook)
 
-		-- it's more convenient than hooking chatFrame.historyBuffer:PushFront()
-		hooksecurefunc(chatFrame, "AddMessage", chatFrame_AddMessageHook)
+		-- some addon devs tend to hook AddMessage to add filtering, so do it the hard way
+		hooksecurefunc(chatFrame.historyBuffer, "PushFront", function()
+			local slidingFrame = E:GetSlidingFrameForChatFrame(chatFrame)
+			if slidingFrame then
+				slidingFrame:NewIncomingMessage()
+			end
+		end)
 
 		-- redraw the frame if visible
 		hooksecurefunc(chatFrame, "RemoveMessagesByPredicate", chatFrame_RemoveMessagesByPredicateHook)
@@ -882,7 +880,7 @@ function object_proto:HasIncomingMessages()
 	return self.numIncomingMessages ~= 0
 end
 
-function object_proto:NewIncomingMessage(...)
+function object_proto:NewIncomingMessage()
 	if self:IsShown() then
 		if self:IsScrolling() or not self:CanProcessIncoming() then
 			self.numIncomingMessagesWhileScrolling = self.numIncomingMessagesWhileScrolling + 1
