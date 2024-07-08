@@ -28,7 +28,7 @@ do
 		-- 0.00000001 for all I know, it happens when nil or "" messages are being rendered
 		local height = self.Text:GetStringHeight()
 		if height < 1 then
-			height = C.db.profile.chat[self:GetPoolID()].font.size
+			height = self.Text:GetLineHeight()
 		end
 
 		self:SetHeight(height + C.db.profile.chat[self:GetPoolID()].y_padding * 2)
@@ -50,10 +50,12 @@ do
 	end
 
 	function message_line_proto:ClearMessage()
-		self:Hide()
-		self:SetID(0)
-		self:SetTimestamp(nil)
-		self:SetText("")
+		if self:IsShown() then
+			self:Hide()
+			self:SetID(0)
+			self:SetTimestamp(nil)
+			self:SetText("")
+		end
 	end
 
 	function message_line_proto:CalculateAlphaFromTimestampDelta(delta)
