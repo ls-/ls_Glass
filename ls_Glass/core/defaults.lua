@@ -22,9 +22,8 @@ D.profile = {
 		smooth = true,
 		fade = {
 			enabled = true, -- if disabled, messages don't fade out
-			-- persistent = false, -- messages can fade in, but don't fade out
 			click = false,
-			out_delay = 10,
+			out_delay = 60,
 		},
 		buttons = {
 			up_and_down = false,
