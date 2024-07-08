@@ -331,10 +331,6 @@ function object_proto:CaptureChatFrame(chatFrame)
 	if chatFrame:GetNumMessages() > 0 then
 		self:SetFirstVisibleMessageID(1)
 	end
-	-- load any messages already in the chat frame
-	-- for i = 1, chatFrame:GetNumMessages() do
-	-- 	self:AddMessage(chatFrame, chatFrame:GetMessageInfo(i))
-	-- end
 
 	-- if chatFrame == DEFAULT_CHAT_FRAME then
 	-- 	selectedSlidingFrame = self
