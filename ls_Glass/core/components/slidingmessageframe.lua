@@ -542,7 +542,9 @@ function object_proto:ResetState(doNotRefresh)
 	self:SetAtBottom(id == 0 or (id == 1 and offset == 0))
 	self:SetAtTop(id == self:GetNumHistoryElements() and offset == 0)
 
-	self:UpdateFading()
+	if not doNotRefresh then
+		self:UpdateFading()
+	end
 
 	self:SetScrolling(false)
 end
