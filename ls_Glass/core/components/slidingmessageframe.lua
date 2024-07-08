@@ -30,15 +30,15 @@ end
 --------------
 
 local setSmoothScroll
-local SCROLL_DURATION = 0.25
-local POST_SCROLL_DELAY = 0.025
 
 do
+	local SCROLL_DURATION = 0.175
+	local POST_SCROLL_DELAY = 0.1
+	local THRESHOLD = 1/120
+
 	local activeFrames = {}
 
 	local smoother = CreateFrame("Frame")
-
-	local THRESHOLD = 1/120
 
 	local function clamp(v)
 		if v > SCROLL_DURATION then
