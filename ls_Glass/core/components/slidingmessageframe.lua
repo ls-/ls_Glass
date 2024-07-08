@@ -13,6 +13,11 @@ local t_insert = _G.table.insert
 local t_wipe = _G.table.wipe
 
 -- Mine
+local CHAT_FADE_OUT_DURATION = 0.6
+local DOCK_FADE_IN_DURATION = 0.1
+local DOCK_FADE_OUT_DURATION = 0.6
+local DOCK_FADE_OUT_DELAY = 4
+
 do
 	local map = {}
 
@@ -32,7 +37,7 @@ end
 local setSmoothScroll
 
 do
-	local SCROLL_DURATION = 0.175
+	local SCROLL_DURATION = 0.2
 	local POST_SCROLL_DELAY = 0.1
 	local THRESHOLD = 1/120
 
@@ -716,11 +721,11 @@ function object_proto:CalculateAlphaFromTimestampDelta(delta)
 	end
 
 	delta = delta - config.out_delay
-	if delta >= config.out_duration then
+	if delta >= CHAT_FADE_OUT_DURATION then
 		return 0
 	end
 
-	return 1 - delta / config.out_duration
+	return 1 - delta / CHAT_FADE_OUT_DURATION
 end
 
 function object_proto:UpdateFading()
@@ -739,18 +744,16 @@ function object_proto:UpdateFading()
 		messageLine:SetAlpha(alpha)
 
 		if alpha < 1 then
-			messageLine:FadeOut(0, C.db.profile.chat.fade.out_duration * alpha)
+			messageLine:FadeOut(0, CHAT_FADE_OUT_DURATION * alpha)
 		else
-			messageLine:FadeOut(C.db.profile.chat.fade.out_delay - timeDelta, C.db.profile.chat.fade.out_duration)
+			messageLine:FadeOut(C.db.profile.chat.fade.out_delay - timeDelta, CHAT_FADE_OUT_DURATION)
 		end
 	end
 end
 
 function object_proto:ShouldShowMessage(delta)
-	local config = C.db.profile.chat.fade
-
-	delta = delta - config.out_delay
-	if delta >= config.out_duration then
+	delta = delta - C.db.profile.chat.fade.out_delay
+	if delta >= CHAT_FADE_OUT_DURATION then
 		return false
 	end
 
@@ -951,37 +954,37 @@ function object_proto:OnFrame()
 				-- so I'm trying not to interfere with that
 				-- ! DO NOT SHOW/HIDE the tab, it'll taint EVERYTHING, just adjust its alpha
 				if not self.ChatFrame.isDocked then
-					E:FadeIn(self.ChatTab, 0.1, function()
+					E:FadeIn(self.ChatTab, DOCK_FADE_IN_DURATION, function()
 						if self.isMouseOver then
 							E:StopFading(self.ChatTab, 1)
 						else
-							E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration)
+							E:FadeOut(self.ChatTab, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 						end
 					end)
 				end
 
-				E:FadeIn(self.ButtonFrame, 0.1, function()
+				E:FadeIn(self.ButtonFrame, DOCK_FADE_IN_DURATION, function()
 					if self.isMouseOver then
 						E:StopFading(self.ButtonFrame, 1)
 					else
-						E:FadeOut(self.ButtonFrame, 4, C.db.profile.dock.fade.out_duration)
+						E:FadeOut(self.ButtonFrame, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 					end
 				end)
 
 				if C.db.profile.chat.buttons.up_and_down then
-					E:FadeIn(self.ScrollDownButton, 0.1, function()
+					E:FadeIn(self.ScrollDownButton, DOCK_FADE_IN_DURATION, function()
 						if self.isMouseOver then
 							E:StopFading(self.ScrollDownButton, 1)
 						else
-							E:FadeOut(self.ScrollDownButton, 4, C.db.profile.dock.fade.out_duration)
+							E:FadeOut(self.ScrollDownButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 						end
 					end)
 
-					E:FadeIn(self.ScrollUpButton, 0.1, function()
+					E:FadeIn(self.ScrollUpButton, DOCK_FADE_IN_DURATION, function()
 						if self.isMouseOver then
 							E:StopFading(self.ScrollUpButton, 1)
 						else
-							E:FadeOut(self.ScrollUpButton, 4, C.db.profile.dock.fade.out_duration)
+							E:FadeOut(self.ScrollUpButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 						end
 					end)
 				end
@@ -993,17 +996,17 @@ function object_proto:OnFrame()
 				-- ! DO NOT SHOW/HIDE the tab, it'll taint EVERYTHING, just adjust its alpha
 				if not self.ChatFrame.isDocked then
 					if not self.isDragging then
-						E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration)
+						E:FadeOut(self.ChatTab, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 					else
 						E:StopFading(self.ChatTab, 1)
 					end
 				end
 
-				E:FadeOut(self.ButtonFrame, 4, C.db.profile.dock.fade.out_duration)
+				E:FadeOut(self.ButtonFrame, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 
 				if C.db.profile.chat.buttons.up_and_down then
-					E:FadeOut(self.ScrollDownButton, 4, C.db.profile.dock.fade.out_duration)
-					E:FadeOut(self.ScrollUpButton, 4, C.db.profile.dock.fade.out_duration)
+					E:FadeOut(self.ScrollDownButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+					E:FadeOut(self.ScrollUpButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 				end
 			end
 		end

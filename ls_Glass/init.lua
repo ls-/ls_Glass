@@ -8,6 +8,10 @@ local next = _G.next
 local tonumber = _G.tonumber
 
 -- Mine
+local DOCK_FADE_IN_DURATION = 0.1
+local DOCK_FADE_OUT_DURATION = 0.6
+local DOCK_FADE_OUT_DELAY = 4
+
 E.VER = {}
 E.VER.string = C_AddOns.GetAddOnMetadata(addonName, "Version")
 E.VER.number = tonumber(E.VER.string:gsub("%D", ""), nil)
@@ -252,7 +256,7 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 				end
 
 				if isAlerting then
-					E:FadeIn(GeneralDockManager, 0.1)
+					E:FadeIn(GeneralDockManager, DOCK_FADE_IN_DURATION)
 				end
 
 				LSGlassUpdater.isAlerting = isAlerting
@@ -281,15 +285,15 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 						self.isMouseOver = isMouseOver
 
 						if isMouseOver then
-							E:FadeIn(GeneralDockManager, 0.1, function()
+							E:FadeIn(GeneralDockManager, DOCK_FADE_IN_DURATION, function()
 								if self.isMouseOver then
 									E:StopFading(GeneralDockManager, 1)
 								elseif not self.isAlerting then
-									E:FadeOut(GeneralDockManager, 4, C.db.profile.dock.fade.out_duration)
+									E:FadeOut(GeneralDockManager, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 								end
 							end)
 						elseif not self.isAlerting then
-							E:FadeOut(GeneralDockManager, 4, C.db.profile.dock.fade.out_duration)
+							E:FadeOut(GeneralDockManager, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 						end
 					end
 				end
