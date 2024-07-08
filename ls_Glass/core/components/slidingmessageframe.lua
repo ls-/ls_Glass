@@ -32,7 +32,6 @@ end
 local setSmoothScroll
 local SCROLL_DURATION = 0.25
 local POST_SCROLL_DELAY = 0.025
-local FADE_IN_DURATION = 0.2
 
 do
 	local activeFrames = {}
@@ -660,7 +659,7 @@ function object_proto:RefreshBackfill(startIndex, maxLines, maxPixels, fadeIn)
 
 		if fadeIn then
 			messageLine:SetAlpha(0)
-			messageLine:FadeIn(FADE_IN_DURATION)
+			messageLine:FadeIn()
 		else
 			messageLine:SetAlpha(1)
 		end

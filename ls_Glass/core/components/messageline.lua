@@ -7,6 +7,9 @@ local pairs = _G.pairs
 local t_insert = _G.table.insert
 
 -- Mine
+local FADE_IN_DURATION = 0.2
+local FADE_IN_DELAY = 0.075
+
 local message_line_proto = {}
 do
 	function message_line_proto:GetText()
@@ -68,8 +71,8 @@ do
 		return 1 - delta / config.out_duration
 	end
 
-	function message_line_proto:FadeIn(duration)
-		E:FadeIn(self, duration)
+	function message_line_proto:FadeIn()
+		E:FadeIn(self, FADE_IN_DURATION, nil, FADE_IN_DELAY)
 	end
 
 	function message_line_proto:FadeOut(delay, duration)

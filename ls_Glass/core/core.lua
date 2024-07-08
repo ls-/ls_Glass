@@ -236,10 +236,10 @@ do
 		end
 	end
 
-	function E:FadeIn(object, duration, callback)
+	function E:FadeIn(object, duration, callback, delay)
 		if not object then return end
 
-		add(FADE_IN, object, 0, duration * (1 - object:GetAlpha()), callback)
+		add(FADE_IN, object, delay or 0, duration * (1 - object:GetAlpha()), callback)
 	end
 
 	function E:FadeOut(object, ...)
