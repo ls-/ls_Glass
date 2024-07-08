@@ -148,7 +148,7 @@ D.profile = {
 		},
 	},
 	edit = {
-		-- alpha = 0.8, -- TODO
+		alpha = 0.8,
 		position = "bottom", -- "top"
 		offset = 32,
 		font = {

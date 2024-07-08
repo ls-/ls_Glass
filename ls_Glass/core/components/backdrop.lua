@@ -9,7 +9,11 @@ local t_insert = _G.table.insert
 -- Mine
 local backdrops = {}
 
-function E:CreateBackdrop(parent, xOffset, yOffset)
+local function fetchAlpha()
+	return C.db.profile.dock.alpha
+end
+
+function E:CreateBackdrop(parent, xOffset, yOffset, alphaFunc)
 	local backdrop = CreateFrame("Frame", nil, parent, "BackdropTemplate")
 	backdrop:SetFrameLevel(parent:GetFrameLevel() - 1)
 	backdrop:SetPoint("TOPLEFT", xOffset or 0, -(yOffset or 0))
@@ -29,8 +33,10 @@ function E:CreateBackdrop(parent, xOffset, yOffset)
 	backdrop.Center:SetPoint("TOPLEFT", backdrop.TopLeftCorner, "BOTTOMRIGHT", 0, 0)
 	backdrop.Center:SetPoint("BOTTOMRIGHT", backdrop.BottomRightCorner, "TOPLEFT", 0, 0)
 
-	backdrop:SetBackdropColor(0, 0, 0, C.db.profile.dock.alpha)
-	backdrop:SetBackdropBorderColor(0, 0, 0, C.db.profile.dock.alpha)
+	backdrop.FetchAlpha = alphaFunc or fetchAlpha
+
+	backdrop:SetBackdropColor(0, 0, 0, backdrop:FetchAlpha())
+	backdrop:SetBackdropBorderColor(0, 0, 0, backdrop:FetchAlpha())
 
 	t_insert(backdrops, backdrop)
 
@@ -39,7 +45,7 @@ end
 
 function E:UpdateBackdrops()
 	for _, backdrop in next, backdrops do
-		backdrop:SetBackdropColor(0, 0, 0, C.db.profile.dock.alpha)
-		backdrop:SetBackdropBorderColor(0, 0, 0, C.db.profile.dock.alpha)
+		backdrop:SetBackdropColor(0, 0, 0, backdrop:FetchAlpha())
+		backdrop:SetBackdropBorderColor(0, 0, 0, backdrop:FetchAlpha())
 	end
 end

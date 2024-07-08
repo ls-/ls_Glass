@@ -6,6 +6,10 @@ local _G = getfenv(0)
 local next = _G.next
 
 -- Mine
+local function fetchAlpha()
+	return C.db.profile.edit.alpha
+end
+
 local handledEditBoxes = {}
 
 local EDIT_BOX_TEXTURES = {
@@ -20,7 +24,7 @@ local EDIT_BOX_TEXTURES = {
 
 function E:HandleEditBox(frame)
 	if not handledEditBoxes[frame] then
-		frame.Backdrop = E:CreateBackdrop(frame, 0, 2)
+		frame.Backdrop = E:CreateBackdrop(frame, 0, 2, fetchAlpha)
 
 		handledEditBoxes[frame] = true
 	end
