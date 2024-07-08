@@ -58,21 +58,6 @@ do
 		end
 	end
 
-	function message_line_proto:CalculateAlphaFromTimestampDelta(delta)
-		local config = C.db.profile.chat.fade
-
-		if delta <= config.out_delay then
-			return 1
-		end
-
-		delta = delta - config.out_delay
-		if delta >= config.out_duration then
-			return 0
-		end
-
-		return 1 - delta / config.out_duration
-	end
-
 	function message_line_proto:FadeIn()
 		E:FadeIn(self, FADE_IN_DURATION, nil, FADE_IN_DELAY)
 	end

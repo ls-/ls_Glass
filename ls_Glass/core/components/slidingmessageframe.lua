@@ -542,9 +542,9 @@ function object_proto:ResetState(doNotRefresh)
 	self:SetAtBottom(id == 0 or (id == 1 and offset == 0))
 	self:SetAtTop(id == self:GetNumHistoryElements() and offset == 0)
 
-	self:SetScrolling(false)
-
 	self:UpdateFading()
+
+	self:SetScrolling(false)
 end
 
 function object_proto:EnableIncomingProcessing(state)
@@ -706,7 +706,21 @@ function object_proto:CanFade()
 	return not C.db.profile.chat.fade.persistent and self:IsAtBottom()
 end
 
--- TODO: USE ME!
+function object_proto:CalculateAlphaFromTimestampDelta(delta)
+	local config = C.db.profile.chat.fade
+
+	if delta <= config.out_delay then
+		return 1
+	end
+
+	delta = delta - config.out_delay
+	if delta >= config.out_duration then
+		return 0
+	end
+
+	return 1 - delta / config.out_duration
+end
+
 function object_proto:UpdateFading()
 	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 or not self:CanFade() then return end
 
@@ -718,7 +732,7 @@ function object_proto:UpdateFading()
 		if messageLine:GetID() == 0 then return end
 
 		local timeDelta = now - m_max(messageLine:GetTimestamp(), self.overrideFadeTimestamp)
-		local alpha = messageLine:CalculateAlphaFromTimestampDelta(timeDelta)
+		local alpha = self:CalculateAlphaFromTimestampDelta(timeDelta)
 
 		messageLine:SetAlpha(alpha)
 
@@ -730,6 +744,17 @@ function object_proto:UpdateFading()
 	end
 end
 
+function object_proto:ShouldShowMessage(delta)
+	local config = C.db.profile.chat.fade
+
+	delta = delta - config.out_delay
+	if delta >= config.out_duration then
+		return false
+	end
+
+	return true
+end
+
 function object_proto:RefreshActive(startIndex, maxPixels)
 	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
 
@@ -737,6 +762,7 @@ function object_proto:RefreshActive(startIndex, maxPixels)
 
 	self:SetLastActiveMessageInfo(0, 0, 0)
 
+	local now = GetTime()
 	local lineIndex = 0
 	local messageID, messageInfo, messageLine
 
@@ -747,6 +773,12 @@ function object_proto:RefreshActive(startIndex, maxPixels)
 
 		messageInfo = self:GetHistoryEntryAtIndex(messageID)
 		if not messageInfo then
+			lineIndex = lineIndex - 1
+
+			break
+		end
+
+		if not self:ShouldShowMessage(now - m_max(messageInfo.timestamp, self.overrideFadeTimestamp)) then
 			lineIndex = lineIndex - 1
 
 			break
