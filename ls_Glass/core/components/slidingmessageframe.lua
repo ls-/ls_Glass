@@ -792,7 +792,6 @@ function object_proto:RefreshActive(startIndex, maxPixels)
 	end
 end
 
-
 function object_proto:FadeInMessages()
 	self:ResetFadingTimer()
 	self:RefreshActive(self:GetFirstActiveMessageID())
