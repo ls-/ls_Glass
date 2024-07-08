@@ -20,8 +20,18 @@ D.profile = {
 	chat = {
 		tooltips = true,
 		smooth = true,
+		fade = {
+			enabled = true, -- if disabled, messages don't fade out
+			-- persistent = false, -- messages can fade in, but don't fade out
+			click = false,
+			out_delay = 10,
+		},
+		buttons = {
+			up_and_down = false,
+		},
 		[ 1] = {
 			alpha = 0.4,
+			-- solid = false,
 			x_padding = 14,
 			y_padding = 0,
 			font = {
@@ -32,6 +42,7 @@ D.profile = {
 		},
 		[ 2] = {
 			alpha = 0.4,
+			-- solid = false,
 			x_padding = 14,
 			y_padding = 0,
 			font = {
@@ -42,6 +53,7 @@ D.profile = {
 		},
 		[ 3] = {
 			alpha = 0.4,
+			-- solid = false,
 			x_padding = 14,
 			y_padding = 0,
 			font = {
@@ -52,6 +64,7 @@ D.profile = {
 		},
 		[ 4] = {
 			alpha = 0.4,
+			-- solid = false,
 			x_padding = 14,
 			y_padding = 0,
 			font = {
@@ -62,6 +75,7 @@ D.profile = {
 		},
 		[ 5] = {
 			alpha = 0.4,
+			-- solid = false,
 			x_padding = 14,
 			y_padding = 0,
 			font = {
@@ -72,6 +86,7 @@ D.profile = {
 		},
 		[ 6] = {
 			alpha = 0.4,
+			-- solid = false,
 			x_padding = 14,
 			y_padding = 0,
 			font = {
@@ -82,6 +97,7 @@ D.profile = {
 		},
 		[ 7] = {
 			alpha = 0.4,
+			-- solid = false,
 			x_padding = 14,
 			y_padding = 0,
 			font = {
@@ -92,6 +108,7 @@ D.profile = {
 		},
 		[ 8] = {
 			alpha = 0.4,
+			-- solid = false,
 			x_padding = 14,
 			y_padding = 0,
 			font = {
@@ -102,6 +119,7 @@ D.profile = {
 		},
 		[ 9] = {
 			alpha = 0.4,
+			-- solid = false,
 			x_padding = 14,
 			y_padding = 0,
 			font = {
@@ -112,6 +130,7 @@ D.profile = {
 		},
 		[10] = {
 			alpha = 0.4,
+			-- solid = false,
 			x_padding = 14,
 			y_padding = 0,
 			font = {
@@ -119,19 +138,6 @@ D.profile = {
 				shadow = true,
 				outline = false,
 			},
-		},
-		-- bg = {
-		-- 	solid = false,
-		-- },
-		fade = {
-			-- enabled = true, -- * hardcoded
-			persistent = false, -- messages can fade in, but don't fade out
-			click = false,
-			out_delay = 60,
-			out_duration = 0.6,
-		},
-		buttons = {
-			up_and_down = false,
 		},
 	},
 	dock = {
@@ -143,8 +149,6 @@ D.profile = {
 		},
 		fade = {
 			enabled = true,
-			-- out_delay = 4, -- * hardcoded
-			out_duration = 0.6,
 		},
 	},
 	edit = {

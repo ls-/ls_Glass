@@ -710,7 +710,7 @@ function object_proto:ResetFadingTimer()
 end
 
 function object_proto:CanFade()
-	return not C.db.profile.chat.fade.persistent and self:IsAtBottom()
+	return C.db.profile.chat.fade.enabled and self:IsAtBottom()
 end
 
 function object_proto:CalculateAlphaFromTimestampDelta(delta)

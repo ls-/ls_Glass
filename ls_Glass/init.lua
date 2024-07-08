@@ -304,16 +304,18 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 
 		-- ? consider moving it elsewhere as well
 		E:RegisterEvent("GLOBAL_MOUSE_DOWN", function(button)
-			if button == "LeftButton" and C.db.profile.chat.fade.click then
-				for frame in next, chatFrames do
-					if frame:IsShown() and frame:IsMouseOver() and not frame:IsMouseOverHyperlink() then
-						frame:FadeInMessages()
+			if C.db.profile.chat.fade.enabled then
+				if button == "LeftButton" and C.db.profile.chat.fade.click then
+					for frame in next, chatFrames do
+						if frame:IsShown() and frame:IsMouseOver() and not frame:IsMouseOverHyperlink() then
+							frame:FadeInMessages()
+						end
 					end
-				end
 
-				for frame in next, tempChatFrames do
-					if frame:IsShown() and frame:IsMouseOver() and not frame:IsMouseOverHyperlink() then
-						frame:FadeInMessages()
+					for frame in next, tempChatFrames do
+						if frame:IsShown() and frame:IsMouseOver() and not frame:IsMouseOverHyperlink() then
+							frame:FadeInMessages()
+						end
 					end
 				end
 			end
