@@ -23,17 +23,6 @@ do
 		self:AdjustHeight()
 	end
 
-	function message_line_proto:AdjustHeight()
-		-- realistically, it should be height == 0, but given how this API works, it could be
-		-- 0.00000001 for all I know, it happens when nil or "" messages are being rendered
-		local height = self.Text:GetStringHeight()
-		if height < 1 then
-			height = self.Text:GetLineHeight()
-		end
-
-		self:SetHeight(height + C.db.profile.chat[self:GetPoolID()].y_padding * 2)
-	end
-
 	function message_line_proto:SetTimestamp(...)
 		self.timestamp = ...
 	end
@@ -68,6 +57,31 @@ do
 
 	function message_line_proto:StopFading(finalAlpha)
 		E:StopFading(self, finalAlpha)
+	end
+
+	function message_line_proto:SetPadding(width, xPadding, yPadding)
+		self.Text:SetPoint("TOPLEFT", xPadding, -yPadding)
+		self.Text:SetWidth(width - xPadding * 2)
+	end
+
+	-- SetHeight is taken, duh
+	function message_line_proto:AdjustHeight()
+		-- realistically, it should be height == 0, but given how this API works, it could be
+		-- 0.00000001 for all I know, it happens when nil or "" messages are being rendered
+		local height = self.Text:GetStringHeight()
+		if height < 1 then
+			height = self.Text:GetLineHeight()
+		end
+
+		self:SetHeight(height + C.db.profile.chat[self:GetPoolID()].y_padding * 2)
+	end
+
+	-- ditto
+	function message_line_proto:AdjustWidth(width, xPadding)
+		self:SetWidth(width)
+		self:SetGradientBackgroundSize(width)
+
+		self.Text:SetWidth(width - xPadding * 2)
 	end
 end
 
@@ -119,17 +133,52 @@ end
 
 local message_pool_proto = {}
 do
-	function message_pool_proto:AdjustWidth()
+	function message_pool_proto:UpdateWidth()
 		local width = E:Round(self:GetParent():GetWidth())
-		local textWidth = width - C.db.profile.chat[self:GetID()].x_padding * 2
+		local xPadding = C.db.profile.chat[self:GetID()].x_padding
 
-		self:ReleaseAll()
+		for messageLine in self:EnumerateActive() do
+			messageLine:AdjustWidth(width, xPadding)
+		end
 
 		for _, messageLine in self:EnumerateInactive() do
-			messageLine:SetWidth(width)
-			messageLine:SetGradientBackgroundSize(width)
+			messageLine:AdjustWidth(width, xPadding)
+		end
+	end
 
-			messageLine.Text:SetWidth(textWidth)
+	function message_pool_proto:UpdateHeight()
+		for messageLine in self:EnumerateActive() do
+			messageLine:AdjustHeight()
+		end
+
+		for _, messageLine in self:EnumerateInactive() do
+			messageLine:AdjustHeight()
+		end
+	end
+
+	function message_pool_proto:UpdateGradientBackgroundAlpha()
+		local alpha = C.db.profile.chat[self:GetID()].alpha
+
+		for messageLine in self:EnumerateActive() do
+			messageLine:SetGradientBackgroundAlpha(alpha)
+		end
+
+		for _, messageLine in self:EnumerateInactive() do
+			messageLine:SetGradientBackgroundAlpha(alpha)
+		end
+	end
+
+	function message_pool_proto:UpdatePadding()
+		local width = E:Round(self:GetParent():GetWidth())
+		local xPadding = C.db.profile.chat[self:GetID()].x_padding
+		local yPadding = C.db.profile.chat[self:GetID()].y_padding
+
+		for messageLine in self:EnumerateActive() do
+			messageLine:SetPadding(width, xPadding, yPadding)
+		end
+
+		for _, messageLine in self:EnumerateInactive() do
+			messageLine:SetPadding(width, xPadding, yPadding)
 		end
 	end
 
@@ -161,9 +210,16 @@ function E:CreateMessageLinePool(parent, id)
 		return id
 	end
 
-	t_insert(pools, pool)
+	pools[id] = pool
 
 	counters[pool] = 0
 
 	return pool
+end
+
+function E:ForMessageLinePool(id, method, ...)
+	local pool = pools[id]
+	if pool and pool[method] then
+		pool[method](pool, ...)
+	end
 end

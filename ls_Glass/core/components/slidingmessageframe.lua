@@ -385,7 +385,8 @@ function object_proto:UpdateLayout()
 	t_wipe(self.backfillMessages)
 
 	if self.messageFramePool then
-		self.messageFramePool:AdjustWidth()
+		self.messageFramePool:ReleaseAll()
+		self.messageFramePool:UpdateWidth()
 	end
 end
 
