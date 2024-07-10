@@ -286,6 +286,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 	chatFrame:SetClampRectInsets(0, 0, 0, 0)
 	chatFrame:SetResizeBounds(176, 64)
 	chatFrame:EnableMouse(false)
+	chatFrame:SetScript("OnUpdate", nil)
 
 	E:ForceHide(chatFrame.ScrollBar)
 	E:ForceHide(chatFrame.ScrollToBottomButton)
