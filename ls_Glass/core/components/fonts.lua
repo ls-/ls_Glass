@@ -42,7 +42,7 @@ function E:CreateFonts()
 	local editBoxFont = CreateFont("LSGlassEditBoxFont")
 	editBoxFont:CopyFontObject(GameFontNormalSmall)
 	editBoxFont:SetFont(
-		LSM:Fetch("font", C.db.profile.font), -- ? Add a separate font?
+		LSM:Fetch("font", C.db.profile.font),
 		C.db.profile.edit.font.size,
 		C.db.profile.edit.font.outline and "OUTLINE" or ""
 	)
@@ -68,48 +68,62 @@ function E:CreateFonts()
 	editBoxFont:SetJustifyV("MIDDLE")
 end
 
--- function E:UpdateMessageFont()
--- 	LSGlassMessaLSGlassMessageFontgeFont:SetFont(
--- 		LSM:Fetch("font", C.db.profile.font),
--- 		C.db.profile.chat.font.size,
--- 		C.db.profile.chat.font.outline and "OUTLINE" or ""
--- 	)
+function E:UpdateMessageFont(id)
+	local messageFont = _G["LSGlassMessageFont" .. id]
+	messageFont:SetFont(
+		LSM:Fetch("font", C.db.profile.font),
+		C.db.profile.chat[id].font.size,
+		C.db.profile.chat[id].font.outline and "OUTLINE" or ""
+	)
 
--- 	local font = LSGlassMessageFont:GetFont()
--- 	if not font then
--- 		:SetFont(
--- 			LSM:Fetch("font"),
--- 			C.db.profile.chat.font.size,
--- 			C.db.profile.chat.font.outline and "OUTLINE" or ""
--- 		)
--- 	end
+	local font = messageFont:GetFont()
+	if not font then
+		-- a corrupt, missing, or misplaced font was supplied, reset it
+		messageFont:SetFont(
+			LSM:Fetch("font"),
+			C.db.profile.chat.font[id].size,
+			C.db.profile.chat.font[id].outline and "OUTLINE" or ""
+		)
+	end
 
--- 	if C.db.profile.chat.font.shadow then
--- 		LSGlassMessageFont:SetShadowOffset(1, -1)
--- 	else
--- 		LSGlassMessageFont:SetShadowOffset(0, 0)
--- 	end
--- end
+	if C.db.profile.chat[id].font.shadow then
+		messageFont:SetShadowOffset(1, -1)
+	else
+		messageFont:SetShadowOffset(0, 0)
+	end
 
--- function E:UpdateEditBoxFont()
--- 	LSGlassEditBoxFont:SetFont(
--- 		LSM:Fetch("font", C.db.profile.font),
--- 		C.db.profile.edit.font.size,
--- 		C.db.profile.edit.font.outline and "OUTLINE" or ""
--- 	)
+	messageFont:SetJustifyH("LEFT")
+	messageFont:SetJustifyV("MIDDLE")
+end
 
--- 	local font = LSGlassEditBoxFont:GetFont()
--- 	if not font then
--- 		LSGlassEditBoxFont:SetFont(
--- 			LSM:Fetch("font"),
--- 			C.db.profile.edit.font.size,
--- 			C.db.profile.edit.font.outline and "OUTLINE" or ""
--- 		)
--- 	end
+function E:UpdateMessageFonts()
+	for i = 1, 10 do
+		self:UpdateMessageFont(i)
+	end
+end
 
--- 	if C.db.profile.edit.font.shadow then
--- 		LSGlassEditBoxFont:SetShadowOffset(1, -1)
--- 	else
--- 		LSGlassEditBoxFont:SetShadowOffset(0, 0)
--- 	end
--- end
+function E:UpdateEditBoxFont()
+	LSGlassEditBoxFont:SetFont(
+		LSM:Fetch("font", C.db.profile.font),
+		C.db.profile.edit.font.size,
+		C.db.profile.edit.font.outline and "OUTLINE" or ""
+	)
+
+	local font = LSGlassEditBoxFont:GetFont()
+	if not font then
+		LSGlassEditBoxFont:SetFont(
+			LSM:Fetch("font"),
+			C.db.profile.edit.font.size,
+			C.db.profile.edit.font.outline and "OUTLINE" or ""
+		)
+	end
+
+	if C.db.profile.edit.font.shadow then
+		LSGlassEditBoxFont:SetShadowOffset(1, -1)
+	else
+		LSGlassEditBoxFont:SetShadowOffset(0, 0)
+	end
+
+	LSGlassEditBoxFont:SetJustifyH("LEFT")
+	LSGlassEditBoxFont:SetJustifyV("MIDDLE")
+end

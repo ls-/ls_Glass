@@ -50,6 +50,7 @@ read_globals = {
 	"GameFontNormalSmall",
 	"GameTooltip",
 	"GeneralDockManager",
+	"GetChatWindowInfo",
 	"GetLocale",
 	"GetTime",
 	"HideUIPanel",

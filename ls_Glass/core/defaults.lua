@@ -141,11 +141,11 @@ D.profile = {
 	},
 	dock = {
 		alpha = 0.8,
-		font = {
-			size = 12,
-			shadow = true,
-			outline = false,
-		},
+		-- font = {
+		-- 	size = 12,
+		-- 	shadow = true,
+		-- 	outline = false,
+		-- },
 		fade = {
 			enabled = true,
 		},

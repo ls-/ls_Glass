@@ -17,11 +17,12 @@ E.VER.string = C_AddOns.GetAddOnMetadata(addonName, "Version")
 E.VER.number = tonumber(E.VER.string:gsub("%D", ""), nil)
 
 local function updateCallback()
-	-- E:UpdateMessageFont()
+	E:UpdateEditBoxFont()
+	E:UpdateMessageFonts()
+
 	-- E:UpdateMessageLinesHeights()
 	-- E:UpdateMessageLinesBackgrounds()
 	-- E:UpdateBackdrops()
-	-- E:UpdateEditBoxFont()
 	-- E:UpdateEditBoxes()
 	-- E:ResetSlidingFrameDockFading()
 	-- E:ResetSlidingFrameChatFading()
@@ -48,130 +49,6 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 	C.db:RegisterCallback("OnProfileReset", updateCallback)
 	C.db:RegisterCallback("OnProfileShutdown", shutdownCallback)
 	C.db:RegisterCallback("OnDatabaseShutdown", shutdownCallback)
-
-	C.options = {
-		type = "group",
-		name = "|cffffffff" .. L["LS_GLASS"] .. "|r",
-		args = {
-			-- general = {},
-			about = {
-				order = 110,
-				type = "group",
-				name = L["INFO"],
-				args = {
-					desc = {
-						order = 1,
-						type = "description",
-						name = L["LS_GLASS"] .. " |cffffd200v|r" .. E.VER.string,
-						width = "full",
-						fontSize = "medium",
-					},
-					spacer_1 = {
-						order = 2,
-						type = "description",
-						name = " ",
-						width = "full",
-					},
-					support = {
-						order = 3,
-						type = "group",
-						name = L["SUPPORT"],
-						inline = true,
-						args = {
-							discord = {
-								order = 1,
-								type = "execute",
-								name = L["DISCORD"],
-								func = function()
-									E:ShowLinkCopyPopup("https://discord.gg/7QcJgQkDYD")
-								end,
-							},
-							github = {
-								order = 2,
-								type = "execute",
-								name = L["GITHUB"],
-								func = function()
-									E:ShowLinkCopyPopup("https://github.com/ls-/ls_Glass/issues")
-								end,
-							},
-						},
-					},
-					spacer_2 = {
-						order = 4,
-						type = "description",
-						name = " ",
-						width = "full",
-					},
-					downloads = {
-						order = 5,
-						type = "group",
-						name = L["DOWNLOADS"],
-						inline = true,
-						args = {
-							cf = {
-								order = 1,
-								type = "execute",
-								name = L["CURSEFORGE"],
-								func = function()
-									E:ShowLinkCopyPopup("https://www.curseforge.com/wow/addons/ls-glass")
-								end,
-							},
-							wago = {
-								order = 2,
-								type = "execute",
-								name = L["WAGO"],
-								func = function()
-									E:ShowLinkCopyPopup("https://addons.wago.io/addons/ls-glass")
-								end,
-							},
-						},
-					},
-					spacer_3 = {
-						order = 6,
-						type = "description",
-						name = " ",
-						width = "full",
-					},
-					CHANGELOG = {
-						order = 7,
-						type = "group",
-						name = L["CHANGELOG"],
-						inline = true,
-						args = {
-							latest = {
-								order = 1,
-								type = "description",
-								name = E.CHANGELOG,
-								width = "full",
-								fontSize = "medium",
-							},
-							spacer_1 = {
-								order = 2,
-								type = "description",
-								name = " ",
-								width = "full",
-							},
-							cf = {
-								order = 3,
-								type = "execute",
-								name = L["CHANGELOG_FULL"],
-								func = function()
-									E:ShowLinkCopyPopup("https://github.com/ls-/ls_Glass/blob/master/CHANGELOG.md")
-								end,
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-
-	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, C.options)
-	LibStub("AceConfigDialog-3.0"):SetDefaultSize(addonName, 1024, 768)
-
-	C.options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(C.db, true)
-	C.options.args.profiles.order = 100
-	C.options.args.profiles.desc = nil
 
 	E:RegisterEvent("PLAYER_LOGIN", function()
 		E:CreateFonts()
@@ -332,6 +209,10 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 			if not InCombatLockdown() then
 				HideUIPanel(SettingsPanel)
 
+				if not C.options then
+					E:CreateConfig()
+				end
+
 				LibStub("AceConfigDialog-3.0"):Open(addonName)
 			end
 		end)
@@ -345,6 +226,10 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 			registerForAnyClick = true,
 			func = function()
 				if not InCombatLockdown() then
+					if not C.options then
+						E:CreateConfig()
+					end
+
 					LibStub("AceConfigDialog-3.0"):Open(addonName)
 				end
 			end,
@@ -359,6 +244,10 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 		SlashCmdList["LSGLASS"] = function(msg)
 			if msg == "" then
 				if not InCombatLockdown() then
+					if not C.options then
+						E:CreateConfig()
+					end
+
 					LibStub("AceConfigDialog-3.0"):Open(addonName)
 				end
 			end
