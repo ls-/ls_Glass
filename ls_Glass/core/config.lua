@@ -7,14 +7,6 @@ local next = _G.next
 local tonumber = _G.tonumber
 local type = _G.type
 
-if not DevTool then
-	function DevTool_AddData() end
-else
-	function DevTool_AddData(...)
-		DevTool:AddData(...)
-	end
-end
-
 -- Mine
 local showLinkCopyPopup
 do
