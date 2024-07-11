@@ -63,7 +63,7 @@ local TAB_TEXTURES = {
 
 function E:HandleChatTab(frame)
 	if not handledTabs[frame] then
-		frame.Backdrop = E:CreateBackdrop(frame)
+		frame.Backdrop = E:CreateBackdrop(frame, C.db.profile.dock.alpha)
 
 		hooksecurefunc(frame, "SetPoint", chatTab_SetPoint)
 		frame:HookScript("OnDragStart", chatTab_OnDragStart)
@@ -155,7 +155,7 @@ local MINI_TAB_TEXTURES = {
 
 function E:HandleMinimizedTab(frame)
 	if not handledMiniTabs[frame] then
-		frame.Backdrop = E:CreateBackdrop(frame)
+		frame.Backdrop = E:CreateBackdrop(frame, C.db.profile.dock.alpha)
 
 		E:HandleMaximizeButton(_G[frame:GetName() .. "MaximizeButton"])
 
@@ -199,4 +199,12 @@ function E:HandleMinimizedTab(frame)
 	end
 
 	frame.conversationIcon:SetPoint("RIGHT", frame.Text, "LEFT", 0, 0)
+end
+
+function E:UpdateTabAlpha()
+	local alpha = C.db.profile.dock.alpha
+
+	for tab in next, handledTabs do
+		tab.Backdrop:UpdateAlpha(alpha)
+	end
 end

@@ -6,10 +6,6 @@ local _G = getfenv(0)
 local next = _G.next
 
 -- Mine
-local function fetchAlpha()
-	return C.db.profile.edit.alpha
-end
-
 local handledEditBoxes = {}
 
 local EDIT_BOX_TEXTURES = {
@@ -24,7 +20,7 @@ local EDIT_BOX_TEXTURES = {
 
 function E:HandleEditBox(frame)
 	if not handledEditBoxes[frame] then
-		frame.Backdrop = E:CreateBackdrop(frame, 0, 2, fetchAlpha)
+		frame.Backdrop = E:CreateBackdrop(frame, C.db.profile.edit.alpha, 0, 2)
 
 		handledEditBoxes[frame] = true
 	end
@@ -50,16 +46,27 @@ function E:HandleEditBox(frame)
 	frame.prompt:SetFontObject("LSGlassEditBoxFont")
 end
 
-function E:UpdateEditBoxes()
+function E:UpdateEditBoxPosition()
+	local isOnTop = C.db.profile.edit.position == "top"
+	local offset = C.db.profile.edit.offset
+
 	for editBox in next, handledEditBoxes do
 		editBox:ClearAllPoints()
 
-		if C.db.profile.edit.position == "top" then
-			editBox:SetPoint("TOPLEFT", editBox.chatFrame, "TOPLEFT", 0, C.db.profile.edit.offset)
-			editBox:SetPoint("TOPRIGHT", editBox.chatFrame, "TOPRIGHT", 0, C.db.profile.edit.offset)
+		if isOnTop then
+			editBox:SetPoint("TOPLEFT", editBox.chatFrame, "TOPLEFT", 0, offset)
+			editBox:SetPoint("TOPRIGHT", editBox.chatFrame, "TOPRIGHT", 0, offset)
 		else
-			editBox:SetPoint("BOTTOMLEFT", editBox.chatFrame, "BOTTOMLEFT", 0, -C.db.profile.edit.offset)
-			editBox:SetPoint("BOTTOMRIGHT", editBox.chatFrame, "BOTTOMRIGHT", 0, -C.db.profile.edit.offset)
+			editBox:SetPoint("BOTTOMLEFT", editBox.chatFrame, "BOTTOMLEFT", 0, -offset)
+			editBox:SetPoint("BOTTOMRIGHT", editBox.chatFrame, "BOTTOMRIGHT", 0, -offset)
 		end
+	end
+end
+
+function E:UpdateEditBoxAlpha()
+	local alpha = C.db.profile.edit.alpha
+
+	for editBox in next, handledEditBoxes do
+		editBox.Backdrop:UpdateAlpha(alpha)
 	end
 end

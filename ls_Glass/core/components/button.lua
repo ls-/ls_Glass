@@ -4,6 +4,7 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 -- Lua
 local _G = getfenv(0)
 local hooksecurefunc = _G.hooksecurefunc
+local next = _G.next
 local t_remove = _G.table.remove
 local tonumber = _G.tonumber
 
@@ -12,7 +13,7 @@ local handledbuttons = {}
 
 local function handleButton(frame, ...)
 	if not handledbuttons[frame] then
-		frame.Backdrop = E:CreateBackdrop(frame)
+		frame.Backdrop = E:CreateBackdrop(frame, C.db.profile.dock.alpha)
 		frame.HighlightLeft = frame:CreateTexture(nil, "HIGHLIGHT")
 		frame.HighlightMiddle = frame:CreateTexture(nil, "HIGHLIGHT")
 		frame.HighlightRight = frame:CreateTexture(nil, "HIGHLIGHT")
@@ -198,4 +199,12 @@ function E:HandleTTSButton(frame)
 	parent:SetParent(ChatFrame1.buttonFrame)
 	parent:ClearAllPoints()
 	parent:SetPoint("TOPRIGHT", ChatFrameMenuButton, "BOTTOMRIGHT", 0, -1)
+end
+
+function E:UpdateButtonAlpha()
+	local alpha = C.db.profile.dock.alpha
+
+	for button in next, handledbuttons do
+		button.Backdrop:UpdateAlpha(alpha)
+	end
 end

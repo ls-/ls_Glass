@@ -21,6 +21,7 @@ L["ENABLE"] = _G.ENABLE
 L["GENERAL"] = _G.GENERAL_LABEL
 L["INFO"] = "|cffe0bc5b" .. _G.INFO .. "|r"
 L["OKAY"] = _G.OKAY
+L["RESET_TO_DEFAULT"] = _G.RESET_TO_DEFAULT
 
 -- Require translation
 L["BACKGROUND_ALPHA"] = "Background Opacity"
@@ -44,8 +45,10 @@ L["TOP"] = "Top"
 L["X_PADDING"] = "Horizontal Padding"
 L["Y_PADDING"] = "Vertical Padding"
 
-L["FADE_IN_ON_CLICK"] = "Fade In On Click"
-L["SMOOTH_SCROLLING"] = "Smooth Scrolling"
+L["CONFIRM_RESET"] = "Do you wish to reset \"%s\"?"
+L["COPY_FROM"] = "Copy from"
 L["DOCK"] = "Dock"
 L["EDITBOX"] = "Edit Box"
 L["POSITION"] = "Position"
+L["SHOW_ON_CLICK"] = "Show On Click"
+L["SMOOTH_SCROLLING"] = "Smooth Scrolling"

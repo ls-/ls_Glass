@@ -3,21 +3,137 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
 -- Lua
 local _G = getfenv(0)
+local next = _G.next
 local tonumber = _G.tonumber
+local type = _G.type
+
+if not DevTool then
+	function DevTool_AddData() end
+else
+	function DevTool_AddData(...)
+		DevTool:AddData(...)
+	end
+end
 
 -- Mine
-local isInit = false
+local showLinkCopyPopup
+do
+	local link = ""
+
+	local popup = CreateFrame("Frame", nil, UIParent)
+	popup:Hide()
+	popup:SetPoint("CENTER", UIParent, "CENTER")
+	popup:SetSize(384, 78)
+	popup:EnableMouse(true)
+	popup:SetFrameStrata("TOOLTIP")
+	popup:SetFixedFrameStrata(true)
+	popup:SetFrameLevel(100)
+	popup:SetFixedFrameLevel(true)
+
+	local border = CreateFrame("Frame", nil, popup, "DialogBorderTranslucentTemplate")
+	border:SetAllPoints(popup)
+
+	local editBox = CreateFrame("EditBox", nil, popup, "InputBoxTemplate")
+	editBox:SetHeight(32)
+	editBox:SetPoint("TOPLEFT", 22, -10)
+	editBox:SetPoint("TOPRIGHT", -16, -10)
+	editBox:SetScript("OnChar", function(self)
+		self:SetText(link)
+		self:HighlightText()
+	end)
+	editBox:SetScript("OnMouseUp", function(self)
+		self:HighlightText()
+	end)
+	editBox:SetScript("OnEscapePressed", function()
+		popup:Hide()
+	end)
+
+	local button = CreateFrame("Button", nil, popup, "UIPanelButtonNoTooltipTemplate")
+	button:SetText(L["OKAY"])
+	button:SetSize(90, 22)
+	button:SetPoint("BOTTOM", 0, 16)
+	button:SetScript("OnClick", function()
+		popup:Hide()
+	end)
+
+	popup:SetScript("OnHide", function()
+		link = ""
+		editBox:SetText(link)
+	end)
+	popup:SetScript("OnShow", function()
+		editBox:SetText(link)
+		editBox:SetFocus()
+		editBox:HighlightText()
+	end)
+
+	function showLinkCopyPopup(text)
+		popup:Hide()
+		link = text
+		popup:Show()
+	end
+end
+
+local function configReset(info)
+	local option = C.options
+	for i = 1, #info - 1 do
+		option = option.args[info[i]]
+	end
+
+	local name = option.name
+	if type(option.name) == "function" then
+		name = option.name({info[#info - 1]})
+	end
+
+	return L["CONFIRM_RESET"]:format(name)
+end
+
+local function copyOptions(src, dest, ignoredKeys)
+	for k, v in next, dest do
+		if not (ignoredKeys and ignoredKeys[k]) then
+			if src[k] ~= nil then
+				if type(v) == "table" then
+					if next(v) and type(src[k]) == "table" then
+						copyOptions(src[k], v, ignoredKeys)
+					end
+				else
+					if type(v) == type(src[k]) then
+						dest[k] = src[k]
+					end
+				end
+			end
+		end
+	end
+end
 
 local function getChatFrameName(info)
 	local id = tonumber(info[#info])
 	return GetChatWindowInfo(id)
 end
 
+local function isChatFrameShown(id)
+	local _, _, _, _, _, _, isShown, _, isDocked = GetChatWindowInfo(id)
+	return isShown or (not isShown and isDocked)
+end
+
 local function isChatFrameHidden(info)
 	local id = tonumber(info[#info])
-	local _, _, _, _, _, _, isShown, _, isDocked = GetChatWindowInfo(id)
+	return not isChatFrameShown(id)
+end
 
-	return not (isShown or (not isShown and isDocked))
+local function getChatOptionsForCopy(id)
+	local tabs = {}
+
+	for i = 1, 10 do
+		if i ~= id and i ~= 2 then
+			if isChatFrameShown(i) then
+				tabs[i] = GetChatWindowInfo(i)
+			else
+				break
+			end
+		end
+	end
+
+	return tabs
 end
 
 local function createChatFrameConfig(id, order)
@@ -30,8 +146,47 @@ local function createChatFrameConfig(id, order)
 			return C.db.profile.chat[id][info[#info]]
 		end,
 		args = {
-			alpha = {
+			reset = {
+				type = "execute",
 				order = 1,
+				name = L["RESET_TO_DEFAULT"],
+				confirm = configReset,
+				hidden = false,
+				func = function()
+					copyOptions(D.profile.chat[id], C.db.profile.chat[id])
+
+					E:UpdateMessageFont(id)
+					E:ForMessageLinePool(id, "UpdatePadding")
+					E:ForMessageLinePool(id, "UpdateHeight")
+					E:ForMessageLinePool(id, "UpdateGradientBackgroundAlpha")
+				end,
+			},
+			copy = {
+				order = 2,
+				type = "select",
+				name = L["COPY_FROM"],
+				hidden = false,
+				values = function()
+					return getChatOptionsForCopy(id)
+				end,
+				get = function() end,
+				set = function(_, value)
+					copyOptions(C.db.profile.chat[value], C.db.profile.chat[id])
+
+					E:UpdateMessageFont(id)
+					E:ForMessageLinePool(id, "UpdatePadding")
+					E:ForMessageLinePool(id, "UpdateHeight")
+					E:ForMessageLinePool(id, "UpdateGradientBackgroundAlpha")
+				end,
+			},
+			spacer_1 = {
+				order = 9,
+				type = "description",
+				name = " ",
+				hidden = false,
+			},
+			alpha = {
+				order = 10,
 				type = "range",
 				name = L["BACKGROUND_ALPHA"],
 				hidden = false,
@@ -46,7 +201,7 @@ local function createChatFrameConfig(id, order)
 			},
 			-- solid = {},
 			x_padding = {
-				order = 3,
+				order = 13,
 				type = "range",
 				name = L["X_PADDING"],
 				hidden = false,
@@ -60,7 +215,7 @@ local function createChatFrameConfig(id, order)
 				end,
 			},
 			y_padding = {
-				order = 4,
+				order = 14,
 				type = "range",
 				name = L["Y_PADDING"],
 				hidden = false,
@@ -74,14 +229,14 @@ local function createChatFrameConfig(id, order)
 					end
 				end,
 			},
-			spacer_1 = {
-				order = 9,
+			spacer_2 = {
+				order = 19,
 				type = "description",
 				name = " ",
 				hidden = false,
 			},
 			font = {
-				order = 10,
+				order = 20,
 				type = "group",
 				inline = true,
 				name = L["FONT"],
@@ -119,6 +274,8 @@ local function createChatFrameConfig(id, order)
 		},
 	}
 end
+
+local isInit = false
 
 function E:CreateConfig()
 	if isInit then return end
@@ -190,7 +347,9 @@ function E:CreateConfig()
 									if C.db.profile.dock.alpha ~= value then
 										C.db.profile.dock.alpha = value
 
-										E:UpdateBackdrops()
+										E:UpdateTabAlpha()
+										E:UpdateScrollButtonAlpha()
+										E:UpdateButtonAlpha()
 									end
 								end,
 							},
@@ -205,7 +364,9 @@ function E:CreateConfig()
 									if C.db.profile.dock.fade.enabled ~= value then
 										C.db.profile.dock.fade.enabled = value
 
-										-- E:ResetSlidingFrameDockFading()
+										for i = 1, 10 do
+											E:ForChatFrame(i, "FadeInChatWidgets")
+										end
 									end
 								end,
 							},
@@ -234,7 +395,7 @@ function E:CreateConfig()
 									if C.db.profile.edit.alpha ~= value then
 										C.db.profile.edit.alpha = value
 
-										-- E:UpdateBackdrops()
+										E:UpdateEditBoxAlpha()
 									end
 								end,
 							},
@@ -250,7 +411,7 @@ function E:CreateConfig()
 									if C.db.profile.edit.position ~= value then
 										C.db.profile.edit.position = value
 
-										-- E:UpdateEditBoxes()
+										E:UpdateEditBoxPosition()
 									end
 								end,
 							},
@@ -260,10 +421,10 @@ function E:CreateConfig()
 								name = L["OFFSET"],
 								min = 0, max = 64, step = 1,
 								set = function(_, value)
-									if C.db.profile.dock.offset ~= value then
-										C.db.profile.dock.offset = value
+									if C.db.profile.edit.offset ~= value then
+										C.db.profile.edit.offset = value
 
-										-- E:UpdateEditBoxes()
+										E:UpdateEditBoxPosition()
 									end
 								end,
 							},
@@ -322,6 +483,11 @@ function E:CreateConfig()
 						get = function(info)
 							return C.db.profile.chat[info[#info]]
 						end,
+						set = function(info, value)
+							if C.db.profile.chat[info[#info]] ~= value then
+								C.db.profile.chat[info[#info]] = value
+							end
+						end,
 						args = {
 							tooltips = {
 								order = 1,
@@ -343,7 +509,9 @@ function E:CreateConfig()
 								set = function(_, value)
 									C.db.profile.chat.buttons.up_and_down = value
 
-									-- E:ToggleScrollButtons()
+									for i = 1, 10 do
+										E:ForChatFrame(i, "ToggleScrollButtons")
+									end
 								end,
 							},
 							spacer_1 = {
@@ -370,24 +538,29 @@ function E:CreateConfig()
 
 												if value then
 													C.db.profile.chat.fade.click = false
-												end
 
-												-- E:ResetSlidingFrameDockFading()
+													for i = 1, 10 do
+														E:ForChatFrame(i, "ResetFadingTimer")
+														E:ForChatFrame(i, "UpdateFading")
+													end
+												else
+													for i = 1, 10 do
+														E:ForChatFrame(i, "FadeInMessages")
+													end
+												end
 											end
 										end,
 									},
 									click = {
 										order = 2,
 										type = "toggle",
-										name = L["FADE_IN_ON_CLICK"],
+										name = L["SHOW_ON_CLICK"],
 										disabled = function()
 											return not C.db.profile.chat.fade.enabled
 										end,
 										set = function(_, value)
 											if C.db.profile.chat.fade.click ~= value then
 												C.db.profile.chat.fade.click = value
-
-												-- E:ResetSlidingFrameDockFading()
 											end
 										end,
 									},
@@ -398,6 +571,16 @@ function E:CreateConfig()
 										min = 10, max = 240, step = 1, bigStep = 10,
 										disabled = function()
 											return not C.db.profile.chat.fade.enabled
+										end,
+										set = function(_, value)
+											if C.db.profile.chat.fade.out_delay ~= value then
+												C.db.profile.chat.fade.out_delay = value
+
+												for i = 1, 10 do
+													E:ForChatFrame(i, "ResetFadingTimer")
+													E:ForChatFrame(i, "UpdateFading")
+												end
+											end
 										end,
 									},
 								},
@@ -450,7 +633,7 @@ function E:CreateConfig()
 								type = "execute",
 								name = L["DISCORD"],
 								func = function()
-									E:ShowLinkCopyPopup("https://discord.gg/7QcJgQkDYD")
+									showLinkCopyPopup("https://discord.gg/7QcJgQkDYD")
 								end,
 							},
 							github = {
@@ -458,7 +641,7 @@ function E:CreateConfig()
 								type = "execute",
 								name = L["GITHUB"],
 								func = function()
-									E:ShowLinkCopyPopup("https://github.com/ls-/ls_Glass/issues")
+									showLinkCopyPopup("https://github.com/ls-/ls_Glass/issues")
 								end,
 							},
 						},
@@ -480,7 +663,7 @@ function E:CreateConfig()
 								type = "execute",
 								name = L["CURSEFORGE"],
 								func = function()
-									E:ShowLinkCopyPopup("https://www.curseforge.com/wow/addons/ls-glass")
+									showLinkCopyPopup("https://www.curseforge.com/wow/addons/ls-glass")
 								end,
 							},
 							wago = {
@@ -488,7 +671,7 @@ function E:CreateConfig()
 								type = "execute",
 								name = L["WAGO"],
 								func = function()
-									E:ShowLinkCopyPopup("https://addons.wago.io/addons/ls-glass")
+									showLinkCopyPopup("https://addons.wago.io/addons/ls-glass")
 								end,
 							},
 						},
@@ -523,7 +706,7 @@ function E:CreateConfig()
 								type = "execute",
 								name = L["CHANGELOG_FULL"],
 								func = function()
-									E:ShowLinkCopyPopup("https://github.com/ls-/ls_Glass/blob/master/CHANGELOG.md")
+									showLinkCopyPopup("https://github.com/ls-/ls_Glass/blob/master/CHANGELOG.md")
 								end,
 							},
 						},

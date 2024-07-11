@@ -9,7 +9,6 @@ local m_max = _G.math.max
 local m_min = _G.math.min
 local next = _G.next
 local pcall = _G.pcall
-local t_insert = _G.table.insert
 local t_wipe = _G.table.wipe
 
 -- Mine
@@ -828,6 +827,8 @@ function object_proto:RefreshActive(startIndex, maxPixels)
 end
 
 function object_proto:FadeInMessages()
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+
 	self:ResetFadingTimer()
 	self:RefreshActive(self:GetFirstActiveMessageID())
 	self:UpdateFading()
@@ -857,6 +858,11 @@ function object_proto:FastForward()
 			end
 		end
 	end
+end
+
+function object_proto:ToggleScrollButtons()
+	self.ScrollDownButton:SetShown(C.db.profile.chat.buttons.up_and_down)
+	self.ScrollUpButton:SetShown(C.db.profile.chat.buttons.up_and_down)
 end
 
 local DOWN = 1
@@ -1135,7 +1141,7 @@ do
 			-- backdrop:SetBackdropColor(0, 0, 0, 0.4)
 			-- backdrop:SetBackdropBorderColor(0, 0, 0, 0.4)
 
-			t_insert(frames, frame)
+			frames[curID] = frame
 
 			return frame
 		end,
@@ -1161,45 +1167,10 @@ do
 		end
 	end
 
-	-- function E:ResetSlidingFrameDockFading()
-	-- 	for _, frame in next, frames do
-	-- 		if frame:IsShown() then
-	-- 			frame.isMouseOver = nil
-
-	-- 			E:StopFading(frame.ChatTab, 1)
-	-- 			E:StopFading(frame.ButtonFrame, 1)
-	-- 		end
-	-- 	end
-
-	-- 	-- ? I don't like this... Should I attach to the first frame?
-	-- 	LSGlassUpdater.isMouseOver = nil
-
-	-- 	E:StopFading(GeneralDockManager, 1)
-	-- end
-
-	-- function E:ResetSlidingFrameChatFading()
-	-- 	for _, frame in next, frames do
-	-- 		if frame:IsShown() then
-	-- 			frame.isMouseOver = nil
-
-	-- 			for _, visibleLine in next, frame.activeMessages do
-	-- 				if visibleLine:IsShown() then
-	-- 					E:StopFading(visibleLine, 1)
-	-- 				end
-	-- 			end
-
-	-- 			if frame:GetFirstVisibleMessageID() ~= 0 then
-	-- 				frame.ScrollToBottomButton:Show()
-	-- 				E:StopFading(frame.ScrollToBottomButton, 1)
-	-- 			end
-	-- 		end
-	-- 	end
-	-- end
-
-	-- function E:ToggleScrollButtons()
-	-- 	for _, frame in next, frames do
-	-- 		frame.ScrollDownButton:SetShown(C.db.profile.chat.buttons.up_and_down)
-	-- 		frame.ScrollUpButton:SetShown(C.db.profile.chat.buttons.up_and_down)
-	-- 	end
-	-- end
+	function E:ForChatFrame(id, method, ...)
+		local frame = frames[id]
+		if frame and frame[method] then
+			frame[method](frame, ...)
+		end
+	end
 end
