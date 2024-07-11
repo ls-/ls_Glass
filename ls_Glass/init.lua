@@ -15,13 +15,20 @@ E.VER.number = tonumber(E.VER.string:gsub("%D", ""), nil)
 local function updateCallback()
 	E:UpdateEditBoxFont()
 	E:UpdateMessageFonts()
+	E:UpdateTabAlpha()
+	E:UpdateScrollButtonAlpha()
+	E:UpdateButtonAlpha()
 
-	-- E:UpdateMessageLinesHeights()
-	-- E:UpdateMessageLinesBackgrounds()
-	-- E:UpdateBackdrops()
-	-- E:UpdateEditBoxes()
-	-- E:ResetSlidingFrameDockFading()
-	-- E:ResetSlidingFrameChatFading()
+	for i = 1, 10 do
+		E:ForMessageLinePool(i, "UpdateWidth")
+		E:ForMessageLinePool(i, "UpdateHeight")
+		E:ForMessageLinePool(i, "UpdateGradientBackgroundAlpha")
+		E:ForMessageLinePool(i, "UpdatePadding")
+
+		E:ForChatFrame(i, "ToggleScrollButtons")
+		E:ForChatFrame(i, "FadeInChatWidgets")
+		E:ForChatFrame(i, "FadeInMessages")
+	end
 end
 
 local function shutdownCallback()
