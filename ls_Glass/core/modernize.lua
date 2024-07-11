@@ -25,6 +25,7 @@ function E:Modernize(data, name, key)
 			data.version = 10000003
 		end
 
+		--> 100002.01
 		if data.version < 10000201 then
 			if data.dock then
 				if data.dock.edit then

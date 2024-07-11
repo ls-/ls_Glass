@@ -301,7 +301,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 	self.ScrollChild:SetSize(width, height)
 
-	-- it's safer to hide the string container than the chat frame itself
+	-- ! it's safer to hide the string container than the chat frame itself
 	chatFrame.FontStringContainer:Hide()
 
 	if not hookedChatFrames[chatFrame] then
