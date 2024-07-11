@@ -4,7 +4,6 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 -- Lua
 local _G = getfenv(0)
 local pairs = _G.pairs
-local t_insert = _G.table.insert
 
 -- Mine
 local FADE_IN_DURATION = 0.2
