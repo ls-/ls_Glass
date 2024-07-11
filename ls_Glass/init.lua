@@ -8,10 +8,6 @@ local next = _G.next
 local tonumber = _G.tonumber
 
 -- Mine
-local DOCK_FADE_IN_DURATION = 0.1
-local DOCK_FADE_OUT_DURATION = 0.6
-local DOCK_FADE_OUT_DELAY = 4
-
 E.VER = {}
 E.VER.string = C_AddOns.GetAddOnMetadata(addonName, "Version")
 E.VER.number = tonumber(E.VER.string:gsub("%D", ""), nil)
@@ -120,26 +116,6 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 			end
 		end)
 
-		local alertingTabs = {}
-
-		hooksecurefunc("FCFTab_UpdateAlpha", function(chatFrame)
-			local tab = _G[chatFrame:GetName() .. "Tab"]
-			if tab then
-				alertingTabs[tab] = tab.alerting and true or nil
-
-				local isAlerting = false
-				for _, v in next, alertingTabs do
-					isAlerting = isAlerting or v
-				end
-
-				if isAlerting then
-					E:FadeIn(GeneralDockManager, DOCK_FADE_IN_DURATION)
-				end
-
-				LSGlassUpdater.isAlerting = isAlerting
-			end
-		end)
-
 		-- ? consider moving it elsewhere
 		local updater = CreateFrame("Frame", "LSGlassUpdater", UIParent)
 		updater:SetScript("OnUpdate", function (self, elapsed)
@@ -151,28 +127,6 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 
 				for frame in next, tempChatFrames do
 					frame:OnFrame()
-				end
-
-				if C.db.profile.dock.fade.enabled then
-					-- these use custom values for fading in/out because Blizz fade chat as well
-					-- so I'm trying not to interfere with that
-					-- ! DO NOT SHOW/HIDE gdm, it'll taint EVERYTHING, just adjust its alpha
-					local isMouseOver = ChatFrame1:IsMouseOver(26, -36, -36, 0)
-					if self.isMouseOver ~= isMouseOver then
-						self.isMouseOver = isMouseOver
-
-						if isMouseOver then
-							E:FadeIn(GeneralDockManager, DOCK_FADE_IN_DURATION, function()
-								if self.isMouseOver then
-									E:StopFading(GeneralDockManager, 1)
-								elseif not self.isAlerting then
-									E:FadeOut(GeneralDockManager, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
-								end
-							end)
-						elseif not self.isAlerting then
-							E:FadeOut(GeneralDockManager, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
-						end
-					end
 				end
 
 				self.elapsed = 0

@@ -193,25 +193,21 @@ local function chatFrame_OnHyperlinkLeaveHook(self)
 	end
 end
 
--- I track it because I need to distinguish between frames being hidden and then shown due to
--- cinematics, loading screens, etc and the user switching between docked chat frames
--- local selectedSlidingFrame
+local alertingFrames = {}
 
--- hooksecurefunc("FCF_SelectDockFrame", function(chatFrame)
--- 	local slidingFrame = E:GetSlidingFrameForChatFrame(chatFrame)
--- 	if slidingFrame then
--- 		selectedSlidingFrame = slidingFrame
--- 		print("FCF_SelectDockFrame", chatFrame:GetDebugName())
--- 	end
--- end)
+local function isAnyChatAlerting()
+	return not not next(alertingFrames)
+end
 
--- hooksecurefunc("FCFDock_SelectWindow", function(_, chatFrame)
--- 	local slidingFrame = E:GetSlidingFrameForChatFrame(chatFrame)
--- 	if slidingFrame then
--- 		selectedSlidingFrame = slidingFrame
--- 		-- print("FCFDock_SelectWindow", chatFrame:GetDebugName())
--- 	end
--- end)
+hooksecurefunc("FCF_StartAlertFlash", function(chatFrame)
+	alertingFrames[chatFrame] = true
+
+	E:FadeIn(GeneralDockManager, DOCK_FADE_IN_DURATION)
+end)
+
+hooksecurefunc("FCF_StopAlertFlash", function(chatFrame)
+	alertingFrames[chatFrame] = nil
+end)
 
 ---------------------------
 -- SLIDING MESSAGE FRAME --
@@ -946,70 +942,101 @@ function object_proto:OnFrame()
 		self.numIncomingMessages = 0
 	end
 
+	self:UpdateChatWidgetFading()
+end
+
+function object_proto:FadeInChatWidgets()
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+
+	self.isMouseOver = nil
+
+	E:StopFading(self.ChatTab, 1)
+	E:StopFading(self.ButtonFrame, 1)
+	E:StopFading(self.ScrollDownButton, 1)
+	E:StopFading(self.ScrollUpButton, 1)
+
+	if self:GetID() == 1 then
+		E:StopFading(GeneralDockManager, 1)
+	end
+
+	self:UpdateChatWidgetFading()
+end
+
+function object_proto:UpdateChatWidgetFading()
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not C.db.profile.dock.fade.enabled then return end
+
 	local isMouseOver = self:IsMouseOver(26, -36, -36, 0)
 	if isMouseOver ~= self.isMouseOver then
 		self.isMouseOver = isMouseOver
 
+		-- ! DO NOT SHOW/HIDE tabs or gdm, it'll taint EVERYTHING, just adjust its alpha
 		if isMouseOver then
-			if C.db.profile.dock.fade.enabled then
-				-- these use custom values for fading in/out because Blizz fade chat as well
-				-- so I'm trying not to interfere with that
-				-- ! DO NOT SHOW/HIDE the tab, it'll taint EVERYTHING, just adjust its alpha
-				if not self.ChatFrame.isDocked then
-					E:FadeIn(self.ChatTab, DOCK_FADE_IN_DURATION, function()
-						if self.isMouseOver then
-							E:StopFading(self.ChatTab, 1)
-						else
-							E:FadeOut(self.ChatTab, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
-						end
-					end)
-				end
-
-				E:FadeIn(self.ButtonFrame, DOCK_FADE_IN_DURATION, function()
+			if self:GetID() == 1 then
+				E:FadeIn(GeneralDockManager, DOCK_FADE_IN_DURATION, function()
 					if self.isMouseOver then
-						E:StopFading(self.ButtonFrame, 1)
+						E:StopFading(GeneralDockManager, 1)
+					elseif not isAnyChatAlerting() then
+						E:FadeOut(GeneralDockManager, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+					end
+				end)
+			end
+
+			if not self.ChatFrame.isDocked then
+				E:FadeIn(self.ChatTab, DOCK_FADE_IN_DURATION, function()
+					if self.isMouseOver then
+						E:StopFading(self.ChatTab, 1)
 					else
-						E:FadeOut(self.ButtonFrame, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+						E:FadeOut(self.ChatTab, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+					end
+				end)
+			end
+
+			E:FadeIn(self.ButtonFrame, DOCK_FADE_IN_DURATION, function()
+				if self.isMouseOver then
+					E:StopFading(self.ButtonFrame, 1)
+				else
+					E:FadeOut(self.ButtonFrame, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+				end
+			end)
+
+			if C.db.profile.chat.buttons.up_and_down then
+				E:FadeIn(self.ScrollDownButton, DOCK_FADE_IN_DURATION, function()
+					if self.isMouseOver then
+						E:StopFading(self.ScrollDownButton, 1)
+					else
+						E:FadeOut(self.ScrollDownButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 					end
 				end)
 
-				if C.db.profile.chat.buttons.up_and_down then
-					E:FadeIn(self.ScrollDownButton, DOCK_FADE_IN_DURATION, function()
-						if self.isMouseOver then
-							E:StopFading(self.ScrollDownButton, 1)
-						else
-							E:FadeOut(self.ScrollDownButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
-						end
-					end)
-
-					E:FadeIn(self.ScrollUpButton, DOCK_FADE_IN_DURATION, function()
-						if self.isMouseOver then
-							E:StopFading(self.ScrollUpButton, 1)
-						else
-							E:FadeOut(self.ScrollUpButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
-						end
-					end)
-				end
+				E:FadeIn(self.ScrollUpButton, DOCK_FADE_IN_DURATION, function()
+					if self.isMouseOver then
+						E:StopFading(self.ScrollUpButton, 1)
+					else
+						E:FadeOut(self.ScrollUpButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+					end
+				end)
 			end
 		else
-			if C.db.profile.dock.fade.enabled then
-				-- these use custom values for fading in/out because Blizz fade chat as well
-				-- so I'm trying not to interfere with that
-				-- ! DO NOT SHOW/HIDE the tab, it'll taint EVERYTHING, just adjust its alpha
-				if not self.ChatFrame.isDocked then
-					if not self.isDragging then
-						E:FadeOut(self.ChatTab, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
-					else
-						E:StopFading(self.ChatTab, 1)
-					end
+			if self:GetID() == 1 then
+				if not isAnyChatAlerting() then
+					E:FadeOut(GeneralDockManager, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 				end
+			end
 
-				E:FadeOut(self.ButtonFrame, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
-
-				if C.db.profile.chat.buttons.up_and_down then
-					E:FadeOut(self.ScrollDownButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
-					E:FadeOut(self.ScrollUpButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+			if not self.ChatFrame.isDocked then
+				if not self.isDragging then
+					E:FadeOut(self.ChatTab, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+				else
+					E:StopFading(self.ChatTab, 1)
 				end
+			end
+
+			E:FadeOut(self.ButtonFrame, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+
+			if C.db.profile.chat.buttons.up_and_down then
+				E:FadeOut(self.ScrollDownButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+				E:FadeOut(self.ScrollUpButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 			end
 		end
 	end
