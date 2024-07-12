@@ -299,6 +299,7 @@ function E:CreateConfig()
 						order = 10,
 						type = "select",
 						name = L["FONT"],
+						width = 1.25,
 						dialogControl = "LSM30_Font",
 						values = LibStub("LibSharedMedia-3.0"):HashTable("font"),
 						get = function()
