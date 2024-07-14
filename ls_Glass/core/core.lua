@@ -190,7 +190,6 @@ do
 				data.initAlpha = data.initAlpha or object:GetAlpha()
 
 				object:SetAlpha(outCubic(data.fadeTimer, data.initAlpha, data.finalAlpha - data.initAlpha, data.duration))
-				-- object:SetAlpha(lerp(data.initAlpha, data.finalAlpha, data.fadeTimer / data.duration))
 
 				if data.fadeTimer >= data.duration then
 					remove(object)
