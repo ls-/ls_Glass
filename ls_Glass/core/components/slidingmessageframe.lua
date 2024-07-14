@@ -157,7 +157,7 @@ local function chatFrame_RemoveMessagesByPredicateHook(self)
 	end
 end
 
-local function chatFrame_OnHyperlinkEnterHook(self, link, text)
+local function chatFrame_OnHyperlinkEnterHook(self, link, text, fontString)
 	if C.db.profile.chat.tooltips then
 		local linkType = LinkUtil.SplitLinkData(link)
 		if linkType == "battlepet" then
@@ -177,7 +177,7 @@ local function chatFrame_OnHyperlinkEnterHook(self, link, text)
 
 	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
 	if slidingFrame then
-		slidingFrame.isMouseOverHyperlink = true
+		slidingFrame.mouseOverHyperlinkMessageLine = fontString:GetParent()
 	end
 end
 
@@ -187,7 +187,7 @@ local function chatFrame_OnHyperlinkLeaveHook(self)
 
 	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
 	if slidingFrame and slidingFrame:IsShown() then
-		slidingFrame.isMouseOverHyperlink = false
+		slidingFrame.mouseOverHyperlinkMessageLine = nil
 	end
 end
 
@@ -242,7 +242,6 @@ local object_proto = {
 	isScrolling = false,
 	isLayoutDirty = true,
 	isDisplayDirty = true,
-	isMouseOverHyperlink = false,
 	canProcessIncoming = true,
 	numIncomingMessages = 0,
 	numIncomingMessagesWhileScrolling = 0,
@@ -367,7 +366,7 @@ function object_proto:OnHide()
 	self.isLayoutDirty = true
 	self.isDisplayDirty = true
 	self.numIncomingMessages = 0
-	self.isMouseOverHyperlink = false
+	self.mouseOverHyperlinkMessageLine = nil
 	-- self.numIncomingMessagesWhileScrolling = 0
 end
 
@@ -936,7 +935,7 @@ function object_proto:NewIncomingMessage()
 end
 
 function object_proto:IsMouseOverHyperlink()
-	return self.isMouseOverHyperlink
+	return self.mouseOverHyperlinkMessageLine and self.mouseOverHyperlinkMessageLine:IsShown()
 end
 
 function object_proto:OnFrame()
