@@ -36,6 +36,7 @@ read_globals = {
 	"BattlePetTooltip",
 	"BattlePetToolTip_ShowLink",
 	"C_AddOns",
+	"C_Timer",
 	"ChatAlertFrame",
 	"ChatFontNormal",
 	"ChatFrame1",

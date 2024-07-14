@@ -102,15 +102,6 @@ end
 -- BLIZZ CHAT --
 ----------------
 
-local function chatFrame_StopMovingOrSizingHook(self)
-	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
-	if slidingFrame then
-		slidingFrame:RefreshIfNecessary()
-	end
-end
-
--- FIXME: When something changes UIParent's scale, this one fires, but it never reaches
--- RefreshIfNecessary
 local function chatFrame_OnSizeChanged(self, width, height)
 	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
 	if slidingFrame then
@@ -121,6 +112,14 @@ local function chatFrame_OnSizeChanged(self, width, height)
 
 		slidingFrame.isLayoutDirty = true
 		slidingFrame.isDisplayDirty = true
+
+		-- don't use StopMovingOrSizing, OnSizeChanged can fire for a multitude of reasons, but only one ends with
+		-- StopMovingOrSizing
+		if slidingFrame.refreshTimer then
+			slidingFrame.refreshTimer:Cancel()
+		end
+
+		slidingFrame.refreshTimer = C_Timer.NewTimer(0.5, slidingFrame.funcCache.refreshDisplay)
 	end
 end
 
@@ -306,7 +305,6 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 	if not hookedChatFrames[chatFrame] then
 		chatFrame:HookScript("OnSizeChanged", chatFrame_OnSizeChanged)
-		hooksecurefunc(chatFrame, "StopMovingOrSizing", chatFrame_StopMovingOrSizingHook)
 
 		hooksecurefunc(chatFrame, "SetShown", chatFrame_SetShownHook)
 		hooksecurefunc(chatFrame, "Hide", chatFrame_HideHook)
@@ -382,6 +380,7 @@ function object_proto:UpdateLayout()
 	if self.messageFramePool then
 		self.messageFramePool:ReleaseAll()
 		self.messageFramePool:UpdateWidth()
+		self.messageFramePool:UpdateHeight()
 	end
 end
 
@@ -1132,6 +1131,11 @@ do
 							frame.ScrollToBottomButton:Hide()
 						end)
 					end
+				end,
+				refreshDisplay = function()
+					frame:RefreshIfNecessary()
+
+					frame.refreshTimer = nil
 				end,
 			}
 
