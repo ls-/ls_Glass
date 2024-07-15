@@ -22,8 +22,8 @@ local function chatTab_OnDragStart(self)
 end
 
 -- called from FCFTab_OnUpdate
-hooksecurefunc("FCFTab_OnDragStop", function(chatFrame)
-	local frame = E:GetSlidingFrameForChatFrame(chatFrame)
+hooksecurefunc("FCFTab_OnDragStop", function(self)
+	local frame = E:GetSlidingFrameForChatFrame(_G["ChatFrame" .. self:GetID()])
 	if frame then
 		if frame.isMouseOver then
 			frame.isMouseOver = nil
