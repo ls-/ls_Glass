@@ -129,8 +129,7 @@ local function chatFrame_SetShownHook(self, isShown)
 
 		local slidingFrame = E:GetSlidingFrameForChatFrame(self)
 		if slidingFrame then
-			-- FCF indiscriminately calls :SetShown(true) when adding new tabs, I don't need to do
-			-- anything when that happens
+			-- FCF indiscriminately calls :SetShown(true) when adding new tabs, I don't need to do anything when that happens
 			if not slidingFrame:IsShown() then
 				slidingFrame:Show()
 			end
@@ -329,10 +328,6 @@ function object_proto:CaptureChatFrame(chatFrame)
 		self:SetFirstVisibleMessageID(1)
 	end
 
-	-- if chatFrame == DEFAULT_CHAT_FRAME then
-	-- 	selectedSlidingFrame = self
-	-- end
-
 	self:SetShown(chatFrame:IsShown())
 end
 
@@ -355,8 +350,8 @@ function object_proto:ReleaseChatFrame()
 end
 
 function object_proto:OnShow()
-	-- happens when additional docked chat frames were resized while hidden
-	-- OnSizeChanged will fire first followed by OnShow
+	-- happens when additional docked chat frames were resized while hidden OnSizeChanged will fire first followed by
+	-- OnShow
 	self:ResetFadingTimer()
 	self:RefreshIfNecessary()
 	self:ResetState()
@@ -491,8 +486,8 @@ function object_proto:UpdateFirstVisibleMessageInfo()
 		if messageLine:GetID() == 0 then break end
 		if messageLine:GetTop() < self:GetBottom() then break end
 
-		-- ideally, it should be messageLine:GetBottom() <= self:GetBottom() in here, but since I'm dealing with floats
-		-- I can forget about having equal values, instead subtract 0.01 to account for any rounding bs
+		-- ideally, it should be messageLine:GetBottom() <= self:GetBottom() in here, but since I'm dealing with floats I can
+		-- forget about having equal values, instead subtract 0.01 to account for any rounding bs
 		if messageLine:GetBottom() - 0.01 < self:GetBottom() and messageLine:GetTop() > self:GetBottom() then
 			self:SetFirstVisibleMessageInfo(messageLine:GetID(), messageLine:GetBottom() - self:GetBottom())
 
@@ -505,8 +500,8 @@ function object_proto:UpdateFirstVisibleMessageInfo()
 
 		if messageLine:GetID() == 0 then break end
 
-		-- ideally, it should be messageLine:GetBottom() <= self:GetBottom() in here, but since I'm dealing with floats
-		-- I can forget about having equal values, instead subtract 0.01 to account for any rounding bs
+		-- ideally, it should be messageLine:GetBottom() <= self:GetBottom() in here, but since I'm dealing with floats I can
+		-- forget about having equal values, instead subtract 0.01 to account for any rounding bs
 		if messageLine:GetBottom() - 0.01 < self:GetBottom() and messageLine:GetTop() > self:GetBottom() then
 			self:SetFirstVisibleMessageInfo(messageLine:GetID(), messageLine:GetBottom() - self:GetBottom())
 
@@ -579,9 +574,8 @@ function object_proto:GetFirstVisibleMessageOffset()
 	return self.firstVisibleMessageOffset or 0
 end
 
-function object_proto:SetLastActiveMessageInfo(id, index, offset)
+function object_proto:SetLastActiveMessageInfo(id, offset)
 	self.lastActiveMessageID = id
-	self.lastActiveMessageIndex = index
 	self.lastActiveMessageOffset = offset
 end
 
@@ -590,29 +584,18 @@ function object_proto:GetLastActiveMessageID()
 	return self.lastActiveMessageID or 0
 end
 
--- TODO: Remove
-function object_proto:GetLastActiveMessageIndex()
-	return self.lastActiveMessageIndex or 0
-end
-
 function object_proto:GetLastActiveMessageOffset()
 	return self.lastActiveMessageOffset or 0
 end
 
-function object_proto:SetLastBackfillMessageInfo(id, index, offset)
+function object_proto:SetLastBackfillMessageInfo(id, offset)
 	self.lastBackfillMessageID = id
-	self.lastBackfillMessageIndex = index
 	self.lastBackfillMessageOffset = offset
 end
 
 -- TODO: Remove
 function object_proto:GetLastBackfillMessageID()
 	return self.lastBackfillMessageID or 0
-end
-
--- TODO: Remove
-function object_proto:GetLastBackfillMessageIndex()
-	return self.lastBackfillMessageIndex or 0
 end
 
 function object_proto:GetLastBackfillMessageOffset()
@@ -626,7 +609,7 @@ function object_proto:RefreshBackfill(startIndex, maxLines, maxPixels, fadeIn)
 	maxLines = maxLines or 6
 	maxPixels = maxPixels or self:GetBottom()
 
-	self:SetLastBackfillMessageInfo(0, 0, 0)
+	self:SetLastBackfillMessageInfo(0, 0)
 
 	local lineIndex = 0
 	local messageID, messageInfo, messageLine
@@ -674,13 +657,12 @@ function object_proto:RefreshBackfill(startIndex, maxLines, maxPixels, fadeIn)
 	end
 
 	if lineIndex > 0 then
-		-- I want it to be a positive value, so flip it around instead of doing
-		-- messageLine:GetBottom() - self:GetBottom()
-		self:SetLastBackfillMessageInfo(messageID, lineIndex, self:GetBottom() - self.backfillMessages[lineIndex]:GetBottom())
+		-- I want it to be a positive value, so flip it around instead of doing messageLine:GetBottom() - self:GetBottom()
+		self:SetLastBackfillMessageInfo(messageID, self:GetBottom() - self.backfillMessages[lineIndex]:GetBottom())
 	end
 
-	-- just hide the excess, releasing and removing them here is expensive, they'll be taken care of
-	-- when the frame gets hidden
+	-- just hide the excess, releasing and removing them here is expensive, they'll be taken care of when the frame gets
+	-- hidden
 	for i = lineIndex + 1, #self.backfillMessages do
 		if self.backfillMessages[i]:GetID() ~= 0 then
 			self.backfillMessages[i]:ClearMessage()
@@ -760,7 +742,7 @@ function object_proto:RefreshActive(startIndex, maxPixels)
 
 	maxPixels = maxPixels or self:GetTop()
 
-	self:SetLastActiveMessageInfo(0, 0, 0)
+	self:SetLastActiveMessageInfo(0, 0)
 
 	local now = GetTime()
 	local lineIndex = 0
@@ -812,11 +794,11 @@ function object_proto:RefreshActive(startIndex, maxPixels)
 	end
 
 	if lineIndex > 0 then
-		self:SetLastActiveMessageInfo(messageID, lineIndex, self.activeMessages[lineIndex]:GetBottom() - self:GetBottom())
+		self:SetLastActiveMessageInfo(messageID, self.activeMessages[lineIndex]:GetBottom() - self:GetBottom())
 	end
 
-	-- just hide the excess, releasing and removing them here is expensive, they'll be taken care of
-	-- when the frame gets hidden
+	-- just hide the excess, releasing and removing them here is expensive, they'll be taken care of when the frame gets
+	-- hidden
 	for i = lineIndex + 1, #self.activeMessages do
 		if self.activeMessages[i]:GetID() ~= 0 then
 			self.activeMessages[i]:ClearMessage()

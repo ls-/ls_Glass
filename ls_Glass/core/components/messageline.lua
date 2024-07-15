@@ -65,8 +65,8 @@ do
 
 	-- SetHeight is taken, duh
 	function message_line_proto:AdjustHeight()
-		-- realistically, it should be height == 0, but given how this API works, it could be
-		-- 0.00000001 for all I know, it happens when nil or "" messages are being rendered
+		-- realistically, it should be height == 0, but given how this API works, it could be 0.00000001 for all I know
+		-- it happens when nil or "" messages are being rendered
 		local height = self.Text:GetStringHeight()
 		if height < 1 then
 			height = self.Text:GetLineHeight()

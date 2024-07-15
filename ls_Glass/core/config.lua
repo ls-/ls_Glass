@@ -97,6 +97,15 @@ local function copyOptions(src, dest, ignoredKeys)
 	end
 end
 
+local function createSpacer(order)
+	return {
+		order = order,
+		type = "description",
+		name = " ",
+		hidden = false,
+	}
+end
+
 local function getChatFrameName(info)
 	local id = tonumber(info[#info])
 	return GetChatWindowInfo(id)
@@ -171,12 +180,7 @@ local function createChatFrameConfig(id, order)
 					E:ForMessageLinePool(id, "UpdateGradientBackgroundAlpha")
 				end,
 			},
-			spacer_1 = {
-				order = 9,
-				type = "description",
-				name = " ",
-				hidden = false,
-			},
+			spacer_1 = createSpacer(9),
 			alpha = {
 				order = 10,
 				type = "range",
@@ -221,12 +225,7 @@ local function createChatFrameConfig(id, order)
 					end
 				end,
 			},
-			spacer_2 = {
-				order = 19,
-				type = "description",
-				name = " ",
-				hidden = false,
-			},
+			spacer_2 = createSpacer(19),
 			font = {
 				order = 20,
 				type = "group",
@@ -290,11 +289,7 @@ function E:CreateConfig()
 						imageWidth = 16,
 						imageHeight = 16,
 					},
-					spacer_1 = {
-						order = 9,
-						type = "description",
-						name = " ",
-					},
+					spacer_1 = createSpacer(9),
 					font = {
 						order = 10,
 						type = "select",
@@ -317,11 +312,7 @@ function E:CreateConfig()
 							end
 						end
 					},
-					spacer_2 = {
-						order = 19,
-						type = "description",
-						name = " ",
-					},
+					spacer_2 = createSpacer(19),
 					dock = {
 						order = 20,
 						type = "group",
@@ -365,11 +356,7 @@ function E:CreateConfig()
 							},
 						},
 					},
-					spacer_3 = {
-						order = 29,
-						type = "description",
-						name = " ",
-					},
+					spacer_3 = createSpacer(29),
 					edit = {
 						order = 30,
 						type = "group",
@@ -421,11 +408,7 @@ function E:CreateConfig()
 									end
 								end,
 							},
-							spacer_1 = {
-								order = 9,
-								type = "description",
-								name = " ",
-							},
+							spacer_1 = createSpacer(9),
 							font = {
 								order = 10,
 								type = "group",
@@ -462,11 +445,7 @@ function E:CreateConfig()
 							},
 						},
 					},
-					spacer_4 = {
-						order = 39,
-						type = "description",
-						name = " ",
-					},
+					spacer_4 = createSpacer(39),
 					chat = {
 						order = 40,
 						type = "group",
@@ -507,11 +486,7 @@ function E:CreateConfig()
 									end
 								end,
 							},
-							spacer_1 = {
-								order = 9,
-								type = "description",
-								name = " ",
-							},
+							spacer_1 = createSpacer(9),
 							fade = {
 								order = 10,
 								type = "group",
@@ -578,11 +553,7 @@ function E:CreateConfig()
 									},
 								},
 							},
-							spacer_2 = {
-								order = 19,
-								type = "description",
-								name = " ",
-							},
+							spacer_2 = createSpacer(19),
 							[ "1"] = createChatFrameConfig(1, 20), -- general
 							-- [ "2"] = createChatFrameConfig(2, 21), -- combat log
 							[ "3"] = createChatFrameConfig(3, 22), -- voice
@@ -609,12 +580,7 @@ function E:CreateConfig()
 						width = "full",
 						fontSize = "medium",
 					},
-					spacer_1 = {
-						order = 2,
-						type = "description",
-						name = " ",
-						width = "full",
-					},
+					spacer_1 = createSpacer(2),
 					support = {
 						order = 3,
 						type = "group",
@@ -639,12 +605,7 @@ function E:CreateConfig()
 							},
 						},
 					},
-					spacer_2 = {
-						order = 4,
-						type = "description",
-						name = " ",
-						width = "full",
-					},
+					spacer_2 = createSpacer(4),
 					downloads = {
 						order = 5,
 						type = "group",
@@ -669,12 +630,7 @@ function E:CreateConfig()
 							},
 						},
 					},
-					spacer_3 = {
-						order = 6,
-						type = "description",
-						name = " ",
-						width = "full",
-					},
+					spacer_3 = createSpacer(6),
 					CHANGELOG = {
 						order = 7,
 						type = "group",
@@ -688,12 +644,7 @@ function E:CreateConfig()
 								width = "full",
 								fontSize = "medium",
 							},
-							spacer_1 = {
-								order = 2,
-								type = "description",
-								name = " ",
-								width = "full",
-							},
+							spacer_1 = createSpacer(2),
 							cf = {
 								order = 3,
 								type = "execute",
