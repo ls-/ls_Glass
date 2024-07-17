@@ -3,37 +3,37 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
 -- Lua
 local _G = getfenv(0)
-local m_max = _G.math.max
 
 -- Mine
 function E:Modernize(data, name, key)
 	if not data.version then return end
 
 	if key == "profile" then
-		--> 100000.03
-		if data.version < 10000003 then
+		--> 110000.01
+		if data.version < 11000001 then
 			if data.chat then
-				if data.chat.x_padding then
-					data.chat.x_padding = m_max(1, data.chat.x_padding)
+				if data.chat.font then
+					data.chat[1] = {
+						font = {
+							size = data.chat.font.size,
+							shadow = data.chat.font.shadow,
+							outline = data.chat.font.outline,
+						},
+					}
+
+					data.chat.font = nil
 				end
 
-				if data.chat.y_padding then
-					data.chat.y_padding = m_max(1, data.chat.y_padding)
-				end
+				data.chat.alpha = nil
+				data.chat.fade = nil
+				data.chat.slide_in_duration = nil
+				data.chat.x_padding = nil
+				data.chat.y_padding = nil
 			end
 
-			data.version = 10000003
-		end
+			data.dock = nil
 
-		--> 100002.01
-		if data.version < 10000201 then
-			if data.dock then
-				if data.dock.edit then
-					data.dock.edit.offset = nil
-				end
-			end
-
-			data.version = 10000201
+			data.version = 11000001
 		end
 	end
 end
