@@ -5,14 +5,17 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 local _G = getfenv(0)
 local hooksecurefunc = _G.hooksecurefunc
 local m_ceil = _G.math.ceil
+local m_max = _G.math.max
 local m_min = _G.math.min
 local next = _G.next
-local t_insert = _G.table.insert
-local t_removemulti = _G.table.removemulti
+local pcall = _G.pcall
 local t_wipe = _G.table.wipe
 
 -- Mine
-local LibEasing = LibStub("LibEasing-1.0")
+local CHAT_FADE_OUT_DURATION = 0.6
+local DOCK_FADE_IN_DURATION = 0.1
+local DOCK_FADE_OUT_DURATION = 0.6
+local DOCK_FADE_OUT_DELAY = 4
 
 do
 	local map = {}
@@ -23,6 +26,75 @@ do
 
 	function E:SetSlidingFrameForChatFrame(chatFrame, slidingFrame)
 		map[chatFrame] = slidingFrame
+	end
+end
+
+--------------
+-- SMOOTHER --
+--------------
+
+local setSmoothScroll
+
+do
+	local SCROLL_DURATION = 0.2
+	local POST_SCROLL_DELAY = 0.1
+	local THRESHOLD = 1/120
+
+	local activeFrames = {}
+
+	local smoother = CreateFrame("Frame")
+
+	local function clamp(v)
+		if v > SCROLL_DURATION then
+			return SCROLL_DURATION
+		elseif v < 0 then
+			return 0
+		end
+
+		return v
+	end
+
+	-- out cubic
+	local function smoothFunc(t, b, c)
+		t = t / SCROLL_DURATION - 1
+		return c * (t ^ 3 + 1) + b
+	end
+
+	local elapsed = 0
+	local function onUpdate(_, e)
+		elapsed = elapsed + e
+		if elapsed >= THRESHOLD then
+			for frame, data in next, activeFrames do
+				data[2] = data[2] + elapsed
+				data[1](smoothFunc(clamp(data[2]), data[3], data[4]))
+
+				if data[2] >= SCROLL_DURATION + POST_SCROLL_DELAY then
+					if data[5] then
+						data[5]()
+					end
+
+					activeFrames[frame] = nil
+				end
+			end
+
+			if not next(activeFrames) then
+				smoother:SetScript("OnUpdate", nil)
+			end
+
+			elapsed = 0
+		end
+	end
+
+	function setSmoothScroll(frame, func, change, callback)
+		elapsed = THRESHOLD
+		-- func, time, start, change, callback
+		activeFrames[frame] = {func, 0, frame:GetVerticalScroll(), change, callback}
+
+		if not smoother:GetScript("OnUpdate") then
+			smoother:SetScript("OnUpdate", onUpdate)
+		end
+
+		return true
 	end
 end
 
@@ -38,23 +110,16 @@ local function chatFrame_OnSizeChanged(self, width, height)
 		slidingFrame:SetSize(width, height)
 		slidingFrame.ScrollChild:SetSize(width, height)
 
-		t_wipe(slidingFrame.visibleLines)
+		slidingFrame.isLayoutDirty = true
+		slidingFrame.isDisplayDirty = true
 
-		-- TODO: Refactor it later...
-		if slidingFrame.messageFramePool then
-			if slidingFrame:GetNumActiveMessageLines() > 0 then
-				slidingFrame:ReleaseAllMessageLines()
-			end
-
-			for _, messageLine in slidingFrame.messageFramePool:EnumerateInactive() do
-				messageLine:SetWidth(width - C.db.profile.chat.x_padding * 2)
-				messageLine:SetGradientBackgroundSize(E:Round(width * 0.1), E:Round(width * 0.4))
-			end
+		-- don't use StopMovingOrSizing, OnSizeChanged can fire for a multitude of reasons, but only one ends with
+		-- StopMovingOrSizing
+		if slidingFrame.refreshTimer then
+			slidingFrame.refreshTimer:Cancel()
 		end
 
-		slidingFrame:SetFirstMessageIndex(0)
-
-		slidingFrame.ScrollToBottomButton:Hide()
+		slidingFrame.refreshTimer = C_Timer.NewTimer(0.5, slidingFrame.funcCache.refreshDisplay)
 	end
 end
 
@@ -64,8 +129,7 @@ local function chatFrame_SetShownHook(self, isShown)
 
 		local slidingFrame = E:GetSlidingFrameForChatFrame(self)
 		if slidingFrame then
-			-- FCF indiscriminately calls :SetShown(true) when adding new tabs, I don't need to do
-			-- anything when that happens
+			-- FCF indiscriminately calls :SetShown(true) when adding new tabs, I don't need to do anything when that happens
 			if not slidingFrame:IsShown() then
 				slidingFrame:Show()
 			end
@@ -80,15 +144,67 @@ local function chatFrame_HideHook(self)
 	end
 end
 
-local function chatFrame_AddMessageHook(self)
+local function chatFrame_RemoveMessagesByPredicateHook(self)
 	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
 	if slidingFrame then
-		-- pull the data from history to account for any text processing done by other
-		-- addons
-		local data = slidingFrame:GetHistoryEntryAtIndex(1)
-		slidingFrame:AddMessage(self, data.message, data.r, data.g, data.b)
+		slidingFrame.isLayoutDirty = true
+		slidingFrame.isDisplayDirty = true
+
+		if slidingFrame:IsShown() then
+			slidingFrame:OnShow()
+		end
 	end
 end
+
+local function chatFrame_OnHyperlinkEnterHook(self, link, text, fontString)
+	if C.db.profile.chat.tooltips then
+		local linkType = LinkUtil.SplitLinkData(link)
+		if linkType == "battlepet" then
+			GameTooltip:SetOwner(self, "ANCHOR_CURSOR_RIGHT", 4, 2)
+			BattlePetToolTip_ShowLink(text)
+		elseif linkType ~= "trade" then
+			GameTooltip:SetOwner(self, "ANCHOR_CURSOR_RIGHT", 4, 2)
+
+			local isOK = pcall(GameTooltip.SetHyperlink, GameTooltip, link)
+			if not isOK then
+				GameTooltip:Hide()
+			else
+				GameTooltip:Show()
+			end
+		end
+	end
+
+	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
+	if slidingFrame then
+		slidingFrame.mouseOverHyperlinkMessageLine = fontString:GetParent()
+	end
+end
+
+local function chatFrame_OnHyperlinkLeaveHook(self)
+	BattlePetTooltip:Hide()
+	GameTooltip:Hide()
+
+	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
+	if slidingFrame and slidingFrame:IsShown() then
+		slidingFrame.mouseOverHyperlinkMessageLine = nil
+	end
+end
+
+local alertingFrames = {}
+
+local function isAnyChatAlerting()
+	return not not next(alertingFrames)
+end
+
+hooksecurefunc("FCF_StartAlertFlash", function(chatFrame)
+	alertingFrames[chatFrame] = true
+
+	E:FadeIn(GeneralDockManager, DOCK_FADE_IN_DURATION)
+end)
+
+hooksecurefunc("FCF_StopAlertFlash", function(chatFrame)
+	alertingFrames[chatFrame] = nil
+end)
 
 ---------------------------
 -- SLIDING MESSAGE FRAME --
@@ -119,7 +235,16 @@ local CHAT_FRAME_TEXTURES = {
 }
 
 local object_proto = {
-	firstMessageIndex = 0,
+	firstActiveMessageIndex = 0,
+	isAtBottom = true,
+	isAtTop = true,
+	isScrolling = false,
+	isLayoutDirty = true,
+	isDisplayDirty = true,
+	canProcessIncoming = true,
+	numIncomingMessages = 0,
+	numIncomingMessagesWhileScrolling = 0,
+	overrideFadeTimestamp = 0,
 }
 
 function object_proto:CaptureChatFrame(chatFrame)
@@ -153,6 +278,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 	chatFrame:SetClampRectInsets(0, 0, 0, 0)
 	chatFrame:SetResizeBounds(176, 64)
 	chatFrame:EnableMouse(false)
+	chatFrame:SetScript("OnUpdate", nil)
 
 	E:ForceHide(chatFrame.ScrollBar)
 	E:ForceHide(chatFrame.ScrollToBottomButton)
@@ -172,7 +298,7 @@ function object_proto:CaptureChatFrame(chatFrame)
 
 	self.ScrollChild:SetSize(width, height)
 
-	-- it's safer to hide the string container than the chat frame itself
+	-- ! it's safer to hide the string container than the chat frame itself
 	chatFrame.FontStringContainer:Hide()
 
 	if not hookedChatFrames[chatFrame] then
@@ -181,15 +307,25 @@ function object_proto:CaptureChatFrame(chatFrame)
 		hooksecurefunc(chatFrame, "SetShown", chatFrame_SetShownHook)
 		hooksecurefunc(chatFrame, "Hide", chatFrame_HideHook)
 
-		-- it's more convenient than hooking chatFrame.historyBuffer:PushFront()
-		hooksecurefunc(chatFrame, "AddMessage", chatFrame_AddMessageHook)
+		-- some addon devs tend to hook AddMessage to add filtering, so do it the hard way
+		hooksecurefunc(chatFrame.historyBuffer, "PushFront", function()
+			local slidingFrame = E:GetSlidingFrameForChatFrame(chatFrame)
+			if slidingFrame then
+				slidingFrame:NewIncomingMessage()
+			end
+		end)
+
+		-- redraw the frame if visible
+		hooksecurefunc(chatFrame, "RemoveMessagesByPredicate", chatFrame_RemoveMessagesByPredicateHook)
+
+		chatFrame:HookScript("OnHyperlinkEnter", chatFrame_OnHyperlinkEnterHook)
+		chatFrame:HookScript("OnHyperlinkLeave", chatFrame_OnHyperlinkLeaveHook)
 
 		hookedChatFrames[chatFrame] = true
 	end
 
-	-- load any messages already in the chat frame
-	for i = 1, chatFrame:GetNumMessages() do
-		self:AddMessage(chatFrame, chatFrame:GetMessageInfo(i))
+	if chatFrame:GetNumMessages() > 0 then
+		self:SetFirstVisibleMessageID(1)
 	end
 
 	self:SetShown(chatFrame:IsShown())
@@ -204,11 +340,8 @@ function object_proto:ReleaseChatFrame()
 		self.EditBox = nil
 		self.ButtonFrame = nil
 		self.historyBuffer = nil
-		t_wipe(self.visibleLines)
-		t_wipe(self.incomingMessages)
-
-		LibEasing:StopEasing(self:GetScrollingHandler())
-		self:SetScrollingHandler(nil)
+		t_wipe(self.activeMessages)
+		t_wipe(self.backfillMessages)
 
 		self:ReleaseAllMessageLines()
 		self:SetParent(UIParent)
@@ -217,19 +350,48 @@ function object_proto:ReleaseChatFrame()
 end
 
 function object_proto:OnShow()
-	LibEasing:StopEasing(self:GetScrollingHandler())
-	self:SetScrollingHandler(nil)
-	self:FastForward()
-
-	self.ScrollToBottomButton:Hide()
+	-- happens when additional docked chat frames were resized while hidden OnSizeChanged will fire first followed by
+	-- OnShow
+	self:ResetFadingTimer()
+	self:RefreshIfNecessary()
+	self:ResetState()
 end
 
 function object_proto:OnHide()
-	LibEasing:StopEasing(self:GetScrollingHandler())
-	self:SetScrollingHandler(nil)
+	self.isLayoutDirty = true
+	self.isDisplayDirty = true
+	self.numIncomingMessages = 0
+	self.mouseOverHyperlinkMessageLine = nil
+	-- self.numIncomingMessagesWhileScrolling = 0
+end
 
-	t_wipe(self.visibleLines)
-	self:ReleaseAllMessageLines()
+function object_proto:UpdateLayout()
+	self.isLayoutDirty = false
+
+	t_wipe(self.activeMessages)
+	t_wipe(self.backfillMessages)
+
+	if self.messageFramePool then
+		self.messageFramePool:ReleaseAll()
+		self.messageFramePool:UpdateWidth()
+		self.messageFramePool:UpdateHeight()
+	end
+end
+
+function object_proto:UpdateDisplay()
+	self.isDisplayDirty = false
+
+	self:RefreshActive(self:GetFirstVisibleMessageID())
+end
+
+function object_proto:RefreshIfNecessary()
+	if self.isLayoutDirty then
+		self:UpdateLayout()
+	end
+
+	if self.isDisplayDirty then
+		self:UpdateDisplay()
+	end
 end
 
 function object_proto:GetNumHistoryElements()
@@ -240,14 +402,23 @@ function object_proto:GetHistoryEntryAtIndex(index)
 	return self.historyBuffer:GetEntryAtIndex(index)
 end
 
-function object_proto:SetFirstMessageIndex(index)
-	self.firstMessageIndex = index
+function object_proto:SetAtBottom(state)
+	self.isAtBottom = state
 end
 
-function object_proto:GetFirstMessageIndex()
-	return self.firstMessageIndex
+function object_proto:IsAtBottom()
+	return self.isAtBottom
 end
 
+function object_proto:SetAtTop(state)
+	self.isAtTop = state
+end
+
+function object_proto:IsAtTop()
+	return self.isAtTop
+end
+
+-- TODO: Remove
 function object_proto:GetNumActiveMessageLines()
 	if self.messageFramePool then
 		return self.messageFramePool:GetNumActive()
@@ -258,12 +429,13 @@ end
 
 function object_proto:AcquireMessageLine()
 	if not self.messageFramePool then
-		self.messageFramePool = E:CreateMessageLinePool(self.ScrollChild)
+		self.messageFramePool = E:CreateMessageLinePool(self.ScrollChild, self:GetID())
 	end
 
 	return self.messageFramePool:Acquire()
 end
 
+-- TODO: Remove
 function object_proto:ReleaseMessageLine(messageLine)
 	if self.messageFramePool and messageLine then
 		self.messageFramePool:Release(messageLine)
@@ -277,356 +449,588 @@ function object_proto:ReleaseAllMessageLines()
 end
 
 function object_proto:GetMaxNumVisibleLines()
-	return m_ceil(self:GetHeight() / (C.db.profile.chat.font.size + C.db.profile.chat.y_padding * 2))
+	return m_ceil(self:GetHeight() / self:GetMessageLineHeight())
 end
 
-function object_proto:ScrollTo(index, refreshFading, tryToFadeIn)
+function object_proto:GetMessageLineHeight()
+	return C.db.profile.chat[self:GetID()].font.size + C.db.profile.chat[self:GetID()].y_padding * 2
+end
+
+function object_proto:IsScrolling()
+	return self.isScrolling
+end
+
+function object_proto:SetScrolling(state)
+	self.isScrolling = state
+end
+
+function object_proto:SetSmoothScroll(func, change, callback)
+	if C.db.profile.chat.smooth then
+		setSmoothScroll(self, func, change, callback)
+
+		self.numIncomingMessagesWhileScrolling = 0
+		self:SetScrolling(true)
+	else
+		func(self:GetVerticalScroll() + change)
+
+		if callback then
+			callback()
+		end
+	end
+end
+
+function object_proto:UpdateFirstVisibleMessageInfo()
+	for i = 1, #self.backfillMessages do
+		local messageLine = self.backfillMessages[i]
+
+		if messageLine:GetID() == 0 then break end
+		if messageLine:GetTop() < self:GetBottom() then break end
+
+		-- ideally, it should be messageLine:GetBottom() <= self:GetBottom() in here, but since I'm dealing with floats I can
+		-- forget about having equal values, instead subtract 0.01 to account for any rounding bs
+		if messageLine:GetBottom() - 0.01 < self:GetBottom() and messageLine:GetTop() > self:GetBottom() then
+			self:SetFirstVisibleMessageInfo(messageLine:GetID(), messageLine:GetBottom() - self:GetBottom())
+
+			break
+		end
+	end
+
+	for i = 1, #self.activeMessages do
+		local messageLine = self.activeMessages[i]
+
+		if messageLine:GetID() == 0 then break end
+
+		-- ideally, it should be messageLine:GetBottom() <= self:GetBottom() in here, but since I'm dealing with floats I can
+		-- forget about having equal values, instead subtract 0.01 to account for any rounding bs
+		if messageLine:GetBottom() - 0.01 < self:GetBottom() and messageLine:GetTop() > self:GetBottom() then
+			self:SetFirstVisibleMessageInfo(messageLine:GetID(), messageLine:GetBottom() - self:GetBottom())
+
+			break
+		end
+	end
+end
+
+function object_proto:ResetState(doNotRefresh)
+	self:UpdateFirstVisibleMessageInfo()
+
+	local offset = self:GetFirstVisibleMessageOffset()
+	if offset < 1 and offset > -1 then
+		offset = 0
+	end
+
+	self:SetVerticalScroll(offset)
+
+	local id = self:GetFirstVisibleMessageID() + self.numIncomingMessagesWhileScrolling
+	self.numIncomingMessagesWhileScrolling = 0
+
+	if id == 0 and self:GetNumHistoryElements() > 0 then
+		id = 1
+	end
+
+	if not doNotRefresh then
+		self:RefreshActive(id)
+		self:RefreshBackfill(0)
+	end
+
+	self:SetFirstActiveMessageID(id)
+
+	self:SetAtBottom(id == 0 or (id == 1 and offset == 0))
+	self:SetAtTop(id == self:GetNumHistoryElements() and offset == 0)
+
+	if not doNotRefresh then
+		self:UpdateFading()
+	end
+
+	self:SetScrolling(false)
+end
+
+function object_proto:EnableIncomingProcessing(state)
+	self.canProcessIncoming = state
+end
+
+function object_proto:CanProcessIncoming()
+	return self.canProcessIncoming
+end
+
+function object_proto:ResetStateAfterUserScroll()
+	self:ResetState()
+	self:EnableIncomingProcessing(self:IsAtBottom())
+end
+
+function object_proto:SetFirstVisibleMessageID(id)
+	self.firstVisibleMessageID = id
+end
+
+function object_proto:SetFirstVisibleMessageInfo(id, offset)
+	self.firstVisibleMessageID = id
+	self.firstVisibleMessageOffset = offset
+end
+
+function object_proto:GetFirstVisibleMessageID()
+	return self.firstVisibleMessageID or 0
+end
+
+function object_proto:GetFirstVisibleMessageOffset()
+	return self.firstVisibleMessageOffset or 0
+end
+
+function object_proto:SetLastActiveMessageInfo(id, offset)
+	self.lastActiveMessageID = id
+	self.lastActiveMessageOffset = offset
+end
+
+-- TODO: Remove
+function object_proto:GetLastActiveMessageID()
+	return self.lastActiveMessageID or 0
+end
+
+function object_proto:GetLastActiveMessageOffset()
+	return self.lastActiveMessageOffset or 0
+end
+
+function object_proto:SetLastBackfillMessageInfo(id, offset)
+	self.lastBackfillMessageID = id
+	self.lastBackfillMessageOffset = offset
+end
+
+-- TODO: Remove
+function object_proto:GetLastBackfillMessageID()
+	return self.lastBackfillMessageID or 0
+end
+
+function object_proto:GetLastBackfillMessageOffset()
+	return self.lastBackfillMessageOffset or 0
+end
+
+function object_proto:RefreshBackfill(startIndex, maxLines, maxPixels, fadeIn)
 	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
 
-	local maxNumVisibleLines = self:GetMaxNumVisibleLines()
-	local numVisibleLines = 0
+	local checkLines = maxLines ~= false
+	maxLines = maxLines or 6
+	maxPixels = maxPixels or self:GetBottom()
 
-	for i = 1, maxNumVisibleLines do
-		local messageLine = self.visibleLines[i]
+	self:SetLastBackfillMessageInfo(0, 0)
+
+	local lineIndex = 0
+	local messageID, messageInfo, messageLine
+
+	local isFull = false
+	while not isFull do
+		lineIndex = lineIndex + 1
+		messageID = startIndex - lineIndex + 1
+
+		messageInfo = self:GetHistoryEntryAtIndex(messageID)
+		if not messageInfo then
+			lineIndex = lineIndex - 1
+
+			break
+		end
+
+		messageLine = self.backfillMessages[lineIndex]
 		if not messageLine then
 			messageLine = self:AcquireMessageLine()
-			self.visibleLines[i] = messageLine
-		end
+			self.backfillMessages[lineIndex] = messageLine
 
-		messageLine:ClearAllPoints()
+			messageLine:ClearAllPoints()
 
-		if i == 1 then
-			messageLine:SetPoint("BOTTOMLEFT", self.ScrollChild, "BOTTOMLEFT", 0, 0)
-		else
-			messageLine:SetPoint("BOTTOMLEFT", self.visibleLines[i - 1], "TOPLEFT", 0,0)
-		end
-
-		-- bail out if we're beyond the frame capacity
-		if messageLine:GetBottom() > self:GetTop() then break end
-
-		local messageInfo = self:GetHistoryEntryAtIndex(index + i)
-		if messageInfo then
-			messageLine:SetText(messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b)
-			messageLine:Show()
-
-			if refreshFading then
-				if tryToFadeIn then
-					E:FadeIn(messageLine, C.db.profile.chat.fade.in_duration, function()
-						if not self.isMouseOver and not C.db.profile.chat.fade.persistent then
-							E:FadeOut(messageLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-								messageLine:Hide()
-							end)
-						end
-					end)
-				else
-					messageLine:SetAlpha(1)
-
-					if not self.isMouseOver and not C.db.profile.chat.fade.persistent then
-						E:FadeOut(messageLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-							messageLine:Hide()
-						end)
-					end
-				end
+			if lineIndex == 1 then
+				messageLine:SetPoint("TOPLEFT", self.ScrollChild, "BOTTOMLEFT", 0, 0)
 			else
-				if messageLine:GetAlpha() == 0 then
-					messageLine:Hide()
-				end
+				messageLine:SetPoint("TOPLEFT", self.backfillMessages[lineIndex - 1], "BOTTOMLEFT", 0, 0)
 			end
-		else
-			messageLine:SetText("", 1, 1, 1)
-			messageLine:Hide()
 		end
 
-		numVisibleLines = numVisibleLines + 1
-	end
+		messageLine:SetMessage(messageID, messageInfo.timestamp, messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b)
 
-	for i = numVisibleLines + 1, #self.visibleLines do
-		if i > maxNumVisibleLines then
-			self:ReleaseMessageLine(self.visibleLines[i])
-			self.visibleLines[i] = nil
+		if fadeIn then
+			messageLine:SetAlpha(0)
+			messageLine:FadeIn()
 		else
-			E:StopFading(self.visibleLines[i], 0)
-			self.visibleLines[i]:SetText("", 1, 1, 1)
-			self.visibleLines[i]:Hide()
+			messageLine:SetAlpha(1)
+		end
+
+		if checkLines then
+			isFull = lineIndex == maxLines
+		else
+			isFull = messageLine:GetBottom() - 1 <= maxPixels
 		end
 	end
 
-	self:SetFirstMessageIndex(index)
+	if lineIndex > 0 then
+		-- I want it to be a positive value, so flip it around instead of doing messageLine:GetBottom() - self:GetBottom()
+		self:SetLastBackfillMessageInfo(messageID, self:GetBottom() - self.backfillMessages[lineIndex]:GetBottom())
+	end
+
+	-- just hide the excess, releasing and removing them here is expensive, they'll be taken care of when the frame gets
+	-- hidden
+	for i = lineIndex + 1, #self.backfillMessages do
+		if self.backfillMessages[i]:GetID() ~= 0 then
+			self.backfillMessages[i]:ClearMessage()
+		end
+	end
+end
+
+function object_proto:SetFirstActiveMessageID(id)
+	self.firstActiveMessageID = id
+end
+
+function object_proto:GetFirstActiveMessageID()
+	return self.firstActiveMessageID or 0
+end
+
+function object_proto:GetNegativeVerticalOffset()
+	return m_max(self:GetBottom() - self.ScrollChild:GetBottom(), self:GetLastBackfillMessageOffset())
+end
+
+function object_proto:ResetFadingTimer()
+	self.overrideFadeTimestamp = GetTime()
+end
+
+function object_proto:CanFade()
+	return C.db.profile.chat.fade.enabled and self:IsAtBottom()
+end
+
+function object_proto:CalculateAlphaFromTimestampDelta(delta)
+	local config = C.db.profile.chat.fade
+
+	if delta <= config.out_delay then
+		return 1
+	end
+
+	delta = delta - config.out_delay
+	if delta >= CHAT_FADE_OUT_DURATION then
+		return 0
+	end
+
+	return 1 - delta / CHAT_FADE_OUT_DURATION
+end
+
+function object_proto:UpdateFading()
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 or not self:CanFade() then return end
+
+	local now = GetTime()
+
+	for i = 1, #self.activeMessages do
+		local messageLine = self.activeMessages[i]
+
+		if messageLine:GetID() == 0 then return end
+
+		local timeDelta = now - m_max(messageLine:GetTimestamp(), self.overrideFadeTimestamp)
+		local alpha = self:CalculateAlphaFromTimestampDelta(timeDelta)
+
+		messageLine:SetAlpha(alpha)
+
+		if alpha < 1 then
+			messageLine:FadeOut(0, CHAT_FADE_OUT_DURATION * alpha)
+		else
+			messageLine:FadeOut(C.db.profile.chat.fade.out_delay - timeDelta, CHAT_FADE_OUT_DURATION)
+		end
+	end
+end
+
+function object_proto:ShouldShowMessage(delta)
+	delta = delta - C.db.profile.chat.fade.out_delay
+	if delta >= CHAT_FADE_OUT_DURATION then
+		return false
+	end
+
+	return true
+end
+
+function object_proto:RefreshActive(startIndex, maxPixels)
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+
+	maxPixels = maxPixels or self:GetTop()
+
+	self:SetLastActiveMessageInfo(0, 0)
+
+	local now = GetTime()
+	local lineIndex = 0
+	local messageID, messageInfo, messageLine
+
+	local isFull = false
+	while not isFull do
+		lineIndex = lineIndex + 1
+		messageID = startIndex + lineIndex - 1
+
+		messageInfo = self:GetHistoryEntryAtIndex(messageID)
+		if not messageInfo then
+			lineIndex = lineIndex - 1
+
+			break
+		end
+
+		if not self:ShouldShowMessage(now - m_max(messageInfo.timestamp, self.overrideFadeTimestamp)) then
+			lineIndex = lineIndex - 1
+
+			break
+		end
+
+		messageLine = self.activeMessages[lineIndex]
+		if not messageLine then
+			messageLine = self:AcquireMessageLine()
+			self.activeMessages[lineIndex] = messageLine
+
+			messageLine:ClearAllPoints()
+
+			if lineIndex == 1 then
+				messageLine:SetPoint("BOTTOMLEFT", self.ScrollChild, "BOTTOMLEFT", 0, 0)
+			else
+				messageLine:SetPoint("BOTTOMLEFT", self.activeMessages[lineIndex - 1], "TOPLEFT", 0, 0)
+			end
+		end
+
+		messageLine:SetMessage(messageID, messageInfo.timestamp, messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b)
+		messageLine:StopFading(1)
+
+		-- if :GetTop() is nil, then it means that the line is already hidden
+		if not messageLine:GetTop() then
+			lineIndex = lineIndex - 1
+
+			break
+		end
+
+		isFull = messageLine:GetTop() + 1 >= maxPixels
+	end
+
+	if lineIndex > 0 then
+		self:SetLastActiveMessageInfo(messageID, self.activeMessages[lineIndex]:GetBottom() - self:GetBottom())
+	end
+
+	-- just hide the excess, releasing and removing them here is expensive, they'll be taken care of when the frame gets
+	-- hidden
+	for i = lineIndex + 1, #self.activeMessages do
+		if self.activeMessages[i]:GetID() ~= 0 then
+			self.activeMessages[i]:ClearMessage()
+		end
+	end
+end
+
+function object_proto:FadeInMessages()
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+
+	self:ResetFadingTimer()
+	self:RefreshActive(self:GetFirstActiveMessageID())
+	self:UpdateFading()
 end
 
 function object_proto:FastForward()
 	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
 
+	self:ResetFadingTimer()
+
 	if self:GetNumHistoryElements() > 0 then
-		t_wipe(self.incomingMessages)
+		self.numIncomingMessages = 0
 
-		local num = m_min(self:GetNumHistoryElements(), self:GetMaxNumVisibleLines(), self:GetFirstMessageIndex())
-
-		self:SetVerticalScroll(0)
-		self:ScrollTo(num, true)
-
-		if num == 0 then return end
-		if num == self:GetFirstMessageIndex() then
-			num = num + 1
-		end
-
-		local messages = {}
-		for i = num - 1, 1, -1 do
-			local messageInfo = self:GetHistoryEntryAtIndex(i)
-			if messageInfo then
-				t_insert(messages, {messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b})
+		local id = m_min(self:GetNumHistoryElements(), self:GetMaxNumVisibleLines(), self:GetFirstActiveMessageID())
+		if id >= 1 then
+			self:RefreshActive(id)
+			self:RefreshBackfill(id - 1, id - 1)
+			self:EnableIncomingProcessing(true)
+			self:SetSmoothScroll(self.funcCache.baseScroll, self:GetNegativeVerticalOffset(), self.funcCache.baseScrollCallback)
+		else
+			local offset = self:GetNegativeVerticalOffset()
+			if offset > 0 then
+				self:EnableIncomingProcessing(true)
+				self:SetSmoothScroll(self.funcCache.baseScroll, offset, self.funcCache.baseScrollCallback)
+			else
+				self:ResetStateAfterUserScroll()
 			end
 		end
-
-		self:ProcessIncoming(messages, true)
-		self:SetFirstMessageIndex(0)
 	end
 end
+
+function object_proto:ToggleScrollButtons()
+	self.ScrollDownButton:SetShown(C.db.profile.chat.buttons.up_and_down)
+	self.ScrollUpButton:SetShown(C.db.profile.chat.buttons.up_and_down)
+end
+
+local DOWN = 1
+local UP = -1
+
+local MAX_SCROLL = 8
+local MED_SCROLL = 4
+local MIN_SCROLL = 1
 
 function object_proto:OnMouseWheel(delta)
 	if self:GetNumHistoryElements() == 0 then
-		return self:SetFirstMessageIndex(0)
+		return self:SetFirstActiveMessageID(0)
 	end
 
-	local scrollingHandler = self:GetScrollingHandler()
-	if scrollingHandler then
-		LibEasing:StopEasing(scrollingHandler)
-		self:SetScrollingHandler(nil)
-		self:SetVerticalScroll(0)
+	self:ResetFadingTimer()
+
+	if (delta == UP and self:IsAtBottom()) then
+		self:RefreshActive(self:GetFirstActiveMessageID())
+		self:UpdateFading()
+
+		return
 	end
 
-	self:ScrollTo(Clamp(self:GetFirstMessageIndex() + delta, 0, self:GetNumHistoryElements() - 1), true, true)
+	if delta == DOWN and self:IsAtTop() then
+		self:RefreshActive(self:GetFirstActiveMessageID())
 
-	if self:GetFirstMessageIndex() ~= 0 then
-		self.ScrollToBottomButton:Show()
-		E:FadeIn(self.ScrollToBottomButton, 0.1)
+		return
+	end
+
+	self:ResetState(true)
+
+	local offset = (IsShiftKeyDown() and MAX_SCROLL or IsControlKeyDown() and MIN_SCROLL or MED_SCROLL) * self:GetMessageLineHeight()
+
+	if delta == UP then
+		self:RefreshActive(self:GetFirstActiveMessageID())
+		self:RefreshBackfill(self:GetFirstActiveMessageID() - 1, false, self:GetBottom() - offset)
+
+		offset = m_min(offset, self:GetNegativeVerticalOffset())
 	else
-		E:FadeOut(self.ScrollToBottomButton, 0, 0.1, function()
-			self.ScrollToBottomButton:SetState(1, true)
-			self.ScrollToBottomButton:Hide()
-		end)
+		self:RefreshActive(self:GetFirstActiveMessageID(), self:GetTop() + offset)
+		self:RefreshBackfill(0)
+
+		offset = m_min(offset, self:GetLastActiveMessageOffset())
 	end
+
+	self:SetSmoothScroll(self.funcCache.baseScroll, -delta * offset, self.funcCache.userScrollCallback)
 end
 
-function object_proto:GetScrollingHandler()
-	return self.scrollingHandle
+function object_proto:HasIncomingMessages()
+	return self.numIncomingMessages ~= 0
 end
 
-function object_proto:SetScrollingHandler(handler)
-	self.scrollingHandle = handler
-end
-
-function object_proto:AddMessage(_, ...)
+function object_proto:NewIncomingMessage()
 	if self:IsShown() then
-		if not self:GetScrollingHandler() and self:GetFirstMessageIndex() > 0 then
-			-- it means we're scrolling up, just show the message icon
+		if self:IsScrolling() or not self:CanProcessIncoming() then
+			self.numIncomingMessagesWhileScrolling = self.numIncomingMessagesWhileScrolling + 1
+			-- TODO: auto-scroll to the bottom if we reached reached the end of the historyBuffer
+		end
+
+		if self:CanProcessIncoming() then
+			self.numIncomingMessages = self.numIncomingMessages + 1
+		end
+
+		if not self:IsAtBottom() then
 			self.ScrollToBottomButton:SetState(2)
-
-			self:SetFirstMessageIndex(self:GetFirstMessageIndex() + 1)
-		else
-			-- I'm pulling message data from .historyBuffer, so by the time our
-			-- frame is done scrolling, there might be messages that are already
-			-- there, but they weren't animated yet
-			if self:GetScrollingHandler() then
-				self:SetFirstMessageIndex(self:GetFirstMessageIndex() + 1)
-			end
-
-			t_insert(self.incomingMessages, {...})
 		end
 	else
-		-- the frame might be hidden due to a bunch of factors, just bump the index of
-		-- the first message, OnShow will take care of the rest
-		self:SetFirstMessageIndex(self:GetFirstMessageIndex() + 1)
+		if not self:IsAtBottom() then
+			self:SetFirstVisibleMessageID(self:GetFirstVisibleMessageID() + 1)
+		end
 	end
+end
+
+function object_proto:IsMouseOverHyperlink()
+	return self.mouseOverHyperlinkMessageLine and self.mouseOverHyperlinkMessageLine:IsShown()
 end
 
 function object_proto:OnFrame()
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 or self:GetScrollingHandler() then return end
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 or self:IsScrolling() then return end
 
-	if #self.incomingMessages > 0 then
-		self:ProcessIncoming({t_removemulti(self.incomingMessages, 1, #self.incomingMessages)}, false)
+	if self:HasIncomingMessages() and self:CanProcessIncoming() then
+		self:ProcessIncoming(self.numIncomingMessages)
+		self.numIncomingMessages = 0
 	end
 
-	local isMouseOver = self:IsMouseOver(26, -36, 0, 0)
+	self:UpdateChatWidgetFading()
+end
+
+function object_proto:FadeInChatWidgets()
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+
+	self.isMouseOver = nil
+
+	E:StopFading(self.ChatTab, 1)
+	E:StopFading(self.ButtonFrame, 1)
+	E:StopFading(self.ScrollDownButton, 1)
+	E:StopFading(self.ScrollUpButton, 1)
+
+	if self:GetID() == 1 then
+		E:StopFading(GeneralDockManager, 1)
+	end
+
+	self:UpdateChatWidgetFading()
+end
+
+function object_proto:UpdateChatWidgetFading()
+	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not C.db.profile.dock.fade.enabled then return end
+
+	local isMouseOver = self:IsMouseOver(26, -36, -36, 0)
 	if isMouseOver ~= self.isMouseOver then
 		self.isMouseOver = isMouseOver
 
+		-- ! DO NOT SHOW/HIDE tabs or gdm, it'll taint EVERYTHING, just adjust its alpha
 		if isMouseOver then
-			for _, visibleLine in next, self.visibleLines do
-				if visibleLine:IsShown() then
-					if visibleLine:GetAlpha() ~= 0 then
-						E:FadeIn(visibleLine, C.db.profile.chat.fade.in_duration, function()
-							if self.isMouseOver then
-								E:StopFading(visibleLine, 1)
-							elseif not C.db.profile.chat.fade.persistent then
-								E:FadeOut(visibleLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-									visibleLine:Hide()
-								end)
-							end
-						end)
-					end
-				else
-					if C.db.profile.chat.fade.mouseover and visibleLine:GetText() ~= "" then
-						visibleLine:Show()
-						E:FadeIn(visibleLine, C.db.profile.chat.fade.in_duration, function()
-							if self.isMouseOver then
-								E:StopFading(visibleLine, 1)
-							elseif not C.db.profile.chat.fade.persistent then
-								E:FadeOut(visibleLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-									visibleLine:Hide()
-								end)
-							end
-						end)
-					end
-				end
-			end
-
-			if self:GetFirstMessageIndex() ~= 0 then
-				self.ScrollToBottomButton:Show()
-				E:FadeIn(self.ScrollToBottomButton, C.db.profile.chat.fade.in_duration, function()
+			if self:GetID() == 1 then
+				E:FadeIn(GeneralDockManager, DOCK_FADE_IN_DURATION, function()
 					if self.isMouseOver then
-						E:StopFading(self.ScrollToBottomButton, 1)
-					elseif not C.db.profile.chat.fade.persistent then
-						E:FadeOut(self.ScrollToBottomButton, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-							self.ScrollToBottomButton:Hide()
-						end)
+						E:StopFading(GeneralDockManager, 1)
+					elseif not isAnyChatAlerting() then
+						E:FadeOut(GeneralDockManager, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 					end
 				end)
 			end
 
-			if C.db.profile.dock.fade.enabled then
-				-- these use custom values for fading in/out because Blizz fade chat as well
-				-- so I'm trying not to interfere with that
-				-- ! DO NOT SHOW/HIDE the tab, it'll taint EVERYTHING, just adjust its alpha
-				if not self.ChatFrame.isDocked then
-					E:FadeIn(self.ChatTab, 0.1, function()
-						if self.isMouseOver then
-							E:StopFading(self.ChatTab, 1)
-						else
-							E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration)
-						end
-					end)
-				end
-
-				E:FadeIn(self.ButtonFrame, 0.1, function()
+			if not self.ChatFrame.isDocked then
+				E:FadeIn(self.ChatTab, DOCK_FADE_IN_DURATION, function()
 					if self.isMouseOver then
-						E:StopFading(self.ButtonFrame, 1)
+						E:StopFading(self.ChatTab, 1)
 					else
-						E:FadeOut(self.ButtonFrame, 4, C.db.profile.dock.fade.out_duration)
+						E:FadeOut(self.ChatTab, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+					end
+				end)
+			end
+
+			E:FadeIn(self.ButtonFrame, DOCK_FADE_IN_DURATION, function()
+				if self.isMouseOver then
+					E:StopFading(self.ButtonFrame, 1)
+				else
+					E:FadeOut(self.ButtonFrame, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+				end
+			end)
+
+			if C.db.profile.chat.buttons.up_and_down then
+				E:FadeIn(self.ScrollDownButton, DOCK_FADE_IN_DURATION, function()
+					if self.isMouseOver then
+						E:StopFading(self.ScrollDownButton, 1)
+					else
+						E:FadeOut(self.ScrollDownButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 					end
 				end)
 
-				if C.db.profile.chat.buttons.up_and_down then
-					E:FadeIn(self.ScrollDownButton, 0.1, function()
-						if self.isMouseOver then
-							E:StopFading(self.ScrollDownButton, 1)
-						else
-							E:FadeOut(self.ScrollDownButton, 4, C.db.profile.dock.fade.out_duration)
-						end
-					end)
-
-					E:FadeIn(self.ScrollUpButton, 0.1, function()
-						if self.isMouseOver then
-							E:StopFading(self.ScrollUpButton, 1)
-						else
-							E:FadeOut(self.ScrollUpButton, 4, C.db.profile.dock.fade.out_duration)
-						end
-					end)
-				end
+				E:FadeIn(self.ScrollUpButton, DOCK_FADE_IN_DURATION, function()
+					if self.isMouseOver then
+						E:StopFading(self.ScrollUpButton, 1)
+					else
+						E:FadeOut(self.ScrollUpButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+					end
+				end)
 			end
 		else
-			if not C.db.profile.chat.fade.persistent then
-				for _, visibleLine in next, self.visibleLines do
-					if visibleLine:IsShown() and not E:IsFading(visibleLine) then
-						E:FadeOut(visibleLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-							visibleLine:Hide()
-						end)
-					end
+			if self:GetID() == 1 then
+				if not isAnyChatAlerting() then
+					E:FadeOut(GeneralDockManager, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 				end
-
-				E:FadeOut(self.ScrollToBottomButton, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-					self.ScrollToBottomButton:Hide()
-				end)
 			end
 
-			if C.db.profile.dock.fade.enabled then
-				-- these use custom values for fading in/out because Blizz fade chat as well
-				-- so I'm trying not to interfere with that
-				-- ! DO NOT SHOW/HIDE the tab, it'll taint EVERYTHING, just adjust its alpha
-				if not self.ChatFrame.isDocked then
-					if not self.isDragging then
-						E:FadeOut(self.ChatTab, 4, C.db.profile.dock.fade.out_duration)
-					else
-						E:StopFading(self.ChatTab, 1)
-					end
+			if not self.ChatFrame.isDocked then
+				if not self.isDragging then
+					E:FadeOut(self.ChatTab, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+				else
+					E:StopFading(self.ChatTab, 1)
 				end
+			end
 
-				E:FadeOut(self.ButtonFrame, 4, C.db.profile.dock.fade.out_duration)
+			E:FadeOut(self.ButtonFrame, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 
-				if C.db.profile.chat.buttons.up_and_down then
-					E:FadeOut(self.ScrollDownButton, 4, C.db.profile.dock.fade.out_duration)
-					E:FadeOut(self.ScrollUpButton, 4, C.db.profile.dock.fade.out_duration)
-				end
+			if C.db.profile.chat.buttons.up_and_down then
+				E:FadeOut(self.ScrollDownButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
+				E:FadeOut(self.ScrollUpButton, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 			end
 		end
 	end
 end
 
-function object_proto:ProcessIncoming(incoming, doNotFade)
-	local totalHeight = 0
-	local prevIncomingMessage
-
-	for i = 1, #incoming do
-		local messageLine = self:AcquireMessageLine()
-
-		t_insert(self.visibleLines, 1, messageLine)
-
-		if prevIncomingMessage then
-			messageLine:SetPoint("TOPLEFT", prevIncomingMessage, "BOTTOMLEFT", 0, 0)
-		else
-			messageLine:SetPoint("TOPLEFT", self.ScrollChild, "BOTTOMLEFT", 0, 0)
-		end
-
-		messageLine:SetText(incoming[i][1], incoming[i][2], incoming[i][3], incoming[i][4])
-		messageLine:Show()
-
-		if not doNotFade then
-			messageLine:SetAlpha(0)
-			E:FadeIn(messageLine, C.db.profile.chat.fade.in_duration, function()
-				if not self.isMouseOver and not C.db.profile.chat.fade.persistent then
-					E:FadeOut(messageLine, C.db.profile.chat.fade.out_delay, C.db.profile.chat.fade.out_duration, function()
-						messageLine:Hide()
-					end)
-				end
-			end)
-		else
-			messageLine:SetAlpha(1)
-		end
-
-		totalHeight = totalHeight + messageLine:GetHeight()
-		prevIncomingMessage = messageLine
-	end
-
-	local startOffset = self:GetVerticalScroll()
-	local endOffset = totalHeight - startOffset
-
-	LibEasing:StopEasing(self:GetScrollingHandler())
-
-	self:SetScrollingHandler(LibEasing:Ease(
-		function (n)
-			self:SetVerticalScroll(n)
-		end,
-		startOffset,
-		endOffset,
-		C.db.profile.chat.slide_in_duration,
-		LibEasing.OutCubic,
-		function()
-			self:SetVerticalScroll(0)
-			self:ScrollTo(self:GetFirstMessageIndex(), doNotFade)
-			self:SetFirstMessageIndex(0)
-			self:SetScrollingHandler(nil)
-		end
-	))
+function object_proto:ProcessIncoming(num)
+	self:RefreshBackfill(num, num, nil, true)
+	self:SetSmoothScroll(self.funcCache.baseScroll, self:GetLastBackfillMessageOffset(), self.funcCache.baseScrollCallback)
 end
 
 function object_proto:Release()
@@ -635,22 +1039,30 @@ end
 
 do
 	local frames = {}
+	local curID = nil
 
-	local slidingMessageFramePool = CreateObjectPool(
+	local slidingMessageFramePool = CreateUnsecuredObjectPool(
 		function(pool)
-			local frame = Mixin(CreateFrame("ScrollFrame", "LSGlassFrame" .. (#frames + 1), UIParent, "LSGlassHyperlinkPropagator"), object_proto)
+			local frame = Mixin(CreateFrame("ScrollFrame", "LSGlassFrame" .. curID, UIParent, "LSGlassHyperlinkPropagator"), object_proto)
 			frame:EnableMouse(false)
-			frame:SetClipsChildren(true)
 			frame:Hide()
 
-			frame.visibleLines = {}
-			frame.incomingMessages = {}
+			-- local dbg = frame:CreateTexture("ARTWORK")
+			-- dbg:SetAllPoints()
+			-- dbg:SetColorTexture(0.1, 0.1, 0.1, 0.4)
+
+			frame.activeMessages = {}
+			frame.backfillMessages = {}
 			frame.pool = pool
 
 			local scrollChild = CreateFrame("Frame", nil, frame, "LSGlassHyperlinkPropagator")
 			frame:SetFrameLevel(frame:GetFrameLevel() + 1)
 			frame:SetScrollChild(scrollChild)
 			frame.ScrollChild = scrollChild
+
+			-- local dbg = scrollChild:CreateTexture("ARTWORK")
+			-- dbg:SetAllPoints()
+			-- dbg:SetColorTexture(0, 0.4, 0, 0.4)
 
 			frame:SetScript("OnHide", frame.OnHide)
 			frame:SetScript("OnShow", frame.OnShow)
@@ -673,67 +1085,77 @@ do
 			scrollUpButton:SetFrameLevel(frame:GetFrameLevel() + 2)
 			frame.ScrollUpButton = scrollUpButton
 
-			t_insert(frames, frame)
+			-- these functions are always the same, so just cache them
+			frame.funcCache = {
+				baseScroll = function(n)
+					frame:SetVerticalScroll(n)
+				end,
+				baseScrollCallback = function()
+					frame:ResetState()
+				end,
+				userScrollCallback = function()
+					frame:ResetStateAfterUserScroll()
+
+					if not frame:IsAtBottom() then
+						frame.ScrollToBottomButton:Show()
+
+						if frame:HasIncomingMessages() then
+							frame.ScrollToBottomButton:SetState(2, true)
+						else
+							frame.ScrollToBottomButton:SetState(1, true)
+						end
+
+						E:FadeIn(frame.ScrollToBottomButton, 0.1)
+					else
+						E:FadeOut(frame.ScrollToBottomButton, 0, 0.1, function()
+							frame.ScrollToBottomButton:SetState(1, true)
+							frame.ScrollToBottomButton:Hide()
+						end)
+					end
+				end,
+				refreshDisplay = function()
+					frame:RefreshIfNecessary()
+
+					frame.refreshTimer = nil
+				end,
+			}
+
+			-- local backdrop = E:CreateBackdrop(frame, 0, -4)
+			-- frame.Backdrop = backdrop
+
+			-- backdrop:SetBackdropColor(0, 0, 0, 0.4)
+			-- backdrop:SetBackdropBorderColor(0, 0, 0, 0.4)
+
+			frames[curID] = frame
 
 			return frame
 		end,
-		function(_, frame)
+		function(_, frame, isNew)
+			if isNew then return end
+
 			frame:ReleaseChatFrame()
 		end
 	)
 
-	slidingMessageFramePool:SetResetDisallowedIfNew(true)
-
-	function E:HandleChatFrame(chatFrame)
+	function E:HandleChatFrame(chatFrame, id)
 		if chatFrame == ChatFrame2 then
 			-- Combat Log, I might want to skin it, but without sliding
 		else
+			-- for the sake of matching names, otherwise it breaks my brain
+			curID = chatFrame:GetID()
+
 			local frame = slidingMessageFramePool:Acquire()
+			frame:SetID(id)
 			frame:CaptureChatFrame(chatFrame)
 
 			return frame
 		end
 	end
 
-	function E:ResetSlidingFrameDockFading()
-		for _, frame in next, frames do
-			if frame:IsShown() then
-				frame.isMouseOver = nil
-
-				E:StopFading(frame.ChatTab, 1)
-				E:StopFading(frame.ButtonFrame, 1)
-			end
-		end
-
-		-- ? I don't like this... Should I attach to the first frame?
-		LSGlassUpdater.isMouseOver = nil
-
-		E:StopFading(GeneralDockManager, 1)
-	end
-
-	function E:ResetSlidingFrameChatFading()
-		for _, frame in next, frames do
-			if frame:IsShown() then
-				frame.isMouseOver = nil
-
-				for _, visibleLine in next, frame.visibleLines do
-					if visibleLine:IsShown() then
-						E:StopFading(visibleLine, 1)
-					end
-				end
-
-				if frame:GetFirstMessageIndex() ~= 0 then
-					frame.ScrollToBottomButton:Show()
-					E:StopFading(frame.ScrollToBottomButton, 1)
-				end
-			end
-		end
-	end
-
-	function E:ToggleScrollButtons()
-		for _, frame in next, frames do
-			frame.ScrollDownButton:SetShown(C.db.profile.chat.buttons.up_and_down)
-			frame.ScrollUpButton:SetShown(C.db.profile.chat.buttons.up_and_down)
+	function E:ForChatFrame(id, method, ...)
+		local frame = frames[id]
+		if frame and frame[method] then
+			frame[method](frame, ...)
 		end
 	end
 end

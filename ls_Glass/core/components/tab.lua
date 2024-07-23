@@ -21,7 +21,8 @@ local function chatTab_OnDragStart(self)
 	end
 end
 
-local function chatTab_OnDragStop(self)
+-- called from FCFTab_OnUpdate
+hooksecurefunc("FCFTab_OnDragStop", function(self)
 	local frame = E:GetSlidingFrameForChatFrame(_G["ChatFrame" .. self:GetID()])
 	if frame then
 		if frame.isMouseOver then
@@ -30,7 +31,7 @@ local function chatTab_OnDragStop(self)
 
 		frame.isDragging = nil
 	end
-end
+end)
 
 local function chatTabText_SetPoint(self, p, anchor, rP, x, y, shouldIgnore)
 	if not shouldIgnore then
@@ -62,11 +63,10 @@ local TAB_TEXTURES = {
 
 function E:HandleChatTab(frame)
 	if not handledTabs[frame] then
-		frame.Backdrop = E:CreateBackdrop(frame)
+		frame.Backdrop = E:CreateBackdrop(frame, C.db.profile.dock.alpha)
 
 		hooksecurefunc(frame, "SetPoint", chatTab_SetPoint)
 		frame:HookScript("OnDragStart", chatTab_OnDragStart)
-		hooksecurefunc("FCFTab_OnDragStop", chatTab_OnDragStop)
 
 		hooksecurefunc(frame.Text, "SetPoint", chatTabText_SetPoint)
 		hooksecurefunc(frame.Text, "SetTextColor", chatTabText_SetTextColor)
@@ -155,7 +155,7 @@ local MINI_TAB_TEXTURES = {
 
 function E:HandleMinimizedTab(frame)
 	if not handledMiniTabs[frame] then
-		frame.Backdrop = E:CreateBackdrop(frame)
+		frame.Backdrop = E:CreateBackdrop(frame, C.db.profile.dock.alpha)
 
 		E:HandleMaximizeButton(_G[frame:GetName() .. "MaximizeButton"])
 
@@ -199,4 +199,12 @@ function E:HandleMinimizedTab(frame)
 	end
 
 	frame.conversationIcon:SetPoint("RIGHT", frame.Text, "LEFT", 0, 0)
+end
+
+function E:UpdateTabAlpha()
+	local alpha = C.db.profile.dock.alpha
+
+	for tab in next, handledTabs do
+		tab.Backdrop:UpdateAlpha(alpha)
+	end
 end

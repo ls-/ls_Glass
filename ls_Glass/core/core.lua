@@ -3,15 +3,17 @@ local L = ns.L
 
 -- Lua
 local _G = getfenv(0)
+local error = _G.error
 local ipairs = _G.ipairs
 local m_floor = _G.math.floor
 local next= _G.next
 local pcall = _G.pcall
 local s_format = _G.string.format
 local t_insert = _G.table.insert
+local type = _G.type
 
 -- Mine
-local E, C, D = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceEvent-3.0"), {}, {}
+local E, C, D = {}, {}, {}
 ns.E, ns.C, ns.D = E, C, D
 
 _G[addonName] = {
@@ -63,6 +65,54 @@ do
 
 		for _, listener in ipairs(listeners[messageType]) do
 			listener(payload)
+		end
+	end
+end
+
+do
+	local oneTimeEvents = {ADDON_LOADED = false, PLAYER_LOGIN = false}
+	local registeredEvents = {}
+
+	local dispatcher = CreateFrame("Frame", "LSGEventFrame")
+	dispatcher:SetScript("OnEvent", function(_, event, ...)
+		for func in next, registeredEvents[event] do
+			func(...)
+		end
+
+		if oneTimeEvents[event] == false then
+			oneTimeEvents[event] = true
+		end
+	end)
+
+	function E:RegisterEvent(event, func)
+		if oneTimeEvents[event] then
+			error(s_format("Failed to register for '%s' event, already fired!", event), 3)
+		end
+
+		if not func or type(func) ~= "function" then
+			error(s_format("Failed to register for '%s' event, no handler!", event), 3)
+		end
+
+		if not registeredEvents[event] then
+			registeredEvents[event] = {}
+
+			dispatcher:RegisterEvent(event)
+		end
+
+		registeredEvents[event][func] = true
+	end
+
+	function E:UnregisterEvent(event, func)
+		local funcs = registeredEvents[event]
+
+		if funcs and funcs[func] then
+			funcs[func] = nil
+
+			if not next(funcs) then
+				registeredEvents[event] = nil
+
+				dispatcher:UnregisterEvent(event)
+			end
 		end
 	end
 end
@@ -120,8 +170,9 @@ do
 		return v
 	end
 
-	local function lerp(v1, v2, perc)
-		return clamp(v1 + (v2 - v1) * perc)
+	local function outCubic(t, b, c, d)
+		t = t / d - 1
+		return clamp(c * (t ^ 3 + 1) + b)
 	end
 
 	local FADE_IN = 1
@@ -138,7 +189,7 @@ do
 			if data.fadeTimer > 0 then
 				data.initAlpha = data.initAlpha or object:GetAlpha()
 
-				object:SetAlpha(lerp(data.initAlpha, data.finalAlpha, data.fadeTimer / data.duration))
+				object:SetAlpha(outCubic(data.fadeTimer, data.initAlpha, data.finalAlpha - data.initAlpha, data.duration))
 
 				if data.fadeTimer >= data.duration then
 					remove(object)
@@ -184,10 +235,10 @@ do
 		end
 	end
 
-	function E:FadeIn(object, duration, callback)
+	function E:FadeIn(object, duration, callback, delay)
 		if not object then return end
 
-		add(FADE_IN, object, 0, duration * (1 - object:GetAlpha()), callback)
+		add(FADE_IN, object, delay or 0, duration * (1 - object:GetAlpha()), callback)
 	end
 
 	function E:FadeOut(object, ...)
@@ -260,69 +311,4 @@ end
 
 function E:Round(v)
 	return m_floor(v + 0.5)
-end
-
-----------
--- MISC --
-----------
-
-do
-	local link = ""
-
-	local popup = CreateFrame("Frame", nil, UIParent)
-	popup:Hide()
-	popup:SetPoint("CENTER", UIParent, "CENTER")
-	popup:SetSize(384, 78)
-	popup:EnableMouse(true)
-	popup:SetFrameStrata("TOOLTIP")
-	popup:SetFixedFrameStrata(true)
-	popup:SetFrameLevel(100)
-	popup:SetFixedFrameLevel(true)
-
-	local border = CreateFrame("Frame", nil, popup, "DialogBorderTranslucentTemplate")
-	border:SetAllPoints(popup)
-
-	local editBox = CreateFrame("EditBox", nil, popup, "InputBoxTemplate")
-	editBox:SetHeight(32)
-	editBox:SetPoint("TOPLEFT", 22, -10)
-	editBox:SetPoint("TOPRIGHT", -16, -10)
-
-	editBox:SetScript("OnChar", function(self)
-		self:SetText(link)
-		self:HighlightText()
-	end)
-
-	editBox:SetScript("OnMouseUp", function(self)
-		self:HighlightText()
-	end)
-
-	editBox:SetScript("OnEscapePressed", function()
-		popup:Hide()
-	end)
-
-	local button = CreateFrame("Button", nil, popup, "UIPanelButtonNoTooltipTemplate")
-	button:SetText(L["OKAY"])
-	button:SetSize(90, 22)
-	button:SetPoint("BOTTOM", 0, 16)
-
-	button:SetScript("OnClick", function()
-		popup:Hide()
-	end)
-
-	popup:SetScript("OnHide", function()
-		link = ""
-		editBox:SetText(link)
-	end)
-
-	popup:SetScript("OnShow", function()
-		editBox:SetText(link)
-		editBox:SetFocus()
-		editBox:HighlightText()
-	end)
-
-	function E:ShowLinkCopyPopup(text)
-		popup:Hide()
-		link = text
-		popup:Show()
-	end
 end

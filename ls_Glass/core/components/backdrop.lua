@@ -3,14 +3,21 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
 -- Lua
 local _G = getfenv(0)
-local next = _G.next
 local t_insert = _G.table.insert
 
 -- Mine
 local backdrops = {}
 
-function E:CreateBackdrop(parent, xOffset, yOffset)
-	local backdrop = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+local backdrop_proto = {}
+do
+	function backdrop_proto:UpdateAlpha(a)
+		self:SetBackdropColor(0, 0, 0, a)
+		self:SetBackdropBorderColor(0, 0, 0, a)
+	end
+end
+
+function E:CreateBackdrop(parent, alpha,  xOffset, yOffset)
+	local backdrop = Mixin(CreateFrame("Frame", nil, parent, "BackdropTemplate"), backdrop_proto)
 	backdrop:SetFrameLevel(parent:GetFrameLevel() - 1)
 	backdrop:SetPoint("TOPLEFT", xOffset or 0, -(yOffset or 0))
 	backdrop:SetPoint("BOTTOMRIGHT", -(xOffset or 0), yOffset or 0)
@@ -29,17 +36,10 @@ function E:CreateBackdrop(parent, xOffset, yOffset)
 	backdrop.Center:SetPoint("TOPLEFT", backdrop.TopLeftCorner, "BOTTOMRIGHT", 0, 0)
 	backdrop.Center:SetPoint("BOTTOMRIGHT", backdrop.BottomRightCorner, "TOPLEFT", 0, 0)
 
-	backdrop:SetBackdropColor(0, 0, 0, C.db.profile.dock.alpha)
-	backdrop:SetBackdropBorderColor(0, 0, 0, C.db.profile.dock.alpha)
+	backdrop:SetBackdropColor(0, 0, 0, alpha)
+	backdrop:SetBackdropBorderColor(0, 0, 0, alpha)
 
 	t_insert(backdrops, backdrop)
 
 	return backdrop
-end
-
-function E:UpdateBackdrops()
-	for _, backdrop in next, backdrops do
-		backdrop:SetBackdropColor(0, 0, 0, C.db.profile.dock.alpha)
-		backdrop:SetBackdropBorderColor(0, 0, 0, C.db.profile.dock.alpha)
-	end
 end

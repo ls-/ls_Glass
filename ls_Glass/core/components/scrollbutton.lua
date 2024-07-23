@@ -3,6 +3,7 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
 -- Lua
 local _G = getfenv(0)
+local next = _G.next
 local unpack = _G.unpack
 
 -- Mine
@@ -12,6 +13,8 @@ local ICONS = {
 	{0 / 128, 52 / 128, 52 / 128, 104 / 128}, -- 3, "down"
 	{52 / 128, 104 / 128, 52 / 128, 104 / 128}, -- 4, "up"
 }
+
+local buttons = {}
 
 local button_proto = {}
 
@@ -39,7 +42,7 @@ local function setUpBaseButton(button, state)
 	button:SetSize(24, 24)
 	button:Hide()
 
-	button.Backdrop = E:CreateBackdrop(button)
+	button.Backdrop = E:CreateBackdrop(button, C.db.profile.dock.alpha)
 
 	button:SetNormalTexture(0)
 	button:SetPushedTexture(0)
@@ -87,6 +90,8 @@ local function setUpBaseButton(button, state)
 
 	button:SetState(state)
 
+	buttons[button] = true
+
 	return button
 end
 
@@ -114,7 +119,6 @@ do
 	end
 end
 
-
 do
 	local scroll_button_proto = {}
 
@@ -138,7 +142,7 @@ do
 
 	function scroll_button_proto:OnUpdate(elapsed)
 		self.elapsed = (self.elapsed or 0) + elapsed
-		if self.elapsed > (IsControlKeyDown() and 0.128 or 0.064) then
+		if self.elapsed > 0.3 then -- SCROLL_DURATION + POST_SCROLL_DELAY
 			self.elapsed = 0
 
 			self:OnMouseDown()
@@ -154,5 +158,13 @@ do
 		button:SetAlpha(1)
 
 		return setUpBaseButton(button, state)
+	end
+end
+
+function E:UpdateScrollButtonAlpha()
+	local alpha = C.db.profile.dock.alpha
+
+	for button in next, buttons do
+		button.Backdrop:UpdateAlpha(alpha)
 	end
 end

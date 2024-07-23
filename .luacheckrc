@@ -1,6 +1,6 @@
 std = "none"
 max_line_length = false
-max_comment_line_length = 100
+max_comment_line_length = 120
 self = false
 
 exclude_files = {
@@ -36,30 +36,36 @@ read_globals = {
 	"BattlePetTooltip",
 	"BattlePetToolTip_ShowLink",
 	"C_AddOns",
+	"C_Timer",
+	"ChatAlertFrame",
 	"ChatFontNormal",
 	"ChatFrame1",
 	"ChatFrame2",
 	"ChatFrameChannelButton",
 	"ChatFrameMenuButton",
-	"Clamp",
 	"ColorMixin",
 	"CreateFont",
 	"CreateFrame",
-	"CreateObjectPool",
+	"CreateUnsecuredObjectPool",
 	"DEFAULT_TAB_SELECTED_COLOR_TABLE",
 	"GameFontNormalSmall",
 	"GameTooltip",
 	"GeneralDockManager",
+	"GetChatWindowInfo",
 	"GetLocale",
+	"GetTime",
 	"HideUIPanel",
 	"InCombatLockdown",
 	"IsControlKeyDown",
+	"IsShiftKeyDown",
 	"LibStub",
 	"LinkUtil",
 	"Mixin",
 	"NORMAL_FONT_COLOR",
 	"NUM_CHAT_WINDOWS",
+	"QuickJoinToastButton",
 	"Settings",
 	"SettingsPanel",
+	"TextToSpeechButton",
 	"UIParent",
 }

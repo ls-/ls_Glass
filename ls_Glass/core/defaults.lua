@@ -18,44 +18,146 @@ D.global = {
 D.profile = {
 	font = LibStub("LibSharedMedia-3.0"):GetDefault("font"), -- "Friz Quadrata TT"
 	chat = {
-		alpha = 0.4,
 		tooltips = true,
-		slide_in_duration = 0.3,
-		x_padding = 14,
-		y_padding = 2,
-		font = {
-			size = 12,
-			shadow = true,
-			outline = false,
-		},
+		smooth = true,
 		fade = {
-			-- enabled = true, -- * hardcoded
-			persistent = false, -- messages can fade in, but don't fade out
-			mouseover = false, -- hidden messages will fade in on mouse over
-			in_duration = 0.6,
-			out_delay = 10,
-			out_duration = 0.6,
+			enabled = true, -- if disabled, messages don't fade out
+			click = false,
+			out_delay = 60,
 		},
 		buttons = {
 			up_and_down = false,
 		},
-	},
-	dock = { -- and edit boxes
-		alpha = 0.8,
-		edit = {
-			position = "bottom", -- "top"
-			offset = 32,
+		[ 1] = {
+			alpha = 0.4,
+			-- solid = false,
+			x_padding = 8,
+			y_padding = 0,
+			font = {
+				size = 12,
+				shadow = true,
+				outline = false,
+			},
 		},
+		[ 2] = {
+			alpha = 0.4,
+			-- solid = false,
+			x_padding = 8,
+			y_padding = 0,
+			font = {
+				size = 12,
+				shadow = true,
+				outline = false,
+			},
+		},
+		[ 3] = {
+			alpha = 0.4,
+			-- solid = false,
+			x_padding = 8,
+			y_padding = 0,
+			font = {
+				size = 12,
+				shadow = true,
+				outline = false,
+			},
+		},
+		[ 4] = {
+			alpha = 0.4,
+			-- solid = false,
+			x_padding = 8,
+			y_padding = 0,
+			font = {
+				size = 12,
+				shadow = true,
+				outline = false,
+			},
+		},
+		[ 5] = {
+			alpha = 0.4,
+			-- solid = false,
+			x_padding = 8,
+			y_padding = 0,
+			font = {
+				size = 12,
+				shadow = true,
+				outline = false,
+			},
+		},
+		[ 6] = {
+			alpha = 0.4,
+			-- solid = false,
+			x_padding = 8,
+			y_padding = 0,
+			font = {
+				size = 12,
+				shadow = true,
+				outline = false,
+			},
+		},
+		[ 7] = {
+			alpha = 0.4,
+			-- solid = false,
+			x_padding = 8,
+			y_padding = 0,
+			font = {
+				size = 12,
+				shadow = true,
+				outline = false,
+			},
+		},
+		[ 8] = {
+			alpha = 0.4,
+			-- solid = false,
+			x_padding = 8,
+			y_padding = 0,
+			font = {
+				size = 12,
+				shadow = true,
+				outline = false,
+			},
+		},
+		[ 9] = {
+			alpha = 0.4,
+			-- solid = false,
+			x_padding = 8,
+			y_padding = 0,
+			font = {
+				size = 12,
+				shadow = true,
+				outline = false,
+			},
+		},
+		[10] = {
+			alpha = 0.4,
+			-- solid = false,
+			x_padding = 8,
+			y_padding = 0,
+			font = {
+				size = 12,
+				shadow = true,
+				outline = false,
+			},
+		},
+	},
+	dock = {
+		alpha = 0.8,
+		-- font = {
+		-- 	size = 12,
+		-- 	shadow = true,
+		-- 	outline = false,
+		-- },
+		fade = {
+			enabled = true,
+		},
+	},
+	edit = {
+		alpha = 0.8,
+		position = "bottom", -- "top"
+		offset = 32,
 		font = {
 			size = 12,
 			shadow = true,
 			outline = false,
-		},
-		fade = {
-			enabled = true,
-			-- in_duration = 0.1, -- * hardcoded
-			-- out_delay = 4, -- * hardcoded
-			out_duration = 0.6,
 		},
 	},
 }
