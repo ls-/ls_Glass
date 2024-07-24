@@ -128,8 +128,6 @@ local function getChatOptionsForCopy(id)
 		if i ~= id and i ~= 2 then
 			if isChatFrameShown(i) then
 				tabs[i] = GetChatWindowInfo(i)
-			else
-				break
 			end
 		end
 	end
@@ -169,6 +167,9 @@ local function createChatFrameConfig(id, order)
 				hidden = false,
 				values = function()
 					return getChatOptionsForCopy(id)
+				end,
+				disabled = function()
+					return not next(getChatOptionsForCopy(id))
 				end,
 				get = function() end,
 				set = function(_, value)
