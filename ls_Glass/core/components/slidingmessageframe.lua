@@ -535,7 +535,7 @@ function object_proto:ResetState(doNotRefresh)
 	self:SetFirstActiveMessageID(id)
 
 	self:SetAtBottom(id == 0 or (id == 1 and offset == 0))
-	self:SetAtTop(id == self:GetNumHistoryElements())
+	self:SetAtTop(id == self:GetNumHistoryElements() and self:GetLastActiveMessageOffset() < self:GetMessageLineHeight())
 
 	if not doNotRefresh then
 		self:UpdateFading()
@@ -867,7 +867,7 @@ function object_proto:OnMouseWheel(delta)
 		return
 	end
 
-	if delta == DOWN and self:IsAtTop() and self:GetLastActiveMessageOffset() < self:GetMessageLineHeight() then
+	if delta == DOWN and self:IsAtTop() then
 		self:RefreshActive(self:GetFirstActiveMessageID())
 
 		return
