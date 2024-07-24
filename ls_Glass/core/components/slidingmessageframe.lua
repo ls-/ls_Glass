@@ -535,7 +535,7 @@ function object_proto:ResetState(doNotRefresh)
 	self:SetFirstActiveMessageID(id)
 
 	self:SetAtBottom(id == 0 or (id == 1 and offset == 0))
-	self:SetAtTop(id == self:GetNumHistoryElements() and offset == 0)
+	self:SetAtTop(id == self:GetNumHistoryElements())
 
 	if not doNotRefresh then
 		self:UpdateFading()
@@ -794,7 +794,8 @@ function object_proto:RefreshActive(startIndex, maxPixels)
 	end
 
 	if lineIndex > 0 then
-		self:SetLastActiveMessageInfo(messageID, self.activeMessages[lineIndex]:GetTop() - self:GetTop())
+		-- 2 is kinda arbitrary, I just want to make sure that only the first line of the last message is visible at the top
+		self:SetLastActiveMessageInfo(messageID, self.activeMessages[lineIndex]:GetTop() - self:GetBottom() - self:GetMessageLineHeight() + 2)
 	end
 
 	-- just hide the excess, releasing and removing them here is expensive, they'll be taken care of when the frame gets
@@ -859,14 +860,14 @@ function object_proto:OnMouseWheel(delta)
 
 	self:ResetFadingTimer()
 
-	if (delta == UP and self:IsAtBottom()) then
+	if delta == UP and self:IsAtBottom() then
 		self:RefreshActive(self:GetFirstActiveMessageID())
 		self:UpdateFading()
 
 		return
 	end
 
-	if delta == DOWN and self:IsAtTop() and self:GetLastActiveMessageOffset() == 0 then
+	if delta == DOWN and self:IsAtTop() and self:GetLastActiveMessageOffset() < self:GetMessageLineHeight() then
 		self:RefreshActive(self:GetFirstActiveMessageID())
 
 		return
