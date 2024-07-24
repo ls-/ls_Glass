@@ -576,7 +576,7 @@ end
 
 function object_proto:SetLastActiveMessageInfo(id, offset)
 	self.lastActiveMessageID = id
-	self.lastActiveMessageOffset = offset
+	self.lastActiveMessageOffset = m_max(offset, 0)
 end
 
 -- TODO: Remove
@@ -794,7 +794,7 @@ function object_proto:RefreshActive(startIndex, maxPixels)
 	end
 
 	if lineIndex > 0 then
-		self:SetLastActiveMessageInfo(messageID, self.activeMessages[lineIndex]:GetBottom() - self:GetBottom())
+		self:SetLastActiveMessageInfo(messageID, self.activeMessages[lineIndex]:GetTop() - self:GetTop())
 	end
 
 	-- just hide the excess, releasing and removing them here is expensive, they'll be taken care of when the frame gets
@@ -866,7 +866,7 @@ function object_proto:OnMouseWheel(delta)
 		return
 	end
 
-	if delta == DOWN and self:IsAtTop() then
+	if delta == DOWN and self:IsAtTop() and self:GetLastActiveMessageOffset() == 0 then
 		self:RefreshActive(self:GetFirstActiveMessageID())
 
 		return
