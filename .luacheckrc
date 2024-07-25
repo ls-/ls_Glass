@@ -48,6 +48,7 @@ read_globals = {
 	"CreateFrame",
 	"CreateUnsecuredObjectPool",
 	"DEFAULT_TAB_SELECTED_COLOR_TABLE",
+	"ElvUI",
 	"GameFontNormalSmall",
 	"GameTooltip",
 	"GeneralDockManager",

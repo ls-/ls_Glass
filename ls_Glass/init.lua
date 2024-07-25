@@ -38,6 +38,14 @@ end
 E:RegisterEvent("ADDON_LOADED", function(arg1)
 	if arg1 ~= addonName then return end
 
+	-- stop loading if ElvUI with enabled chat is detected
+	local elvUI = ElvUI and ElvUI[1]
+	if elvUI and elvUI.private.chat.enable then
+		elvUI:AddIncompatible("Chat", addonName)
+
+		return
+	end
+
 	if LS_GLASS_GLOBAL_CONFIG then
 		if LS_GLASS_GLOBAL_CONFIG.profiles then
 			for profile, data in next, LS_GLASS_GLOBAL_CONFIG.profiles do
