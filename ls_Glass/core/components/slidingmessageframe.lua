@@ -456,6 +456,10 @@ function object_proto:GetMessageLineHeight()
 	return C.db.profile.chat[self:GetID()].font.size + C.db.profile.chat[self:GetID()].y_padding * 2
 end
 
+function object_proto:IsDocked()
+	return self.ChatFrame.isDocked
+end
+
 function object_proto:IsScrolling()
 	return self.isScrolling
 end
@@ -942,7 +946,8 @@ function object_proto:FadeInChatWidgets()
 	E:StopFading(self.ScrollDownButton, 1)
 	E:StopFading(self.ScrollUpButton, 1)
 
-	if self:GetID() == 1 then
+	-- there's only one visible docked frame at a time
+	if self:IsDocked() then
 		E:StopFading(GeneralDockManager, 1)
 	end
 
@@ -959,7 +964,7 @@ function object_proto:UpdateChatWidgetFading()
 
 		-- ! DO NOT SHOW/HIDE tabs or gdm, it'll taint EVERYTHING, just adjust its alpha
 		if isMouseOver then
-			if self:GetID() == 1 then
+			if self:IsDocked() then
 				E:FadeIn(GeneralDockManager, DOCK_FADE_IN_DURATION, function()
 					if self.isMouseOver then
 						E:StopFading(GeneralDockManager, 1)
@@ -1005,7 +1010,7 @@ function object_proto:UpdateChatWidgetFading()
 				end)
 			end
 		else
-			if self:GetID() == 1 then
+			if self:IsDocked() then
 				if not isAnyChatAlerting() then
 					E:FadeOut(GeneralDockManager, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 				end
