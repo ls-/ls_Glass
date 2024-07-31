@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Version 110000.03
+
+- Fixed an issue where the tabs and buttons wouldn't fade when the main/general tab wasn't selected.
+
 ## Version 110000.02
 
 - Improved compatibility with ElvUI. Now the addon will stop loading if it detects that ElvUI chat is enabled, and
