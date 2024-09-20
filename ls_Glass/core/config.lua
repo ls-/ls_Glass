@@ -338,8 +338,27 @@ function E:CreateConfig()
 									end
 								end,
 							},
-							fade = {
+							position = {
 								order = 2,
+								type = "select",
+								name = L["POSITION"],
+								values = {
+									["left"] = L["LEFT"],
+									["right"] = L["RIGHT"],
+								},
+								get = function()
+									return C.db.profile.dock.buttons.position
+								end,
+								set = function(_, value)
+									if C.db.profile.dock.buttons.position ~= value then
+										C.db.profile.dock.buttons.position = value
+
+										E:UpdateButtonFramePosition()
+									end
+								end,
+							},
+							fade = {
+								order = 3,
 								type = "toggle",
 								name = L["FADING"],
 								get = function()

@@ -222,16 +222,6 @@ local CHAT_FRAME_TEXTURES = {
 	"BottomTexture",
 	"LeftTexture",
 	"RightTexture",
-
-	"ButtonFrameBackground",
-	"ButtonFrameTopLeftTexture",
-	"ButtonFrameTopRightTexture",
-	"ButtonFrameBottomLeftTexture",
-	"ButtonFrameBottomRightTexture",
-	"ButtonFrameTopTexture",
-	"ButtonFrameBottomTexture",
-	"ButtonFrameLeftTexture",
-	"ButtonFrameRightTexture",
 }
 
 local object_proto = {
@@ -958,7 +948,7 @@ function object_proto:UpdateChatWidgetFading()
 	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
 	if not C.db.profile.dock.fade.enabled then return end
 
-	local isMouseOver = self:IsMouseOver(26, -36, -36, 0)
+	local isMouseOver = self:IsMouseOver(26, -36, -36, 36)
 	if isMouseOver ~= self.isMouseOver then
 		self.isMouseOver = isMouseOver
 

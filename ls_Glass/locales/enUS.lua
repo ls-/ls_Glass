@@ -51,3 +51,6 @@ L["SUPPORT"] = "Support"
 L["TOP"] = "Top"
 L["X_PADDING"] = "Horizontal Padding"
 L["Y_PADDING"] = "Vertical Padding"
+
+L["LEFT"] = "Left"
+L["RIGHT"] = "Right"

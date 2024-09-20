@@ -139,13 +139,16 @@ D.profile = {
 			},
 		},
 	},
-	dock = {
+	dock = { -- tabs & buttons
 		alpha = 0.8,
 		-- font = {
 		-- 	size = 12,
 		-- 	shadow = true,
 		-- 	outline = false,
 		-- },
+		buttons = {
+			position = "left", -- "right",
+		},
 		fade = {
 			enabled = true,
 		},
