@@ -17,6 +17,13 @@ local DOCK_FADE_IN_DURATION = 0.1
 local DOCK_FADE_OUT_DURATION = 0.6
 local DOCK_FADE_OUT_DELAY = 4
 
+local DOWN = -1
+local UP = 1
+
+local MAX_SCROLL = 8
+local MED_SCROLL = 4
+local MIN_SCROLL = 1
+
 do
 	local map = {}
 
@@ -105,14 +112,14 @@ end
 hooksecurefunc("ChatFrame_ChatPageUp", function()
 	local slidingFrame = E:GetSlidingFrameForChatFrame(SELECTED_CHAT_FRAME)
 	if slidingFrame then
-		slidingFrame:OnMouseWheel(1)
+		slidingFrame:OnMouseWheel(UP, MAX_SCROLL)
 	end
 end)
 
 hooksecurefunc("ChatFrame_ChatPageDown", function()
 	local slidingFrame = E:GetSlidingFrameForChatFrame(SELECTED_CHAT_FRAME)
 	if slidingFrame then
-		slidingFrame:OnMouseWheel(-1)
+		slidingFrame:OnMouseWheel(DOWN, MAX_SCROLL)
 	end
 end)
 
@@ -877,28 +884,21 @@ function object_proto:ToggleScrollButtons()
 	self.ScrollUpButton:SetShown(C.db.profile.chat.buttons.up_and_down)
 end
 
-local DOWN = 1
-local UP = -1
-
-local MAX_SCROLL = 8
-local MED_SCROLL = 4
-local MIN_SCROLL = 1
-
-function object_proto:OnMouseWheel(delta)
+function object_proto:OnMouseWheel(delta, scrollOverride)
 	if self:GetNumHistoryElements() == 0 then
 		return self:SetFirstActiveMessageID(0)
 	end
 
 	self:ResetFadingTimer()
 
-	if delta == UP and self:IsAtBottom() then
+	if delta == DOWN and self:IsAtBottom() then
 		self:RefreshActive(self:GetFirstActiveMessageID())
 		self:UpdateFading()
 
 		return
 	end
 
-	if delta == DOWN and self:IsAtTop() then
+	if delta == UP and self:IsAtTop() then
 		self:RefreshActive(self:GetFirstActiveMessageID())
 
 		return
@@ -906,9 +906,10 @@ function object_proto:OnMouseWheel(delta)
 
 	self:ResetState(true)
 
-	local offset = (IsShiftKeyDown() and MAX_SCROLL or IsControlKeyDown() and MIN_SCROLL or MED_SCROLL) * self:GetMessageLineHeight()
+	local numLines = scrollOverride or (IsShiftKeyDown() and MAX_SCROLL or IsControlKeyDown() and MIN_SCROLL or MED_SCROLL)
+	local offset = numLines * self:GetMessageLineHeight()
 
-	if delta == UP then
+	if delta == DOWN then
 		self:RefreshActive(self:GetFirstActiveMessageID())
 		self:RefreshBackfill(self:GetFirstActiveMessageID() - 1, false, self:GetBottom() - offset)
 
