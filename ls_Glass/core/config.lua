@@ -338,8 +338,27 @@ function E:CreateConfig()
 									end
 								end,
 							},
-							fade = {
+							position = {
 								order = 2,
+								type = "select",
+								name = L["POSITION"],
+								values = {
+									["left"] = L["LEFT"],
+									["right"] = L["RIGHT"],
+								},
+								get = function()
+									return C.db.profile.dock.buttons.position
+								end,
+								set = function(_, value)
+									if C.db.profile.dock.buttons.position ~= value then
+										C.db.profile.dock.buttons.position = value
+
+										E:UpdateButtonFramePosition()
+									end
+								end,
+							},
+							fade = {
+								order = 3,
 								type = "toggle",
 								name = L["FADING"],
 								get = function()
@@ -351,6 +370,26 @@ function E:CreateConfig()
 
 										for i = 1, 10 do
 											E:ForChatFrame(i, "FadeInChatWidgets")
+										end
+									end
+								end,
+							},
+							toasts = {
+								order = 4,
+								type = "toggle",
+								name = L["QUICK_JOING_TOASTS"],
+								get = function()
+									return C.db.profile.dock.toasts.enabled
+								end,
+								set = function(_, value)
+									if C.db.profile.dock.toasts.enabled ~= value then
+										C.db.profile.dock.toasts.enabled = value
+
+										if value then
+											QuickJoinToastButton:SetScript("OnEvent", QuickJoinToastButton.OnEvent)
+										else
+											QuickJoinToastButton.displayedToast = nil
+											QuickJoinToastButton:SetScript("OnEvent", nil)
 										end
 									end
 								end,

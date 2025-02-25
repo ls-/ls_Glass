@@ -17,6 +17,13 @@ local DOCK_FADE_IN_DURATION = 0.1
 local DOCK_FADE_OUT_DURATION = 0.6
 local DOCK_FADE_OUT_DELAY = 4
 
+local DOWN = -1
+local UP = 1
+
+local MAX_SCROLL = 8
+local MED_SCROLL = 4
+local MIN_SCROLL = 1
+
 do
 	local map = {}
 
@@ -97,6 +104,36 @@ do
 		return true
 	end
 end
+
+------------------
+-- GLOBAL HOOKS --
+------------------
+
+hooksecurefunc("ChatFrame_ChatPageUp", function()
+	local slidingFrame = E:GetSlidingFrameForChatFrame(SELECTED_CHAT_FRAME)
+	if slidingFrame then
+		slidingFrame:OnMouseWheel(UP, MAX_SCROLL)
+	end
+end)
+
+hooksecurefunc("ChatFrame_ChatPageDown", function()
+	local slidingFrame = E:GetSlidingFrameForChatFrame(SELECTED_CHAT_FRAME)
+	if slidingFrame then
+		slidingFrame:OnMouseWheel(DOWN, MAX_SCROLL)
+	end
+end)
+
+hooksecurefunc("ChatFrame_ScrollToBottom", function()
+	local slidingFrame = E:GetSlidingFrameForChatFrame(SELECTED_CHAT_FRAME)
+	if slidingFrame then
+		slidingFrame:FastForward()
+
+		E:FadeOut(slidingFrame.ScrollToBottomButton, 0, 0.1, function()
+			slidingFrame.ScrollToBottomButton:SetState(1, true)
+			slidingFrame.ScrollToBottomButton:Hide()
+		end)
+	end
+end)
 
 ----------------
 -- BLIZZ CHAT --
@@ -222,16 +259,6 @@ local CHAT_FRAME_TEXTURES = {
 	"BottomTexture",
 	"LeftTexture",
 	"RightTexture",
-
-	"ButtonFrameBackground",
-	"ButtonFrameTopLeftTexture",
-	"ButtonFrameTopRightTexture",
-	"ButtonFrameBottomLeftTexture",
-	"ButtonFrameBottomRightTexture",
-	"ButtonFrameTopTexture",
-	"ButtonFrameBottomTexture",
-	"ButtonFrameLeftTexture",
-	"ButtonFrameRightTexture",
 }
 
 local object_proto = {
@@ -350,6 +377,8 @@ function object_proto:ReleaseChatFrame()
 end
 
 function object_proto:OnShow()
+	if not self:CanShowMessages() then return end
+
 	-- happens when additional docked chat frames were resized while hidden OnSizeChanged will fire first followed by
 	-- OnShow
 	self:ResetFadingTimer()
@@ -358,11 +387,16 @@ function object_proto:OnShow()
 end
 
 function object_proto:OnHide()
+	self.isMouseOver = nil
 	self.isLayoutDirty = true
 	self.isDisplayDirty = true
 	self.numIncomingMessages = 0
 	self.mouseOverHyperlinkMessageLine = nil
 	-- self.numIncomingMessagesWhileScrolling = 0
+end
+
+function object_proto:CanShowMessages()
+	return self:GetBottom() and self:IsShown() and self.ScrollChild:GetHeight() ~= 0
 end
 
 function object_proto:UpdateLayout()
@@ -607,7 +641,7 @@ function object_proto:GetLastBackfillMessageOffset()
 end
 
 function object_proto:RefreshBackfill(startIndex, maxLines, maxPixels, fadeIn)
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not self:CanShowMessages() then return end
 
 	local checkLines = maxLines ~= false
 	maxLines = maxLines or 6
@@ -710,7 +744,7 @@ function object_proto:CalculateAlphaFromTimestampDelta(delta)
 end
 
 function object_proto:UpdateFading()
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 or not self:CanFade() then return end
+	if not self:CanShowMessages() or not self:CanFade() then return end
 
 	local now = GetTime()
 
@@ -742,7 +776,7 @@ function object_proto:ShouldShowMessage(delta)
 end
 
 function object_proto:RefreshActive(startIndex, maxPixels)
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not self:CanShowMessages() then return end
 
 	maxPixels = maxPixels or self:GetTop()
 
@@ -812,7 +846,7 @@ function object_proto:RefreshActive(startIndex, maxPixels)
 end
 
 function object_proto:FadeInMessages()
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not self:CanShowMessages() then return end
 
 	self:ResetFadingTimer()
 	self:RefreshActive(self:GetFirstActiveMessageID())
@@ -820,7 +854,7 @@ function object_proto:FadeInMessages()
 end
 
 function object_proto:FastForward()
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not self:CanShowMessages() then return end
 
 	self:ResetFadingTimer()
 
@@ -850,28 +884,21 @@ function object_proto:ToggleScrollButtons()
 	self.ScrollUpButton:SetShown(C.db.profile.chat.buttons.up_and_down)
 end
 
-local DOWN = 1
-local UP = -1
-
-local MAX_SCROLL = 8
-local MED_SCROLL = 4
-local MIN_SCROLL = 1
-
-function object_proto:OnMouseWheel(delta)
+function object_proto:OnMouseWheel(delta, scrollOverride)
 	if self:GetNumHistoryElements() == 0 then
 		return self:SetFirstActiveMessageID(0)
 	end
 
 	self:ResetFadingTimer()
 
-	if delta == UP and self:IsAtBottom() then
+	if delta == DOWN and self:IsAtBottom() then
 		self:RefreshActive(self:GetFirstActiveMessageID())
 		self:UpdateFading()
 
 		return
 	end
 
-	if delta == DOWN and self:IsAtTop() then
+	if delta == UP and self:IsAtTop() then
 		self:RefreshActive(self:GetFirstActiveMessageID())
 
 		return
@@ -879,9 +906,10 @@ function object_proto:OnMouseWheel(delta)
 
 	self:ResetState(true)
 
-	local offset = (IsShiftKeyDown() and MAX_SCROLL or IsControlKeyDown() and MIN_SCROLL or MED_SCROLL) * self:GetMessageLineHeight()
+	local numLines = scrollOverride or (IsShiftKeyDown() and MAX_SCROLL or IsControlKeyDown() and MIN_SCROLL or MED_SCROLL)
+	local offset = numLines * self:GetMessageLineHeight()
 
-	if delta == UP then
+	if delta == DOWN then
 		self:RefreshActive(self:GetFirstActiveMessageID())
 		self:RefreshBackfill(self:GetFirstActiveMessageID() - 1, false, self:GetBottom() - offset)
 
@@ -926,7 +954,7 @@ function object_proto:IsMouseOverHyperlink()
 end
 
 function object_proto:OnFrame()
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 or self:IsScrolling() then return end
+	if not self:CanShowMessages() or self:IsScrolling() then return end
 
 	if self:HasIncomingMessages() and self:CanProcessIncoming() then
 		self:ProcessIncoming(self.numIncomingMessages)
@@ -937,7 +965,7 @@ function object_proto:OnFrame()
 end
 
 function object_proto:FadeInChatWidgets()
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not self:CanShowMessages() then return end
 
 	self.isMouseOver = nil
 
@@ -955,10 +983,10 @@ function object_proto:FadeInChatWidgets()
 end
 
 function object_proto:UpdateChatWidgetFading()
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not self:CanShowMessages() then return end
 	if not C.db.profile.dock.fade.enabled then return end
 
-	local isMouseOver = self:IsMouseOver(26, -36, -36, 0)
+	local isMouseOver = self:IsMouseOver(26, -36, -36, 36)
 	if isMouseOver ~= self.isMouseOver then
 		self.isMouseOver = isMouseOver
 
@@ -972,9 +1000,7 @@ function object_proto:UpdateChatWidgetFading()
 						E:FadeOut(GeneralDockManager, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 					end
 				end)
-			end
-
-			if not self.ChatFrame.isDocked then
+			else
 				E:FadeIn(self.ChatTab, DOCK_FADE_IN_DURATION, function()
 					if self.isMouseOver then
 						E:StopFading(self.ChatTab, 1)
@@ -1014,9 +1040,7 @@ function object_proto:UpdateChatWidgetFading()
 				if not isAnyChatAlerting() then
 					E:FadeOut(GeneralDockManager, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 				end
-			end
-
-			if not self.ChatFrame.isDocked then
+			else
 				if not self.isDragging then
 					E:FadeOut(self.ChatTab, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 				else

@@ -78,6 +78,7 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 
 			E:HandleChatTab(_G["ChatFrame" .. i .. "Tab"])
 			E:HandleEditBox(_G["ChatFrame" .. i .. "EditBox"])
+			E:HandleButtonFrame(_G["ChatFrame" .. i .. "ButtonFrame"], _G["ChatFrame" .. i])
 			E:HandleMinimizeButton(_G["ChatFrame" .. i .. "ButtonFrameMinimizeButton"], _G["ChatFrame" .. i .. "Tab"])
 
 			if i == 1 then
@@ -109,6 +110,7 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 				if frame then
 					E:HandleChatTab(_G[chatFrame:GetName() .. "Tab"])
 					E:HandleEditBox(_G[chatFrame:GetName() .. "EditBox"])
+					E:HandleButtonFrame(_G[chatFrame:GetName() .. "ButtonFrame"], _G[chatFrame:GetName()])
 					E:HandleMinimizeButton(_G[chatFrame:GetName() .. "ButtonFrameMinimizeButton"], _G[chatFrame:GetName() .. "Tab"])
 
 					tempChatFrames[frame] = true
@@ -199,8 +201,6 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 		AddonCompartmentFrame:RegisterAddon({
 			text = L["LS_GLASS"],
 			icon = "Interface\\AddOns\\ls_Glass\\assets\\logo-32",
-			notCheckable = true,
-			registerForAnyClick = true,
 			func = function()
 				if not InCombatLockdown() then
 					if not C.options then

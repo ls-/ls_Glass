@@ -9,16 +9,92 @@ local t_remove = _G.table.remove
 local tonumber = _G.tonumber
 
 -- Mine
-local handledbuttons = {}
+local function updateButtonFramePosition(frame, chatFrame)
+	frame:ClearAllPoints()
+
+	local position = C.db.profile.dock.buttons.position
+	if position == "left" then
+		frame:SetPoint("TOPRIGHT", chatFrame, "TOPLEFT", -5, 0)
+		frame:SetPoint("BOTTOMRIGHT", chatFrame, "BOTTOMLEFT", -5, 0)
+	else
+		frame:SetPoint("TOPLEFT", chatFrame, "TOPRIGHT", 5, 0)
+		frame:SetPoint("BOTTOMLEFT", chatFrame, "BOTTOMRIGHT", 5, 0)
+	end
+
+	if chatFrame == ChatFrame1 then
+		ChatAlertFrame:ClearAllPoints()
+		ChatAlertFrame:SetChatButtonSide(position)
+
+		if position == "left" then
+			ChatAlertFrame:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", -2, 56)
+		else
+			ChatAlertFrame:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", 2, 56)
+		end
+
+		-- hooks will take care of the rest
+		QuickJoinToastButton:SetToastDirection(position == "right")
+	end
+end
+
+hooksecurefunc("FCF_SetButtonSide", function(chatFrame)
+	updateButtonFramePosition(chatFrame.buttonFrame, chatFrame)
+end)
+
+local handledFrames = {}
+
+local BUTTON_FRAME_TEXTURES = {
+	"Background",
+	"TopLeftTexture",
+	"TopRightTexture",
+	"BottomLeftTexture",
+	"BottomRightTexture",
+	"TopTexture",
+	"BottomTexture",
+	"LeftTexture",
+	"RightTexture",
+}
+
+function E:HandleButtonFrame(frame, chatFrame)
+	if not handledFrames[frame] then
+		handledFrames[frame] = chatFrame
+	end
+
+	for _, texture in next, BUTTON_FRAME_TEXTURES do
+		local obj = _G[frame:GetName() .. texture]
+		if obj then
+			obj:SetTexture(0)
+		end
+	end
+
+	frame:SetWidth(16)
+
+	if chatFrame == ChatFrame1 then
+		ChatAlertFrame:SetWidth(20)
+	end
+
+	updateButtonFramePosition(frame, chatFrame)
+end
+
+function E:UpdateButtonFramePosition()
+	for frame, chatFrame in next, handledFrames do
+		updateButtonFramePosition(frame, chatFrame)
+	end
+end
+
+-------------
+-- BUTTONS --
+-------------
+
+local handledButtons = {}
 
 local function handleButton(frame, ...)
-	if not handledbuttons[frame] then
+	if not handledButtons[frame] then
 		frame.Backdrop = E:CreateBackdrop(frame, C.db.profile.dock.alpha)
 		frame.HighlightLeft = frame:CreateTexture(nil, "HIGHLIGHT")
 		frame.HighlightMiddle = frame:CreateTexture(nil, "HIGHLIGHT")
 		frame.HighlightRight = frame:CreateTexture(nil, "HIGHLIGHT")
 
-		handledbuttons[frame] = true
+		handledButtons[frame] = true
 	end
 
 	frame:SetFlattensRenderLayers(true)
@@ -134,21 +210,20 @@ function E:HandleQuickJoinToastButton(frame)
 
 		if anchor == QuickJoinToastButton then
 			self:ClearAllPoints()
-			self:SetPoint("BOTTOMLEFT", ChatAlertFrame, "BOTTOMRIGHT", 2, 0, true)
+
+			if C.db.profile.dock.buttons.position == "left" then
+				self:SetPoint("TOPLEFT", ChatAlertFrame, "BOTTOMLEFT", 0, -2, true)
+			else
+				self:SetPoint("TOPRIGHT", ChatAlertFrame, "BOTTOMRIGHT", 0, -2, true)
+			end
 		end
 	end
 
-	frame.Toast:ClearAllPoints()
-	frame.Toast:SetPoint("TOPLEFT", ChatAlertFrame, "BOTTOMLEFT", 0, -2)
+	resetToastPoint(frame.Toast, nil, QuickJoinToastButton)
 	hooksecurefunc(frame.Toast, "SetPoint", resetToastPoint)
 
-	frame.Toast2:ClearAllPoints()
-	frame.Toast2:SetPoint("TOPLEFT", ChatAlertFrame, "BOTTOMLEFT", 0, -2)
+	resetToastPoint(frame.Toast2, nil, QuickJoinToastButton)
 	hooksecurefunc(frame.Toast2, "SetPoint", resetToastPoint)
-
-	-- ? mb move it elsewhere
-	ChatAlertFrame:ClearAllPoints()
-	ChatAlertFrame:SetPoint("BOTTOMLEFT", ChatFrame1.buttonFrame, "TOPRIGHT", -18, 56)
 end
 
 function E:HandleChannelButton(frame)
@@ -204,7 +279,7 @@ end
 function E:UpdateButtonAlpha()
 	local alpha = C.db.profile.dock.alpha
 
-	for button in next, handledbuttons do
+	for button in next, handledButtons do
 		button.Backdrop:UpdateAlpha(alpha)
 	end
 end

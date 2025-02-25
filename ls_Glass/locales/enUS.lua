@@ -21,6 +21,7 @@ L["ENABLE"] = _G.ENABLE
 L["GENERAL"] = _G.GENERAL_LABEL
 L["INFO"] = "|cffe0bc5b" .. _G.INFO .. "|r"
 L["OKAY"] = _G.OKAY
+L["QUICK_JOING_TOASTS"] = _G.COMMUNITIES_NOTIFICATION_SETTINGS_DIALOG_QUICK_JOIN_LABEL
 L["RESET_TO_DEFAULT"] = _G.RESET_TO_DEFAULT
 
 -- Require translation
@@ -37,11 +38,13 @@ L["EDITBOX"] = "Edit Box"
 L["FADE_OUT_DELAY"] = "Fade Out Delay"
 L["FADING"] = "Fading"
 L["FONT"] = "Font"
+L["LEFT"] = "Left"
 L["MOUSEOVER_TOOLTIPS"] = "Mouseover Tooltips"
 L["OFFSET"] = "Offset"
 L["OPEN_CONFIG"] = "Open Config"
 L["OUTLINE"] = "Outline"
 L["POSITION"] = "Position"
+L["RIGHT"] = "Right"
 L["SCROLL_BUTTONS"] = "Scroll Buttons"
 L["SHADOW"] = "Shadow"
 L["SHOW_ON_CLICK"] = "Show On Click"
