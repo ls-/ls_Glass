@@ -374,6 +374,26 @@ function E:CreateConfig()
 									end
 								end,
 							},
+							toasts = {
+								order = 4,
+								type = "toggle",
+								name = L["QUICK_JOING_TOASTS"],
+								get = function()
+									return C.db.profile.dock.toasts.enabled
+								end,
+								set = function(_, value)
+									if C.db.profile.dock.toasts.enabled ~= value then
+										C.db.profile.dock.toasts.enabled = value
+
+										if value then
+											QuickJoinToastButton:SetScript("OnEvent", QuickJoinToastButton.OnEvent)
+										else
+											QuickJoinToastButton.displayedToast = nil
+											QuickJoinToastButton:SetScript("OnEvent", nil)
+										end
+									end
+								end,
+							},
 						},
 					},
 					spacer_3 = createSpacer(29),

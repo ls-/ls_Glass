@@ -152,6 +152,9 @@ D.profile = {
 		fade = {
 			enabled = true,
 		},
+		toasts = {
+			enabled = true,
+		},
 	},
 	edit = {
 		alpha = 0.8,
