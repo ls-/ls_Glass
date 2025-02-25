@@ -340,6 +340,8 @@ function object_proto:ReleaseChatFrame()
 end
 
 function object_proto:OnShow()
+	if not self:CanShowMessages() then return end
+
 	-- happens when additional docked chat frames were resized while hidden OnSizeChanged will fire first followed by
 	-- OnShow
 	self:ResetFadingTimer()
@@ -353,6 +355,10 @@ function object_proto:OnHide()
 	self.numIncomingMessages = 0
 	self.mouseOverHyperlinkMessageLine = nil
 	-- self.numIncomingMessagesWhileScrolling = 0
+end
+
+function object_proto:CanShowMessages()
+	return self:GetBottom() and self:IsShown() and self.ScrollChild:GetHeight() ~= 0
 end
 
 function object_proto:UpdateLayout()
@@ -597,7 +603,7 @@ function object_proto:GetLastBackfillMessageOffset()
 end
 
 function object_proto:RefreshBackfill(startIndex, maxLines, maxPixels, fadeIn)
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not self:CanShowMessages() then return end
 
 	local checkLines = maxLines ~= false
 	maxLines = maxLines or 6
@@ -700,7 +706,7 @@ function object_proto:CalculateAlphaFromTimestampDelta(delta)
 end
 
 function object_proto:UpdateFading()
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 or not self:CanFade() then return end
+	if not self:CanShowMessages() or not self:CanFade() then return end
 
 	local now = GetTime()
 
@@ -732,7 +738,7 @@ function object_proto:ShouldShowMessage(delta)
 end
 
 function object_proto:RefreshActive(startIndex, maxPixels)
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not self:CanShowMessages() then return end
 
 	maxPixels = maxPixels or self:GetTop()
 
@@ -802,7 +808,7 @@ function object_proto:RefreshActive(startIndex, maxPixels)
 end
 
 function object_proto:FadeInMessages()
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not self:CanShowMessages() then return end
 
 	self:ResetFadingTimer()
 	self:RefreshActive(self:GetFirstActiveMessageID())
@@ -810,7 +816,7 @@ function object_proto:FadeInMessages()
 end
 
 function object_proto:FastForward()
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not self:CanShowMessages() then return end
 
 	self:ResetFadingTimer()
 
@@ -916,7 +922,7 @@ function object_proto:IsMouseOverHyperlink()
 end
 
 function object_proto:OnFrame()
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 or self:IsScrolling() then return end
+	if not self:CanShowMessages() or self:IsScrolling() then return end
 
 	if self:HasIncomingMessages() and self:CanProcessIncoming() then
 		self:ProcessIncoming(self.numIncomingMessages)
@@ -927,7 +933,7 @@ function object_proto:OnFrame()
 end
 
 function object_proto:FadeInChatWidgets()
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not self:CanShowMessages() then return end
 
 	self.isMouseOver = nil
 
@@ -945,7 +951,7 @@ function object_proto:FadeInChatWidgets()
 end
 
 function object_proto:UpdateChatWidgetFading()
-	if not self:IsShown() or self.ScrollChild:GetHeight() == 0 then return end
+	if not self:CanShowMessages() then return end
 	if not C.db.profile.dock.fade.enabled then return end
 
 	local isMouseOver = self:IsMouseOver(26, -36, -36, 36)
