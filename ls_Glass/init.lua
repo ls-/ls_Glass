@@ -110,6 +110,7 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 				if frame then
 					E:HandleChatTab(_G[chatFrame:GetName() .. "Tab"])
 					E:HandleEditBox(_G[chatFrame:GetName() .. "EditBox"])
+					E:HandleButtonFrame(_G[chatFrame:GetName() .. "ButtonFrame"], _G[chatFrame:GetName()])
 					E:HandleMinimizeButton(_G[chatFrame:GetName() .. "ButtonFrameMinimizeButton"], _G[chatFrame:GetName() .. "Tab"])
 
 					tempChatFrames[frame] = true
