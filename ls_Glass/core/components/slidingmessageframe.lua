@@ -98,6 +98,36 @@ do
 	end
 end
 
+------------------
+-- GLOBAL HOOKS --
+------------------
+
+hooksecurefunc("ChatFrame_ChatPageUp", function()
+	local slidingFrame = E:GetSlidingFrameForChatFrame(SELECTED_CHAT_FRAME)
+	if slidingFrame then
+		slidingFrame:OnMouseWheel(1)
+	end
+end)
+
+hooksecurefunc("ChatFrame_ChatPageDown", function()
+	local slidingFrame = E:GetSlidingFrameForChatFrame(SELECTED_CHAT_FRAME)
+	if slidingFrame then
+		slidingFrame:OnMouseWheel(-1)
+	end
+end)
+
+hooksecurefunc("ChatFrame_ScrollToBottom", function()
+	local slidingFrame = E:GetSlidingFrameForChatFrame(SELECTED_CHAT_FRAME)
+	if slidingFrame then
+		slidingFrame:FastForward()
+
+		E:FadeOut(slidingFrame.ScrollToBottomButton, 0, 0.1, function()
+			slidingFrame.ScrollToBottomButton:SetState(1, true)
+			slidingFrame.ScrollToBottomButton:Hide()
+		end)
+	end
+end)
+
 ----------------
 -- BLIZZ CHAT --
 ----------------
