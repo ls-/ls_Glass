@@ -65,6 +65,7 @@ read_globals = {
 	"NORMAL_FONT_COLOR",
 	"NUM_CHAT_WINDOWS",
 	"QuickJoinToastButton",
+	"SELECTED_CHAT_FRAME",
 	"Settings",
 	"SettingsPanel",
 	"TextToSpeechButton",
