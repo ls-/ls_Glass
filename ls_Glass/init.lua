@@ -201,8 +201,6 @@ E:RegisterEvent("ADDON_LOADED", function(arg1)
 		AddonCompartmentFrame:RegisterAddon({
 			text = L["LS_GLASS"],
 			icon = "Interface\\AddOns\\ls_Glass\\assets\\logo-32",
-			notCheckable = true,
-			registerForAnyClick = true,
 			func = function()
 				if not InCombatLockdown() then
 					if not C.options then
