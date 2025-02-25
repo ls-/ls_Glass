@@ -350,6 +350,7 @@ function object_proto:OnShow()
 end
 
 function object_proto:OnHide()
+	self.isMouseOver = nil
 	self.isLayoutDirty = true
 	self.isDisplayDirty = true
 	self.numIncomingMessages = 0
@@ -968,9 +969,7 @@ function object_proto:UpdateChatWidgetFading()
 						E:FadeOut(GeneralDockManager, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 					end
 				end)
-			end
-
-			if not self.ChatFrame.isDocked then
+			else
 				E:FadeIn(self.ChatTab, DOCK_FADE_IN_DURATION, function()
 					if self.isMouseOver then
 						E:StopFading(self.ChatTab, 1)
@@ -1010,9 +1009,7 @@ function object_proto:UpdateChatWidgetFading()
 				if not isAnyChatAlerting() then
 					E:FadeOut(GeneralDockManager, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 				end
-			end
-
-			if not self.ChatFrame.isDocked then
+			else
 				if not self.isDragging then
 					E:FadeOut(self.ChatTab, DOCK_FADE_OUT_DELAY, DOCK_FADE_OUT_DURATION)
 				else
