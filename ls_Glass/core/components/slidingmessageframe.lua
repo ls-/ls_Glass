@@ -181,7 +181,7 @@ local function chatFrame_HideHook(self)
 	end
 end
 
-local function chatFrame_RemoveMessagesByPredicateHook(self)
+local function chatFrame_RefreshMessagesInPlace(self)
 	local slidingFrame = E:GetSlidingFrameForChatFrame(self)
 	if slidingFrame then
 		slidingFrame.isLayoutDirty = true
@@ -343,7 +343,8 @@ function object_proto:CaptureChatFrame(chatFrame)
 		end)
 
 		-- redraw the frame if visible
-		hooksecurefunc(chatFrame, "RemoveMessagesByPredicate", chatFrame_RemoveMessagesByPredicateHook)
+		hooksecurefunc(chatFrame, "RemoveMessagesByPredicate", chatFrame_RefreshMessagesInPlace)
+		hooksecurefunc(chatFrame, "TransformMessages", chatFrame_RefreshMessagesInPlace)
 
 		chatFrame:HookScript("OnHyperlinkEnter", chatFrame_OnHyperlinkEnterHook)
 		chatFrame:HookScript("OnHyperlinkLeave", chatFrame_OnHyperlinkLeaveHook)
