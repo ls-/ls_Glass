@@ -448,6 +448,18 @@ function E:CreateConfig()
 									end
 								end,
 							},
+							multiline = {
+								order = 4,
+								type = "toggle",
+								name = L["MULTILINE"],
+								set = function(_, value)
+									if C.db.profile.edit.multiline ~= value then
+										C.db.profile.edit.multiline = value
+
+										E:UpdateEditBoxMultiLine()
+									end
+								end,
+							},
 							spacer_1 = createSpacer(9),
 							font = {
 								order = 10,

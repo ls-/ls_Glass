@@ -20,7 +20,7 @@ local EDIT_BOX_TEXTURES = {
 
 function E:HandleEditBox(frame)
 	if not handledEditBoxes[frame] then
-		frame.Backdrop = E:CreateBackdrop(frame, C.db.profile.edit.alpha, 0, 2)
+		frame.Backdrop = E:CreateBackdrop(frame, C.db.profile.edit.alpha, 0, C.db.profile.edit.multiline and -9 or 2)
 
 		handledEditBoxes[frame] = true
 	end
@@ -29,6 +29,8 @@ function E:HandleEditBox(frame)
 		_G[frame:GetName() .. texture]:SetTexture(0)
 	end
 
+	frame:SetMultiLine(C.db.profile.edit.multiline)
+	frame:SetHeight(32)
 	frame:ClearAllPoints()
 
 	if C.db.profile.edit.position == "top" then
@@ -60,6 +62,17 @@ function E:UpdateEditBoxPosition()
 			editBox:SetPoint("BOTTOMLEFT", editBox.chatFrame, "BOTTOMLEFT", 0, -offset)
 			editBox:SetPoint("BOTTOMRIGHT", editBox.chatFrame, "BOTTOMRIGHT", 0, -offset)
 		end
+	end
+end
+
+function E:UpdateEditBoxMultiLine()
+	local isMultiline = C.db.profile.edit.multiline
+
+	for editBox in next, handledEditBoxes do
+		editBox:SetMultiLine(isMultiline)
+		editBox:SetHeight(32)
+
+		editBox.Backdrop:UpdateOffsets(0, isMultiline and -9 or 2)
 	end
 end
 

@@ -160,6 +160,7 @@ D.profile = {
 		alpha = 0.8,
 		position = "bottom", -- "top"
 		offset = 32,
+		multiline = false,
 		font = {
 			size = 12,
 			shadow = true,
