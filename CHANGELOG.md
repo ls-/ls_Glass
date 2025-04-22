@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Version 110105.01
+
+- Added 11.1.5 support.
+- Added an option to make the chat input show multiple lines of text. Can be found at / LSG > Edit Xox > Multiline,
+  disabled by default.
+
 ## Version 110100.01
 
 - Added 11.1.0 support.
