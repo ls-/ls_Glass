@@ -5,6 +5,7 @@
 ## Notes: Smooth as glass.
 ## IconTexture: Interface\AddOns\ls_Glass\assets\logo-64
 ## SavedVariables: LS_GLASS_GLOBAL_CONFIG
+## LoadSavedVariablesFirst: 1
 ## OptionalDeps: ElvUI
 
 embeds\_embeds.xml
