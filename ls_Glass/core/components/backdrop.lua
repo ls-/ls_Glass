@@ -14,6 +14,11 @@ do
 		self:SetBackdropColor(0, 0, 0, a)
 		self:SetBackdropBorderColor(0, 0, 0, a)
 	end
+
+	function backdrop_proto:UpdateOffsets(xOffset, yOffset)
+		self:SetPoint("TOPLEFT", xOffset or 0, -(yOffset or 0))
+		self:SetPoint("BOTTOMRIGHT", -(xOffset or 0), yOffset or 0)
+	end
 end
 
 function E:CreateBackdrop(parent, alpha,  xOffset, yOffset)
