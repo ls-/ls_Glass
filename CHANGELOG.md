@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Version 110105.02
+
+- Fixed an issue where old chat messages would still disappear even though message fading is disabled.
+
 ## Version 110105.01
 
 - Added 11.1.5 support.

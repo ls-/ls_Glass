@@ -768,6 +768,10 @@ function object_proto:UpdateFading()
 end
 
 function object_proto:ShouldShowMessage(delta)
+	if not C.db.profile.chat.fade.enabled then
+		return true
+	end
+
 	delta = delta - C.db.profile.chat.fade.out_delay
 	if delta >= CHAT_FADE_OUT_DURATION then
 		return false
