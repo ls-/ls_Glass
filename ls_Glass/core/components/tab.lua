@@ -7,6 +7,13 @@ local hooksecurefunc = _G.hooksecurefunc
 local next = _G.next
 
 -- Mine
+-- BUG: Blizz broke pet battle tab names in 10.x
+hooksecurefunc("FCF_SetWindowName", function(frame, name)
+	if frame and frame.chatType == "PET_BATTLE_COMBAT_LOG" then
+		_G[frame:GetName() .. "Tab"]:SetText(name)
+	end
+end)
+
 local function chatTab_SetPoint(self, _, anchor, _, _, _, shouldIgnore)
 	if anchor == GeneralDockManager.scrollFrame.child and not shouldIgnore then
 		self:ClearAllPoints()
