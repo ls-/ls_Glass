@@ -461,6 +461,19 @@ function E:CreateConfig()
 									end
 								end,
 							},
+							alt = {
+								order = 5,
+								type = "toggle",
+								name = L["ALT_FOR_CURSOR_MOVEMENT"],
+								width = 1.25,
+								set = function(_, value)
+									if C.db.profile.edit.alt ~= value then
+										C.db.profile.edit.alt = value
+
+										E:UpdateEditBoxAltArrowKeyMode()
+									end
+								end,
+							},
 							spacer_1 = createSpacer(9),
 							font = {
 								order = 10,

@@ -25,6 +25,7 @@ L["QUICK_JOING_TOASTS"] = _G.COMMUNITIES_NOTIFICATION_SETTINGS_DIALOG_QUICK_JOIN
 L["RESET_TO_DEFAULT"] = _G.RESET_TO_DEFAULT
 
 -- Require translation
+L["ALT_FOR_CURSOR_MOVEMENT"] = "Alt Key for Cursor Movement"
 L["BACKGROUND_ALPHA"] = "Background Opacity"
 L["BOTTOM"] = "Bottom"
 L["CHANGELOG"] = "Changelog"

@@ -8,6 +8,7 @@ local _G = getfenv(0)
 
 if GetLocale() ~= "ruRU" then return end
 
+L["ALT_FOR_CURSOR_MOVEMENT"] = "Alt для перемещение курсора"
 L["BACKGROUND_ALPHA"] = "Прозрачность фона"
 L["BOTTOM"] = "Снизу"
 L["CHANGELOG"] = "Список изменений"
