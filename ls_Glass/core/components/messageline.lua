@@ -6,7 +6,7 @@ local _G = getfenv(0)
 local pairs = _G.pairs
 
 -- Mine
-local FADE_IN_DURATION = 0.2
+local FADE_IN_DURATION = 0.15
 local FADE_IN_DELAY = 0.075
 
 local message_line_proto = {}
