@@ -161,6 +161,7 @@ D.profile = {
 		position = "bottom", -- "top"
 		offset = 32,
 		multiline = false,
+		alt = true,
 		font = {
 			size = 12,
 			shadow = true,

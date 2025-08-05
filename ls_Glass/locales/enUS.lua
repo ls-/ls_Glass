@@ -25,6 +25,7 @@ L["QUICK_JOING_TOASTS"] = _G.COMMUNITIES_NOTIFICATION_SETTINGS_DIALOG_QUICK_JOIN
 L["RESET_TO_DEFAULT"] = _G.RESET_TO_DEFAULT
 
 -- Require translation
+L["ALT_FOR_CURSOR_MOVEMENT"] = "Alt Key for Cursor Movement"
 L["BACKGROUND_ALPHA"] = "Background Opacity"
 L["BOTTOM"] = "Bottom"
 L["CHANGELOG"] = "Changelog"
@@ -40,6 +41,7 @@ L["FADING"] = "Fading"
 L["FONT"] = "Font"
 L["LEFT"] = "Left"
 L["MOUSEOVER_TOOLTIPS"] = "Mouseover Tooltips"
+L["MULTILINE"] = "Multiline"
 L["OFFSET"] = "Offset"
 L["OPEN_CONFIG"] = "Open Config"
 L["OUTLINE"] = "Outline"
@@ -54,5 +56,3 @@ L["SUPPORT"] = "Support"
 L["TOP"] = "Top"
 L["X_PADDING"] = "Horizontal Padding"
 L["Y_PADDING"] = "Vertical Padding"
-
-L["MULTILINE"] = "Multiline"

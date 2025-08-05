@@ -8,6 +8,7 @@ local _G = getfenv(0)
 
 if GetLocale() ~= "ruRU" then return end
 
+L["ALT_FOR_CURSOR_MOVEMENT"] = "Alt для перемещение курсора"
 L["BACKGROUND_ALPHA"] = "Прозрачность фона"
 L["BOTTOM"] = "Снизу"
 L["CHANGELOG"] = "Список изменений"
@@ -23,6 +24,7 @@ L["FADING"] = "Затухание"
 L["FONT"] = "Шрифт"
 L["LEFT"] = "Слева"
 L["MOUSEOVER_TOOLTIPS"] = "Подсказки по наведению мыши"
+L["MULTILINE"] = "Многострочное"
 L["OFFSET"] = "Смещение"
 L["OPEN_CONFIG"] = "Настройки"
 L["OUTLINE"] = "Контур"
@@ -37,5 +39,3 @@ L["SUPPORT"] = "Поддержка"
 L["TOP"] = "Сверху"
 L["X_PADDING"] = "Внутренний гориз. отступ"
 L["Y_PADDING"] = "Внутренний верт. отступ"
-
-L["MULTILINE"] = "Многострочное"

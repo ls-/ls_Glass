@@ -30,6 +30,7 @@ function E:HandleEditBox(frame)
 	end
 
 	frame:SetMultiLine(C.db.profile.edit.multiline)
+	frame:SetAltArrowKeyMode(C.db.profile.edit.alt)
 	frame:SetHeight(32)
 	frame:ClearAllPoints()
 
@@ -73,6 +74,14 @@ function E:UpdateEditBoxMultiLine()
 		editBox:SetHeight(32)
 
 		editBox.Backdrop:UpdateOffsets(0, isMultiline and -9 or 2)
+	end
+end
+
+function E:UpdateEditBoxAltArrowKeyMode()
+	local altMode = C.db.profile.edit.alt
+
+	for editBox in next, handledEditBoxes do
+		editBox:SetAltArrowKeyMode(altMode)
 	end
 end
 
