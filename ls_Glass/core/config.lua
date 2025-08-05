@@ -241,6 +241,7 @@ local function createChatFrameConfig(id, order)
 						C.db.profile.chat[id].font[info[#info]] = value
 
 						E:UpdateMessageFont(id)
+						E:ForMessageLinePool(id, "UpdateWidth")
 						E:ForMessageLinePool(id, "UpdateHeight")
 					end
 				end,
