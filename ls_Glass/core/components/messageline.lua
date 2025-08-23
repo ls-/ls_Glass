@@ -16,6 +16,8 @@ do
 	end
 
 	function message_line_proto:SetText(text, r, g, b, a)
+		-- BUG: it seems that whenever font's alphabet changes the spacing ends up growing, reset it
+		self.Text:SetSpacing(0)
 		self.Text:SetText(text)
 		self.Text:SetTextColor(r or 1, g or 1, b or 1, a)
 
