@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Version 110200.02
+
+- Fixed an issue with the line spacing. There seems to be a Blizz bug where it just ends up increasing on its own.
+- Reworked and brought back the new message fade-in effect. Instead of fading in all new messages, only the last/lowest
+  new messaged will be faded in. It should eliminate any weird emptiness while keeping things smooth.
+  Bozo, welcome back.
+
 ## Version 110200.01
 
 - Added 11.2.0 support.

@@ -7,7 +7,6 @@ local pairs = _G.pairs
 
 -- Mine
 local FADE_IN_DURATION = 0.15
-local FADE_IN_DELAY = 0.075
 
 local message_line_proto = {}
 do
@@ -16,6 +15,8 @@ do
 	end
 
 	function message_line_proto:SetText(text, r, g, b, a)
+		-- BUG: it seems that whenever font's alphabet changes the spacing ends up growing, reset it
+		self.Text:SetSpacing(0)
 		self.Text:SetText(text)
 		self.Text:SetTextColor(r or 1, g or 1, b or 1, a)
 
@@ -47,7 +48,7 @@ do
 	end
 
 	function message_line_proto:FadeIn()
-		E:FadeIn(self, FADE_IN_DURATION, nil, FADE_IN_DELAY)
+		E:FadeIn(self, FADE_IN_DURATION)
 	end
 
 	function message_line_proto:FadeOut(delay, duration)

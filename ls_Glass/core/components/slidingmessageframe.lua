@@ -633,7 +633,7 @@ function object_proto:GetLastBackfillMessageOffset()
 	return self.lastBackfillMessageOffset or 0
 end
 
-function object_proto:RefreshBackfill(startIndex, maxLines, maxPixels)
+function object_proto:RefreshBackfill(startIndex, maxLines, maxPixels, fadeIn)
 	if not self:CanShowMessages() then return end
 
 	local checkLines = maxLines ~= false
@@ -672,12 +672,18 @@ function object_proto:RefreshBackfill(startIndex, maxLines, maxPixels)
 		end
 
 		messageLine:SetMessage(messageID, messageInfo.timestamp, messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b)
-		messageLine:StopFading(1)
 
 		if checkLines then
 			isFull = lineIndex == maxLines
 		else
 			isFull = messageLine:GetBottom() - 1 <= maxPixels
+		end
+
+		if isFull and fadeIn then
+			messageLine:SetAlpha(0)
+			messageLine:FadeIn()
+		else
+			messageLine:SetAlpha(1)
 		end
 	end
 
@@ -1050,7 +1056,7 @@ function object_proto:UpdateChatWidgetFading()
 end
 
 function object_proto:ProcessIncoming(num)
-	self:RefreshBackfill(num, num)
+	self:RefreshBackfill(num, num, nil, true)
 	self:SetSmoothScroll(self.funcCache.baseScroll, self:GetLastBackfillMessageOffset(), self.funcCache.baseScrollCallback)
 end
 
