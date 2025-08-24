@@ -7,7 +7,6 @@ local pairs = _G.pairs
 
 -- Mine
 local FADE_IN_DURATION = 0.15
-local FADE_IN_DELAY = 0.075
 
 local message_line_proto = {}
 do
@@ -49,7 +48,7 @@ do
 	end
 
 	function message_line_proto:FadeIn()
-		E:FadeIn(self, FADE_IN_DURATION, nil, FADE_IN_DELAY)
+		E:FadeIn(self, FADE_IN_DURATION)
 	end
 
 	function message_line_proto:FadeOut(delay, duration)
