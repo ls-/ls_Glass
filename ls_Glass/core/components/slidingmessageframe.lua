@@ -219,6 +219,12 @@ local function chatFrame_OnHyperlinkLeaveHook(self)
 	end
 end
 
+local function chatFrame_SetHyperlinkEnabledHook(self, state, ignore)
+	if not state and not ignore then
+		self:SetHyperlinksEnabled(true)
+	end
+end
+
 local alertingFrames = {}
 
 local function isAnyChatAlerting()
@@ -320,11 +326,15 @@ function object_proto:CaptureChatFrame(chatFrame)
 	-- ! it's safer to hide the string container than the chat frame itself
 	chatFrame.FontStringContainer:Hide()
 
+	-- keep them enabled, way too many people set their frames to the non-interactive mode without realising it
+	chatFrame:SetHyperlinksEnabled(true)
+
 	if not hookedChatFrames[chatFrame] then
 		chatFrame:HookScript("OnSizeChanged", chatFrame_OnSizeChanged)
 
 		hooksecurefunc(chatFrame, "SetShown", chatFrame_SetShownHook)
 		hooksecurefunc(chatFrame, "Hide", chatFrame_HideHook)
+		hooksecurefunc(chatFrame, "SetHyperlinksEnabled", chatFrame_SetHyperlinkEnabledHook)
 
 		-- some addon devs tend to hook AddMessage to add filtering, so do it the hard way
 		hooksecurefunc(chatFrame.historyBuffer, "PushFront", function()
