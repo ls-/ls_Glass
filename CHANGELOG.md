@@ -3,6 +3,8 @@
 ## Version 110205.01
 
 - Added 11.2.5 support.
+- Added a workaround for an issue where item, achievement, etc links in chat couldn't be clicked because the chat window
+  was set to non-interactive.
 
 ## Version 110200.02
 
