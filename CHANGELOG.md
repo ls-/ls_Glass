@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Version 110205.01
+
+- Added 11.2.5 support.
+
 ## Version 110200.02
 
 - Fixed an issue with the line spacing. There seems to be a Blizz bug where it just ends up increasing on its own.
