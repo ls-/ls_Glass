@@ -62,6 +62,14 @@ do
 		end
 	end
 
+	function message_line_proto:RedrawMessage()
+		local info = self:GetInfo()
+		if info then
+			self:SetText("")
+			self:SetText(info.message, info.r, info.g, info.b)
+		end
+	end
+
 	function message_line_proto:FadeIn()
 		E:FadeIn(self, FADE_IN_DURATION)
 	end
@@ -168,6 +176,12 @@ do
 
 		for _, messageLine in self:EnumerateInactive() do
 			messageLine:AdjustHeight()
+		end
+	end
+
+	function message_pool_proto:RedrawMessages()
+		for messageLine in self:EnumerateActive() do
+			messageLine:RedrawMessage()
 		end
 	end
 

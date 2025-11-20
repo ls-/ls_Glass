@@ -9,6 +9,21 @@ local function rgb(r, g, b)
 	return E:CreateColor(r, g, b)
 end
 
+-- match LSM names to fonts in NumberFont_Shadow_Med
+local function getDefaultFont()
+	local locale = GetLocale()
+	if locale == "koKR" then
+		return "기본 글꼴"
+	elseif locale == "zhCN" then
+		return "聊天"
+	elseif locale == "zhTW" then
+		-- LSM doesn't include arheiuhk_bd.ttf, use similar looking bHEI01B.ttf instead
+		return "聊天"
+	else
+		return "Arial Narrow"
+	end
+end
+
 D.global = {
 	colors = {
 		lanzones = rgb(224, 188, 91)
@@ -16,7 +31,16 @@ D.global = {
 }
 
 D.profile = {
-	font = LibStub("LibSharedMedia-3.0"):GetDefault("font"), -- "Friz Quadrata TT"
+	font = {
+		name = getDefaultFont(),
+		override = {
+			roman = false,
+			russian = false,
+			korean = false,
+			simplifiedchinese = false,
+			traditionalchinese = false,
+		},
+	},
 	chat = {
 		tooltips = true,
 		smooth = true,
