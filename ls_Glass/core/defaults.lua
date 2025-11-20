@@ -34,7 +34,7 @@ D.profile = {
 			x_padding = 8,
 			y_padding = 0,
 			font = {
-				size = 12,
+				size = 14,
 				shadow = true,
 				outline = false,
 			},
@@ -64,7 +64,7 @@ D.profile = {
 		multiline = false,
 		alt = true,
 		font = {
-			size = 12,
+			size = 14,
 			shadow = true,
 			outline = false,
 		},
