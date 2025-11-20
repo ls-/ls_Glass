@@ -14,11 +14,16 @@ do
 		return self.Text:GetText() or ""
 	end
 
-	function message_line_proto:SetText(text, r, g, b, a)
+	function message_line_proto:SetText(text, r, g, b)
 		-- BUG: it seems that whenever font's alphabet changes the spacing ends up growing, reset it
 		self.Text:SetSpacing(0)
 		self.Text:SetText(text)
-		self.Text:SetTextColor(r or 1, g or 1, b or 1, a)
+
+		if b then
+			self.Text:SetTextColor(r, g, b, 1)
+		else
+			self.Text:SetTextColor(1, 1, 1, 1)
+		end
 
 		self:AdjustHeight()
 	end
@@ -31,10 +36,19 @@ do
 		return self.timestamp or 0
 	end
 
-	function message_line_proto:SetMessage(id, timestamp, ...)
+	function message_line_proto:SetInfo(...)
+		self.info = ...
+	end
+
+	function message_line_proto:GetInfo()
+		return self.info
+	end
+
+	function message_line_proto:SetMessage(id, info)
 		self:SetID(id)
-		self:SetTimestamp(timestamp)
-		self:SetText(...)
+		self:SetInfo(info)
+		self:SetTimestamp(info.timestamp)
+		self:SetText(info.message, info.r, info.g, info.b)
 		self:Show()
 	end
 
@@ -42,7 +56,8 @@ do
 		if self:IsShown() then
 			self:Hide()
 			self:SetID(0)
-			self:SetTimestamp(nil)
+			self:SetInfo()
+			self:SetTimestamp()
 			self:SetText("")
 		end
 	end

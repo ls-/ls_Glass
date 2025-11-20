@@ -681,7 +681,7 @@ function object_proto:RefreshBackfill(startIndex, maxLines, maxPixels, fadeIn)
 			end
 		end
 
-		messageLine:SetMessage(messageID, messageInfo.timestamp, messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b)
+		messageLine:SetMessage(messageID, messageInfo)
 
 		if checkLines then
 			isFull = lineIndex == maxLines
@@ -825,7 +825,7 @@ function object_proto:RefreshActive(startIndex, maxPixels)
 			end
 		end
 
-		messageLine:SetMessage(messageID, messageInfo.timestamp, messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b)
+		messageLine:SetMessage(messageID, messageInfo)
 		messageLine:StopFading(1)
 
 		-- if :GetTop() is nil, then it means that the line is already hidden
