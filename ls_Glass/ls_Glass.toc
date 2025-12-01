@@ -1,6 +1,6 @@
-## Interface: 110205
+## Interface: 110207
 ## Author: lightspark
-## Version: 110205.01
+## Version: 110207.01
 ## Title: LS: |cffe0bc5bGlass|r
 ## Notes: Smooth as glass.
 ## IconTexture: Interface\AddOns\ls_Glass\assets\logo-64
