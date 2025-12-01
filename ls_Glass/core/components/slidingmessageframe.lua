@@ -101,21 +101,21 @@ end
 -- GLOBAL HOOKS --
 ------------------
 
-hooksecurefunc("ChatFrame_ChatPageUp", function()
+hooksecurefunc(ChatFrameUtil, "ChatPageUp", function()
 	local slidingFrame = E:GetSlidingFrameForChatFrame(SELECTED_CHAT_FRAME)
 	if slidingFrame then
 		slidingFrame:OnMouseWheel(UP, MAX_SCROLL)
 	end
 end)
 
-hooksecurefunc("ChatFrame_ChatPageDown", function()
+hooksecurefunc(ChatFrameUtil, "ChatPageUp", function()
 	local slidingFrame = E:GetSlidingFrameForChatFrame(SELECTED_CHAT_FRAME)
 	if slidingFrame then
 		slidingFrame:OnMouseWheel(DOWN, MAX_SCROLL)
 	end
 end)
 
-hooksecurefunc("ChatFrame_ScrollToBottom", function()
+hooksecurefunc(ChatFrameUtil, "ScrollToBottom", function()
 	local slidingFrame = E:GetSlidingFrameForChatFrame(SELECTED_CHAT_FRAME)
 	if slidingFrame then
 		slidingFrame:FastForward()
@@ -681,7 +681,7 @@ function object_proto:RefreshBackfill(startIndex, maxLines, maxPixels, fadeIn)
 			end
 		end
 
-		messageLine:SetMessage(messageID, messageInfo.timestamp, messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b)
+		messageLine:SetMessage(messageID, messageInfo)
 
 		if checkLines then
 			isFull = lineIndex == maxLines
@@ -825,7 +825,7 @@ function object_proto:RefreshActive(startIndex, maxPixels)
 			end
 		end
 
-		messageLine:SetMessage(messageID, messageInfo.timestamp, messageInfo.message, messageInfo.r, messageInfo.g, messageInfo.b)
+		messageLine:SetMessage(messageID, messageInfo)
 		messageLine:StopFading(1)
 
 		-- if :GetTop() is nil, then it means that the line is already hidden
