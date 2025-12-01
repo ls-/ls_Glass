@@ -339,7 +339,7 @@ function E:CreateConfig()
 								order = 11,
 								type = "group",
 								inline = true,
-								name = "WIP OVERRIDE",
+								name = L["OVERRIDE"],
 								get = function(info)
 									return C.db.profile.font.override[info[#info]]
 								end,
