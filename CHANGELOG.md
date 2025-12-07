@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Version 110207.02
+
+- Added missing config conversion which broke 110207.01 for many people which is why 110207.01 was nuked.
+
 ## Version 110207.01
 
 - Added 11.2.7 support.
