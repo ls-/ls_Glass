@@ -3,6 +3,7 @@ local E, C, D, L = ns.E, ns.C, ns.D, ns.L
 
 -- Lua
 local _G = getfenv(0)
+local type = _G.type
 
 -- Mine
 function E:Modernize(data, name, key)
@@ -34,6 +35,15 @@ function E:Modernize(data, name, key)
 			data.dock = nil
 
 			data.version = 11000001
+		--> 110207.02
+		elseif data.version < 11020702 then
+			if data.font and type(data.font) == "string" then
+				data.font = {
+					name = data.font,
+				}
+
+				data.version = 11020702
+			end
 		end
 	end
 end
