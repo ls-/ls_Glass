@@ -1,3 +1,5 @@
+# This addon is officially retired and won't receive any updates for Midnight.
+
 # LS: Glass
 
 Replacement for the default chat. Smooth as glass!
